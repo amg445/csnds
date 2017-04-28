@@ -62,6 +62,70 @@
 
   });
 
+  function main() {
+    // Global Variables
+    var sound;
+    var fft;
+
+    // Preload [sound]
+    function preload() {
+      // Initialize [sound]
+      sound = loadSound('assets/doorbell.mp3');
+    }
+
+    // Setup Global Variables (AFTER preload)
+    function setup() {
+      // var cnv = createCanvas(100,100);
+      // cnv.mouseClicked(togglePlay);
+
+      // Initialize [fft]
+      fft = new p5.FFT();
+
+      // Set [sound] amplitude/volume
+      sound.amp(0.2);
+    }
+
+    function draw() {
+      // Reset Background Color
+
+      // Get FFT spectrum
+      var spectrum = fft.analyze();
+
+      // Draw Spectrum
+      console.log("spectrum");
+      for (var i = 0; i < spectrum.length; i++){
+        console.log("spectrum[i]: " + spectrum[i]);
+        // var x = map(i, 0, spectrum.length, 0, width);
+        // var h = -height + map(spectrum[i], 0, 255, height, 0)
+      }
+
+      // Get FFT waveform
+      var waveform = fft.waveform();
+
+      // Draw waveform
+      console.log("waveform:");
+      for (var i = 0; i< waveform.length; i++) {
+        // var x = map(i, 0, waveform.length, 0, width);
+        // var y = map( waveform[i], -1, 1, 0, height);
+        console.log("waveform[i]: " + waveform[i]);
+      }
+
+      // Toggle [sound] play/pause
+      function togglePlay() {
+        if ( sound.isPlaying() ) {
+          sound.pause();
+        } else {
+          sound.play();
+        }
+      }
+
+
+      // Run -----------------------------
+      preload();
+      setup();
+      sound.play();
+  }
+
   </script>
 </body>
 
