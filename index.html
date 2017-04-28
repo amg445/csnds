@@ -13,16 +13,34 @@
   <link href="css/jquery-ui.min.css" rel="stylesheet">
   <link href="css/jquery-ui.theme.min.css" rel="stylesheet">
   <link href="css/jquery-ui.structure.min.css" rel="stylesheet">
-  
+
   <script language="javascript" type="text/javascript" src="libraries/p5.js"></script>
   <script language="javascript" type="text/javascript" src="libraries/p5.sound.js"></script>
 </head>
 
 <body>
-  <label for="js-song">Song:</label>
-  <input type="file" id="js-song">
+  <!-- <label for="js-song">Song:</label>
+  <input type="file" id="js-song"> -->
 
   <script>
+
+  function preload(){
+    sound = loadSound('doorbell.mp3');
+  }
+
+  function setup(){
+    fft = new p5.FFT();
+    sound.amp(0.2);
+    sound.play();
+  }
+
+  //this is a default function in p5.js
+  //it loops and captures new data every time.
+  function draw(){
+    var spectrum = fft.analyze();
+    var waveform = fft.waveform();
+  }
+
   </script>
 </body>
 
