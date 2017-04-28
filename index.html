@@ -14,32 +14,53 @@
   <link href="css/jquery-ui.theme.min.css" rel="stylesheet">
   <link href="css/jquery-ui.structure.min.css" rel="stylesheet">
 
+  <script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous">
+  </script>
+
   <script language="javascript" type="text/javascript" src="libraries/p5.js"></script>
   <script language="javascript" type="text/javascript" src="libraries/p5.sound.js"></script>
 </head>
 
 <body>
-  <!-- <label for="js-song">Song:</label>
-  <input type="file" id="js-song"> -->
+
+  <label for="js-song">Song:</label>
+  <input type="file" id="js-song">
 
   <script>
 
-  function preload(){
-    sound = loadSound('doorbell.mp3');
-  }
+  // NOT SURE WE WANT TO GO ON CHANGE, PROBABLY ON BUTTON PRESS, BUT TESTING FOR NOW
 
-  function setup(){
-    fft = new p5.FFT();
-    sound.amp(0.2);
-    sound.play();
-  }
+  $('#js-song').on('change', function() {
 
-  //this is a default function in p5.js
-  //it loops and captures new data every time.
-  function draw(){
-    var spectrum = fft.analyze();
-    var waveform = fft.waveform();
-  }
+      var url = $(this).val();
+      var song = url.split('\\').pop();
+      console.log(song);
+
+      var s = function(p) {
+
+        p.preload = function() {
+          sound = p.loadSound('assets/'+song);
+        }
+
+        p.setup = function() {
+          fft = new p5.FFT();
+          sound.amp(0.2);
+          sound.play();
+        }
+
+        p.draw = function() {
+          var spectrum = fft.analyze();
+          var waveform = fft.waveform();
+        }
+
+      }
+
+      var myp5 = new p5(s);
+
+  });
 
   </script>
 </body>
