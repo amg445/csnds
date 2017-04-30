@@ -94,8 +94,10 @@
         p.togglePlay = function() {
           if ( sound.isPlaying() ) {
             sound.pause();
+            $('#play').html('Play');
           } else {
             sound.play();
+            $('#play').html('Pause');
           }
         }
 
