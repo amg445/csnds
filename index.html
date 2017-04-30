@@ -30,7 +30,14 @@
   <label for="js-song">Song:</label>
   <input type="file" id="js-song">
 
+  <div align="center">
+    <canvas tabindex="1" id="webglCanvas" style="border: none; background-color: black;" width="800" height="600"></canvas>
+  </div>
+
   <script>
+
+  var gl = initializeWebGL($("#webglCanvas"));
+
 
 
   // NOT SURE WE WANT TO GO ON CHANGE, PROBABLY ON BUTTON PRESS, BUT TESTING FOR NOW
