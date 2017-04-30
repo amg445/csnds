@@ -29,15 +29,41 @@
 
   <label for="js-song">Song:</label>
   <input type="file" id="js-song">
+  <button id="play">Play</button>
 
   <div align="center">
     <canvas tabindex="1" id="webglCanvas" style="border: none; background-color: black;" width="800" height="600"></canvas>
   </div>
 
+  <script id="vertexShader--sphere" type="x-shader/x-vertex">
+    attribute vec3 position;
+    void main() {
+      gl_Position = vec4(position, 1.0);
+    }
+  </script>
+
+  <script id="fragmentShader--sphere" type="x-shader/x-fragment">
+    precision highp float;
+    // uniform vec3 color;
+    vec3 color = vec3(1.0);
+    void main() {
+      gl_FragColor = vec4(color, 1.0);
+    }
+  </script>
+
   <script>
 
   var gl = initializeWebGL($("#webglCanvas"));
+  var sphere_shader = createGlslProgram(gl, "vertexShader--sphere", "fragmentShader--sphere");
 
+  function updateWebGL(time) {
+    gl.clearColor(0.15, 0.2, 0.5, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    // Reschedule the next frame.
+    window.requestAnimationFrame(updateWebGL);
+  }
+  window.requestAnimationFrame(updateWebGL);
 
 
   // NOT SURE WE WANT TO GO ON CHANGE, PROBABLY ON BUTTON PRESS, BUT TESTING FOR NOW
@@ -57,7 +83,6 @@
         p.setup = function() {
           fft = new p5.FFT();
           sound.amp(0.2);
-          sound.play();
         }
 
         p.draw = function() {
@@ -65,76 +90,21 @@
           var waveform = fft.waveform();
         }
 
+        p.togglePlay = function() {
+          if ( sound.isPlaying() ) {
+            sound.pause();
+          } else {
+            sound.play();
+          }
+        }
+
+        $('#play').on('click', p.togglePlay);
+
       }
 
       var myp5 = new p5(s);
 
   });
-
-  function main() {
-    // Global Variables
-    var sound;
-    var fft;
-
-    // Preload [sound]
-    function preload() {
-      // Initialize [sound]
-      sound = loadSound('assets/doorbell.mp3');
-    }
-
-    // Setup Global Variables (AFTER preload)
-    function setup() {
-      // var cnv = createCanvas(100,100);
-      // cnv.mouseClicked(togglePlay);
-
-      // Initialize [fft]
-      fft = new p5.FFT();
-
-      // Set [sound] amplitude/volume
-      sound.amp(0.2);
-    }
-
-    function draw() {
-      // Reset Background Color
-
-      // Get FFT spectrum
-      var spectrum = fft.analyze();
-
-      // Draw Spectrum
-      console.log("spectrum");
-      for (var i = 0; i < spectrum.length; i++){
-        console.log("spectrum[i]: " + spectrum[i]);
-        // var x = map(i, 0, spectrum.length, 0, width);
-        // var h = -height + map(spectrum[i], 0, 255, height, 0)
-      }
-
-      // Get FFT waveform
-      var waveform = fft.waveform();
-
-      // Draw waveform
-      console.log("waveform:");
-      for (var i = 0; i< waveform.length; i++) {
-        // var x = map(i, 0, waveform.length, 0, width);
-        // var y = map( waveform[i], -1, 1, 0, height);
-        console.log("waveform[i]: " + waveform[i]);
-      }
-
-      // Toggle [sound] play/pause
-      function togglePlay() {
-        if ( sound.isPlaying() ) {
-          sound.pause();
-        } else {
-          sound.play();
-        }
-      }
-
-
-      // Run -----------------------------
-      preload();
-      setup();
-      sound.play();
-    }
-  }
 
   </script>
 </body>
