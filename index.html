@@ -53,7 +53,8 @@
 
   <script>
 
-  // Particle System ---------------------------------------------------
+  // Scene Objects  ---------------------------------------------------
+
   // create particle object centered at [x] and [y]
   function createParticle(x, y) {
     var particle = {};
@@ -80,9 +81,24 @@
     return particles;
   }
 
+  /**
+   * create the scene for our visualization
+   * the [scene] object has the following fields:
+   * - camera
+   * - objects
+   */
+  function createScene(camera) {
+    var scene = {};
+    scene.camera = camera;
+
+    return scene;
+  }
+
   // WebGL --------------------------------------------------------------
   var gl = initializeWebGL($("#webglCanvas"));
   var sphere_shader = createGlslProgram(gl, "vertexShader--sphere", "fragmentShader--sphere");
+  var camera = {};
+  var scene = createScene(camera);
   var particles = createParticleSheet(10, 10);
 
   function updateWebGL(time) {
