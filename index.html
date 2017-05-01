@@ -55,9 +55,70 @@
 
   <script>
 
+  // Scene Objects  ---------------------------------------------------
+
+  // create particle object centered at [x] and [y]
+  function createParticle(x, y) {
+    var particle = {};
+    
+    // Instantiate particle
+    particle.x = x;
+    particle.y = y;
+
+    return particle;
+  }
+
+  // create 2D 2D sheet of particles with [width] and [height]
+  function createParticleSheet(width, height) {
+    var particles = [];
+
+    for (var x = 0; x < width; x++) {
+      particles[x] = [];
+      for (var y = 0; y < width; y++) {
+        // Create particle
+        particles[x][y] = createParticle(x,y);
+      }
+    }
+
+    return particles;
+  }
+
+  /**
+   * create the scene for our visualization
+   * the [scene] object has the following fields:
+   * - camera
+   * - objects
+   */
+  function createScene(camera) {
+    var scene = {};
+    scene.camera = camera;
+
+    return scene;
+  }
+
+  // WebGL --------------------------------------------------------------
   var gl = initializeWebGL($("#webglCanvas"));
   var sphere_shader = createGlslProgram(gl, "vertexShader--sphere", "fragmentShader--sphere");
+  var scene = createScene(camera);
 
+  // Create Projection Matrix (Perspective Camera)
+  // var perspectiveMatrix = mat4.create();
+  var fovy = (45.0 / 180.0) * Math.PI;
+  var aspect = 800.0 / 600.0;
+  var near = 0.1;
+  var far = 100.0;
+  // mat4.perspective(perspectiveMatrix, fovy, aspect, near, far);
+
+  // Create Camera
+  var camera = {};
+  camera.x = 5.0;
+  camera.y = 5.0;
+
+  // Create particles
+  var particles = createParticleSheet(10, 10);
+
+
+  // UpdateWebGL ----------------------------------------------------------
   function updateWebGL(time) {
     gl.clearColor(0.15, 0.2, 0.5, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
