@@ -57,13 +57,12 @@
 
   // Scene Objects  ---------------------------------------------------
 
-  // create particle object centered at [x] and [y]
-  function createParticle(x, y) {
+  // create particle object centered at [x], [y], [z]
+  function createParticle(x, y, z) {
     var particle = {};
     
     // Instantiate particle
-    particle.x = x;
-    particle.y = y;
+    particle.position = [x, y, z];
 
     return particle;
   }
@@ -96,6 +95,23 @@
     return scene;
   }
 
+  /**
+   * update [object.toWorld] matrix according to the [object] properties:
+   * - [position]: array [x, y, z]
+   */
+  function updateToWorldMatrix(object) {
+    // Create Translation matrix
+    var [x, y, z] = object.position;
+    var translation = vec3.fromValues(x,y,z);
+    var T = mat4.create();
+    mat4.fromTranslation(T, translation);
+    
+    // Update [object.toWorld] matrix
+    object.toWorld = T;
+
+    return object;
+  }
+
   // WebGL --------------------------------------------------------------
   var gl = initializeWebGL($("#webglCanvas"));
   var sphere_shader = createGlslProgram(gl, "vertexShader--sphere", "fragmentShader--sphere");
@@ -111,8 +127,8 @@
 
   // Create Camera
   var camera = {};
-  camera.x = 5.0;
-  camera.y = 5.0;
+  camera.position = [5.0, 5.0, 5.0];
+  updateToWorldMatrix(camera);
 
   // Create particles
   var particles = createParticleSheet(10, 10);
