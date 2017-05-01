@@ -93,6 +93,7 @@
     var particles = {};
     particles.list = [];
     particles.position = [0, 0, 0];
+    particles.scale = [1, 1, 1];
 
     for (var i = 0; i < numX; i++) {
       particles.list[i] = [];
@@ -179,6 +180,8 @@
   // WebGL --------------------------------------------------------------
   var gl = initializeWebGL($("#webglCanvas"));
   var basic_shader = createGlslProgram(gl, "vertexShader--basic", "fragmentShader--basic");
+  var fft = null;
+  var sound = null;
 
   // Create Projection Matrix (Perspective Camera)
   var perspectiveMatrix = mat4.create();
@@ -209,7 +212,13 @@
     gl.clear(gl.COLOR_BUFFER_BIT);
     
     // TODO: Update Scene based on song data
-
+    if (fft != null && sound != null && sound.isPlaying()) {
+      //console.log("fft: " + fft);
+      console.log("fft.waveform: " + fft.waveform()[0]);
+      var s = Math.abs(fft.waveform()[0]) * 20;
+      scene.particles.scale = [s, s, s];
+      updateToWorldMatrix(scene.particles);
+    }
 
     // Draw Scene
     drawScene(gl, scene);
@@ -237,6 +246,7 @@
 
         p.setup = function() {
           fft = new p5.FFT();
+          console.log("SETUP");
           sound.amp(0.2);
         }
 
