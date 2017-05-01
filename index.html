@@ -45,7 +45,7 @@
     uniform mat4 toCam;
 
     void main() {
-      gl_Position = projection * toCam * vec4(position, 1.0);
+      gl_Position = projection * toCam * toWorld * vec4(position, 1.0);
     }
   </script>
 
@@ -70,20 +70,41 @@
     // Instantiate particle
     particle.position = [x, y, z];
 
+    // Create [particle.toWorld] matrix
+    updateToWorldMatrix(particle);
+
     return particle;
   }
 
-  // create 2D 2D sheet of particles with [width] and [height]
-  function createParticleSheet(width, height) {
-    var particles = [];
+  /*
+   * create 2D sheet of particles with properties:
+   * - [numX]
+   * - [numY]
+   * - [minX]
+   * - [maxX]
+   * - [minY]
+   * - [maxY]
+   */
+  function createParticleSheet(numX, numY, minX, maxX, minY, maxY) {
+    var width = maxX - minX;
+    var height = maxY - minY;
+    
+    var particles = {};
+    particles.list = [];
+    particles.position = [-width/2.0, -height/2.0, 0];
 
-    for (var x = 0; x < width; x++) {
-      particles[x] = [];
-      for (var y = 0; y < width; y++) {
+    for (var i = 0; i < numX; i++) {
+      particles.list[i] = [];
+      for (var j = 0; j < numY; j++) {
         // Create particle
-        particles[x][y] = createParticle(x,y);
+        var x = ((i / (numX-1)) * width) + minX;
+        var y = ((j / (numY-1)) * height) + maxY;
+        particles.list[i][j] = createParticle(x,y,0);
       }
     }
+
+    // Create [particles.toWorld]
+    updateToWorldMatrix(particles);
 
     return particles;
   }
@@ -91,14 +112,44 @@
   /**
    * create the scene for our visualization
    * the [scene] object has the following fields:
-   * - camera
-   * - objects
+   * - [camera]
+   * - [particles]
+   * - [shape]: shape for each particle
    */
-  function createScene(camera) {
-    var scene = {};
-    scene.camera = camera;
+  function createScene(camera, particles, shape) {
+    var scene = {
+      camera: camera,
+      particles: particles,
+      shape: shape
+    };
 
     return scene;
+  }
+
+  /**
+   * draw all the objects in the scene
+   * [scene] has the following properties:
+   * - [particles]
+   *   - [list]
+   *   - [toWorld]
+   * - [camera]
+   *   - [toWorld]
+   *   - [projection]
+   */
+  function drawScene(gl, scene) {
+    // Draw each particle
+    for (var i = 0; i < particles.list.length; i++) {
+      for (var j = 0; j < particles.list[i].length; j++) {
+        var particle = particles.list[i][j];
+        var toWorld = mat4.create();
+        mat4.mul(toWorld, particles.toWorld, particle.toWorld);
+        console.log("particles.toWorld: " + particles.toWorld);
+        console.log("particle.toWorld: " + particle.toWorld);
+        console.log("toWorld: " + toWorld);
+        console.log("\n");
+        drawShape(gl, scene.shape, camera, toWorld);
+      }
+    }
   }
 
   /**
@@ -115,13 +166,13 @@
     // Update [object.toWorld] matrix
     object.toWorld = T;
 
+    console.log("translation: " + translation);
     return object;
   }
 
   // WebGL --------------------------------------------------------------
   var gl = initializeWebGL($("#webglCanvas"));
   var basic_shader = createGlslProgram(gl, "vertexShader--basic", "fragmentShader--basic");
-  var scene = createScene(camera);
 
   // Create Projection Matrix (Perspective Camera)
   var perspectiveMatrix = mat4.create();
@@ -138,16 +189,21 @@
   updateToWorldMatrix(camera);
 
   // Create particles
-  var particles = createParticleSheet(10, 10);
+  var particles = createParticleSheet(10, 10, -1, 1, -1, 1);
 
+  // Create shape
+  var cube = createShape(gl, basic_shader, cubeData, false);
+
+  // Create scene
+  var scene = createScene(camera, particles, cube);
 
   // UpdateWebGL ----------------------------------------------------------
   function updateWebGL(time) {
     gl.clearColor(0.15, 0.2, 0.5, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
-
-    var cube = createShape(gl, cubeData);
-    drawShape(gl, cube, basic_shader, camera, false);
+    
+    //drawShape(gl, cube, camera, mat4.create());
+    drawScene(gl, scene);
 
     // Reschedule the next frame.
     window.requestAnimationFrame(updateWebGL);
