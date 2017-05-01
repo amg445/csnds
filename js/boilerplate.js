@@ -79,7 +79,7 @@ var cubeData = {
     5, 7,
     3, 7
   ],
-  triInd: [
+  triangleIndices: [
     1, 7, 3,
     1, 5, 7,
     0, 3, 2,
@@ -94,3 +94,49 @@ var cubeData = {
     0, 4, 5
   ],
 };
+
+function createShape(gl, data) {
+    var shape = {};
+
+    shape.vertexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, shape.vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data.vertices), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    shape.lineIndexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.lineIndexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(data.lineIndices), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+
+    shape.triIndexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.triIndexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(data.triangleIndices), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+
+    shape.lineLength = data.lineIndices.length;
+    shape.triangleLength = data.triangleIndices.length;
+
+    return shape;
+}
+
+function drawShape(gl, shape, program, faces) {
+    gl.useProgram(program);
+    gl.bindBuffer(gl.ARRAY_BUFFER, shape.vertexBuffer);
+
+    var positionLocation = gl.getAttribLocation(program, "position");
+    gl.enableVertexAttribArray(positionLocation);
+    gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 4 * 3, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    if (faces) {
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.triIndexBuffer);
+        gl.drawElements(gl.TRIANGLES, shape.triangleLength, gl.UNSIGNED_SHORT, 0);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    } else {
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.lineIndexBuffer);
+        gl.drawElements(gl.LINES, shape.lineLength, gl.UNSIGNED_SHORT, 0);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    }
+
+    gl.useProgram(null);
+}
