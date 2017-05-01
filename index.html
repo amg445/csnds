@@ -37,16 +37,22 @@
     <canvas tabindex="1" id="webglCanvas" style="border: none; background-color: black;" width="800" height="600"></canvas>
   </div>
 
-  <script id="vertexShader--sphere" type="x-shader/x-vertex">
+  <script id="vertexShader--basic" type="x-shader/x-vertex">
     attribute vec3 position;
+
+    uniform mat4 projection;
+    uniform mat4 toWorld;
+    uniform mat4 toCam;
+
     void main() {
-      gl_Position = vec4(position, 1.0);
+      gl_Position = projection * toCam * vec4(position, 1.0);
     }
   </script>
 
-  <script id="fragmentShader--sphere" type="x-shader/x-fragment">
+  <script id="fragmentShader--basic" type="x-shader/x-fragment">
     precision highp float;
     // uniform vec3 color;
+    
     vec3 color = vec3(1.0);
     void main() {
       gl_FragColor = vec4(color, 1.0);
@@ -114,7 +120,7 @@
 
   // WebGL --------------------------------------------------------------
   var gl = initializeWebGL($("#webglCanvas"));
-  var sphere_shader = createGlslProgram(gl, "vertexShader--sphere", "fragmentShader--sphere");
+  var basic_shader = createGlslProgram(gl, "vertexShader--basic", "fragmentShader--basic");
   var scene = createScene(camera);
 
   // Create Projection Matrix (Perspective Camera)
@@ -127,7 +133,8 @@
 
   // Create Camera
   var camera = {};
-  camera.position = [5.0, 5.0, 5.0];
+  camera.position = [0.0, 0.0, 5.0];
+  camera.projection = perspectiveMatrix;
   updateToWorldMatrix(camera);
 
   // Create particles
@@ -138,6 +145,9 @@
   function updateWebGL(time) {
     gl.clearColor(0.15, 0.2, 0.5, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
+
+    var cube = createShape(gl, cubeData);
+    drawShape(gl, cube, basic_shader, camera, false);
 
     // Reschedule the next frame.
     window.requestAnimationFrame(updateWebGL);

@@ -119,7 +119,7 @@ function createShape(gl, data) {
     return shape;
 }
 
-function drawShape(gl, shape, program, faces) {
+function drawShape(gl, shape, program, camera, faces) {
     gl.useProgram(program);
     gl.bindBuffer(gl.ARRAY_BUFFER, shape.vertexBuffer);
 
@@ -127,6 +127,12 @@ function drawShape(gl, shape, program, faces) {
     gl.enableVertexAttribArray(positionLocation);
     gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 4 * 3, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, camera.projection);
+    // gl.uniformMatrix4fv(gl.getUniformLocation(program, "toWorld"), false, camera.toWorld);
+    var toCam = mat4.create();
+    mat4.invert(toCam, camera.toWorld);
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, "toCam"), false, toCam);
 
     if (faces) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.triIndexBuffer);
