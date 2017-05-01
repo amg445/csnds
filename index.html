@@ -99,6 +99,16 @@
   var sphere_shader = createGlslProgram(gl, "vertexShader--sphere", "fragmentShader--sphere");
   var camera = {};
   var scene = createScene(camera);
+
+  // Create Projection Matrix (Perspective Camera)
+  // var perspectiveMatrix = mat4.create();
+  var fovy = (45.0 / 180.0) * Math.PI;
+  var aspect = 800.0 / 600.0;
+  var near = 0.1;
+  var far = 100.0;
+  // mat4.perspective(perspectiveMatrix, fovy, aspect, near, far);
+
+  // Create particles
   var particles = createParticleSheet(10, 10);
 
   function updateWebGL(time) {
