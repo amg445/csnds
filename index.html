@@ -215,7 +215,7 @@
     if (fft != null && sound != null && sound.isPlaying()) {
       //console.log("fft: " + fft);
       console.log("fft.waveform: " + fft.waveform()[0]);
-      var s = Math.abs(fft.waveform()[0]) * 20;
+      var s = Math.abs(fft.waveform()[0]) * 10;
       scene.particles.scale = [s, s, s];
       updateToWorldMatrix(scene.particles);
     }
