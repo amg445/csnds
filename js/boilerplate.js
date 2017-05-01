@@ -53,3 +53,22 @@ function createGlslProgram(gl, vertexShaderId, fragmentShaderId) {
         return program;
     }
 }
+
+var cubeData = {
+    vertices: [
+        -0.5, -0.5, -0.5,
+        -0.5, -0.5,  0.5,
+        -0.5,  0.5, -0.5,
+        -0.5,  0.5,  0.5,
+        0.5, -0.5, -0.5,
+        0.5, -0.5,  0.5,
+        0.5,  0.5, -0.5,
+        0.5,  0.5,  0.5,
+    ],
+    lineInd: [
+        0, 1, 0, 2, 0, 4, 1, 3, 1, 5, 2, 3, 2, 6, 4, 5, 4, 6, 6, 7, 5, 7, 3, 7
+    ],
+    triInd: [
+    
+    ],
+};
