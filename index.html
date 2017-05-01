@@ -63,12 +63,13 @@
 
   // Scene Objects  ---------------------------------------------------
 
-  // create particle object centered at [x], [y], [z]
-  function createParticle(x, y, z) {
+  // create particle object centered at [x], [y], [z] with scale [s]
+  function createParticle(x, y, z, s) {
     var particle = {};
     
     // Instantiate particle
     particle.position = [x, y, z];
+    particle.scale = [s, s, s];
 
     // Create [particle.toWorld] matrix
     updateToWorldMatrix(particle);
@@ -99,7 +100,7 @@
         // Create particle
         var x = ((i / (numX-1)) * width) + minX;
         var y = ((j / (numY-1)) * height) + maxY;
-        particles.list[i][j] = createParticle(x,y,0);
+        particles.list[i][j] = createParticle(x, y, 0, 0.1);
       }
     }
 
@@ -155,6 +156,7 @@
   /**
    * update [object.toWorld] matrix according to the [object] properties:
    * - [position]: array [x, y, z]
+   * - [scale]: array [sx, sy, sz] or null
    */
   function updateToWorldMatrix(object) {
     // Create Translation matrix
@@ -162,9 +164,18 @@
     var translation = vec3.fromValues(x,y,z);
     var T = mat4.create();
     mat4.fromTranslation(T, translation);
+
+    // Create Scale Matrix
+    var S = mat4.create();
+    if (object.scale != null) {
+      var [sx, sy, sz] = object.scale;
+      var scale = vec3.fromValues(sx,sy,sz);
+      mat4.fromScaling(S, scale);
+    }
     
     // Update [object.toWorld] matrix
-    object.toWorld = T;
+    object.toWorld = mat4.create();
+    mat4.mul(object.toWorld, T, S);
 
     console.log("translation: " + translation);
     return object;
