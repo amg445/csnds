@@ -92,14 +92,14 @@
     
     var particles = {};
     particles.list = [];
-    particles.position = [-width/2.0, -height/2.0, 0];
+    particles.position = [0, 0, 0];
 
     for (var i = 0; i < numX; i++) {
       particles.list[i] = [];
       for (var j = 0; j < numY; j++) {
         // Create particle
         var x = ((i / (numX-1)) * width) + minX;
-        var y = ((j / (numY-1)) * height) + maxY;
+        var y = ((j / (numY-1)) * height) + minY;
         particles.list[i][j] = createParticle(x, y, 0, 0.1);
       }
     }
@@ -144,10 +144,6 @@
         var particle = particles.list[i][j];
         var toWorld = mat4.create();
         mat4.mul(toWorld, particles.toWorld, particle.toWorld);
-        console.log("particles.toWorld: " + particles.toWorld);
-        console.log("particle.toWorld: " + particle.toWorld);
-        console.log("toWorld: " + toWorld);
-        console.log("\n");
         drawShape(gl, scene.shape, camera, toWorld);
       }
     }
@@ -177,7 +173,6 @@
     object.toWorld = mat4.create();
     mat4.mul(object.toWorld, T, S);
 
-    console.log("translation: " + translation);
     return object;
   }
 
