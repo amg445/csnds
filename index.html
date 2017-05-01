@@ -101,7 +101,7 @@
         // Create particle
         var x = ((i / (numX-1)) * width) + minX;
         var y = ((j / (numY-1)) * height) + minY;
-        particles.list[i][j] = createParticle(x, y, 0, 0.1);
+        particles.list[i][j] = createParticle(x, y, 0, 0.01);
       }
     }
 
@@ -109,6 +109,16 @@
     updateToWorldMatrix(particles);
 
     return particles;
+  }
+
+  /**
+   * Offset the particle to [value]
+   * [particle] is offset along the z axis
+   */
+  function moveParticle(particle, value) {
+    particle.position[2] = value;
+
+    updateToWorldMatrix(particle);
   }
 
   /**
@@ -151,6 +161,31 @@
   }
 
   /**
+   * update scene according to music data
+   * [spectrum] - amplitudes across frequency spectrum
+   *              range: [0, 255]
+   * [waveform] - snapshot of amplitude readings
+   *              range: [-1.0, +1.0]
+   * [scale] - scale factor for particle offset
+   */
+  function updateScene(scene, spectrum, waveform, scale) {
+    // Scale [waveform] by [spectrum]
+    for (var i = 0; i < scene.particles.list.length; i++) {
+      for (var j = 0; j < scene.particles.list[i].length; j++) {
+        var particle = scene.particles.list[i][j];
+        var spectrumAmp = spectrum[i];
+        var waveformAmp = waveform[j];
+
+        var v = (spectrumAmp / 255) * waveformAmp * scale;
+        //console.log("spectrumAmp: " + spectrumAmp);
+        //console.log("waveformAmp: " + waveformAmp);
+        //console.log("v: " + v + "\n");
+        moveParticle(particle, v);
+      }
+    }
+  }
+
+  /**
    * update [object.toWorld] matrix according to the [object] properties:
    * - [position]: array [x, y, z]
    * - [scale]: array [sx, sy, sz] or null
@@ -177,11 +212,49 @@
     return object;
   }
 
+  /**
+   * update [camera.toWorld] so that [camera] is always looking directly at the
+   * origin
+   * [camera] has following properties:
+   * - [distance]: distance from origin
+   * - [rotation]: array [rx, ry, rz] rotation about each axis
+   */
+  function updateCamToWorldMatrix(camera) {
+    var [rx, ry, rz] = camera.rotation;
+    
+    var Rx = mat4.create();
+    mat4.fromXRotation(Rx, rx);
+    var Ry = mat4.create();
+    mat4.fromYRotation(Ry, ry);
+    var Rz = mat4.create();
+    mat4.fromZRotation(Rz, rz);
+
+    // Rotation Rz * Ry * Rx
+    var R = mat4.create();
+    mat4.mul(R, Ry, Rx);
+    mat4.mul(R, Rz, R);
+
+    // Create Translation matrix
+    var translation = vec3.fromValues(0.0, 0.0, camera.distance);
+    var T = mat4.create();
+    mat4.fromTranslation(T, translation);
+
+    // Update [camera.toWorld] matrix (T * R)
+    camera.toWorld = mat4.create();
+    mat4.mul(camera.toWorld, R, T);
+
+    return camera;
+  }
+
   // WebGL --------------------------------------------------------------
+  // Global Vars
   var gl = initializeWebGL($("#webglCanvas"));
   var basic_shader = createGlslProgram(gl, "vertexShader--basic", "fragmentShader--basic");
   var fft = null;
   var sound = null;
+  var smoothing = 0.99;   // range: (0.0, 1.0), def: 0.8
+  var bins = 32;   // range: [16, 1024], def: 1024 - MUST be power of 2
+  var scaleFactor = 4;
 
   // Create Projection Matrix (Perspective Camera)
   var perspectiveMatrix = mat4.create();
@@ -193,15 +266,16 @@
 
   // Create Camera
   var camera = {};
-  camera.position = [0.0, 0.0, 5.0];
+  camera.distance = 3.0;
+  camera.rotation = [Math.PI/3.0, 0.0, Math.PI/3.0];
   camera.projection = perspectiveMatrix;
-  updateToWorldMatrix(camera);
+  updateCamToWorldMatrix(camera);
 
   // Create particles
-  var particles = createParticleSheet(10, 10, -1, 1, -1, 1);
+  var particles = createParticleSheet(bins, bins, -1, 1, -1, 1);
 
   // Create shape
-  var cube = createShape(gl, basic_shader, cubeData, false);
+  var cube = createShape(gl, basic_shader, cubeData, true);
 
   // Create scene
   var scene = createScene(camera, particles, cube);
@@ -211,13 +285,16 @@
     gl.clearColor(0.15, 0.2, 0.5, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     
-    // TODO: Update Scene based on song data
+    // Update Scene based on song data
     if (fft != null && sound != null && sound.isPlaying()) {
-      //console.log("fft: " + fft);
-      console.log("fft.waveform: " + fft.waveform()[0]);
-      var s = Math.abs(fft.waveform()[0]) * 10;
-      scene.particles.scale = [s, s, s];
-      updateToWorldMatrix(scene.particles);
+      // Song is playing
+      var spectrum = fft.analyze();
+      var waveform = fft.waveform();
+      updateScene(scene, spectrum, waveform, scaleFactor);
+
+      //var s = Math.abs(fft.waveform()[0]) * 10;
+      //scene.particles.scale = [s, s, s];
+      //updateToWorldMatrix(scene.particles);
     }
 
     // Draw Scene
@@ -246,7 +323,8 @@
 
         p.setup = function() {
           fft = new p5.FFT();
-          console.log("SETUP");
+          fft.smoothing = smoothing;
+          fft.bins = bins;
           sound.amp(0.2);
         }
 
