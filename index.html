@@ -53,8 +53,37 @@
 
   <script>
 
+  // Particle System ---------------------------------------------------
+  // create particle object centered at [x] and [y]
+  function createParticle(x, y) {
+    var particle = {};
+    
+    // Instantiate particle
+    particle.x = x;
+    particle.y = y;
+
+    return particle;
+  }
+
+  // create 2D 2D sheet of particles with [width] and [height]
+  function createParticleSheet(width, height) {
+    var particles = [];
+
+    for (var x = 0; x < width; x++) {
+      particles[x] = [];
+      for (var y = 0; y < width; y++) {
+        // Create particle
+        particles[x][y] = createParticle(x,y);
+      }
+    }
+
+    return particles;
+  }
+
+  // WebGL --------------------------------------------------------------
   var gl = initializeWebGL($("#webglCanvas"));
   var sphere_shader = createGlslProgram(gl, "vertexShader--sphere", "fragmentShader--sphere");
+  var particles = createParticleSheet(10, 10);
 
   function updateWebGL(time) {
     gl.clearColor(0.15, 0.2, 0.5, 1.0);
