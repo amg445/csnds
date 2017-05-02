@@ -168,7 +168,7 @@
    *              range: [-1.0, +1.0]
    * [scale] - scale factor for particle offset
    */
-  function updateScene(scene, spectrum, waveform, scale) {
+  function updateScene(scene, spectrum, waveform, scale, threshold) {
     // Scale [waveform] by [spectrum]
     for (var i = 0; i < scene.particles.list.length; i++) {
       for (var j = 0; j < scene.particles.list[i].length; j++) {
@@ -180,7 +180,11 @@
         //console.log("spectrumAmp: " + spectrumAmp);
         //console.log("waveformAmp: " + waveformAmp);
         //console.log("v: " + v + "\n");
-        moveParticle(particle, v);
+        if (v > threshold) {
+          moveParticle(particle, v);
+        } else {
+          moveParticle(particle, 0);
+        }
       }
     }
   }
@@ -254,7 +258,8 @@
   var sound = null;
   var smoothing = 0.99;   // range: (0.0, 1.0), def: 0.8
   var bins = 32;   // range: [16, 1024], def: 1024 - MUST be power of 2
-  var scaleFactor = 4;
+  var scaleFactor = 4;  // scale factor (amplitude) for visulization
+  var threshold = 0.01;  // threshold visualization value must be above to move
 
   // Create Projection Matrix (Perspective Camera)
   var perspectiveMatrix = mat4.create();
@@ -290,7 +295,7 @@
       // Song is playing
       var spectrum = fft.analyze();
       var waveform = fft.waveform();
-      updateScene(scene, spectrum, waveform, scaleFactor);
+      updateScene(scene, spectrum, waveform, scaleFactor, threshold);
 
       //var s = Math.abs(fft.waveform()[0]) * 10;
       //scene.particles.scale = [s, s, s];
