@@ -28,6 +28,10 @@ function init() {
   audio.addEventListener('canplay', function() {
     console.log('playing!')
     analyzer = analyze(audio, { audible: true, stereo: false })
+    var waves = analyzer.waveform();
+    console.log(waves);
+    var spec = waves.map(function(m) {
+      var val = m/255; return val; });
     audio.play()
   })
 }
@@ -38,8 +42,9 @@ function updateWebGL(time) {
 
   if(analyzer){
     var waves = analyzer.waveform();
-    console.log(waves);
-    updateScene(scene, waves, waves, scaleFactor);
+    var spec = waves.map(function(m) {
+      var val = m/255; return val; });
+    updateScene(scene, waves, spec, scaleFactor);
   }
 
   // Update Scene based on song data

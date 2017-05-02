@@ -188,7 +188,7 @@
         var spectrumAmp = spectrum[i];
         var waveformAmp = waveform[j];
 
-        var v = (spectrumAmp / 255) * waveformAmp * scale;
+        var v = (spectrumAmp / 255) * (waveformAmp + .1) * scale;
         //console.log("spectrumAmp: " + spectrumAmp);
         //console.log("waveformAmp: " + waveformAmp);
         //console.log("v: " + v + "\n");
