@@ -1,4 +1,5 @@
 var song_url;
+var analyzer;
 
 var analyze = require('web-audio-analyser');
 
@@ -22,11 +23,41 @@ function init() {
   audio.crossOrigin = 'Anonymous'
   audio.src = song_url
   audio.loop = true
+  dogs = true;
 
   audio.addEventListener('canplay', function() {
     console.log('playing!')
-    analyser = analyze(audio, { audible: true, stereo: false })
+    analyzer = analyze(audio, { audible: true, stereo: false })
     audio.play()
-    console.log(analyser);
   })
 }
+
+function updateWebGL(time) {
+  gl.clearColor(0.15, 0.2, 0.5, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  if(analyzer){
+    var waves = analyzer.waveform();
+    console.log(waves);
+    updateScene(scene, waves, waves, scaleFactor);
+  }
+
+  // Update Scene based on song data
+  if (fft != null && sound != null && sound.isPlaying()) {
+    // Song is playing
+    var spectrum = fft.analyze();
+    var waveform = fft.waveform();
+    updateScene(scene, spectrum, waveform, scaleFactor);
+
+    //var s = Math.abs(fft.waveform()[0]) * 10;
+    //scene.particles.scale = [s, s, s];
+    //updateToWorldMatrix(scene.particles);
+  }
+
+  // Draw Scene
+  drawScene(gl, scene);
+
+  // Reschedule the next frame.
+  window.requestAnimationFrame(updateWebGL);
+}
+window.requestAnimationFrame(updateWebGL);

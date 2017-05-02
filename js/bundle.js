@@ -1,5 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var song_url;
+var analyzer;
 
 var analyze = require('web-audio-analyser');
 
@@ -23,14 +24,44 @@ function init() {
   audio.crossOrigin = 'Anonymous'
   audio.src = song_url
   audio.loop = true
+  dogs = true;
 
   audio.addEventListener('canplay', function() {
     console.log('playing!')
-    analyser = analyze(audio, { audible: true, stereo: false })
+    analyzer = analyze(audio, { audible: true, stereo: false })
     audio.play()
-    console.log(analyser);
   })
 }
+
+function updateWebGL(time) {
+  gl.clearColor(0.15, 0.2, 0.5, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  if(analyzer){
+    var waves = analyzer.waveform();
+    console.log(waves);
+    updateScene(scene, waves, waves, scaleFactor);
+  }
+
+  // Update Scene based on song data
+  if (fft != null && sound != null && sound.isPlaying()) {
+    // Song is playing
+    var spectrum = fft.analyze();
+    var waveform = fft.waveform();
+    updateScene(scene, spectrum, waveform, scaleFactor);
+
+    //var s = Math.abs(fft.waveform()[0]) * 10;
+    //scene.particles.scale = [s, s, s];
+    //updateToWorldMatrix(scene.particles);
+  }
+
+  // Draw Scene
+  drawScene(gl, scene);
+
+  // Reschedule the next frame.
+  window.requestAnimationFrame(updateWebGL);
+}
+window.requestAnimationFrame(updateWebGL);
 
 },{"soundcloud-badge":7,"web-audio-analyser":9}],2:[function(require,module,exports){
 (function (global){
