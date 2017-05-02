@@ -31,15 +31,22 @@
   </style>
 </head>
 
+
 <body>
 
   <!-- <label for="js-song">Song:</label>
   <input type="file" id="js-song">
   <button id="play">Play</button> -->
 
+  <p id="js-pause" style="float: right;">pause</p>
+
   <div align="center">
     <canvas tabindex="1" id="webglCanvas" style="border: none; background-color: black;" width="800" height="600"></canvas>
   </div>
+
+  <script>var analyzer;</script>
+
+  <script src="js/bundle.js" charset="utf-8"></script>
 
   <script id="vertexShader--basic" type="x-shader/x-vertex">
     attribute vec3 position;
@@ -65,6 +72,7 @@
 
   <script>
 
+  $('#js-pause').on('click', function() { console.log('p'); if(Audio){audio.pause();} });
   // Scene Objects  ---------------------------------------------------
 
   // create particle object centered at [x], [y], [z] with scale [s]
@@ -285,29 +293,33 @@
   var scene = createScene(camera, particles, cube);
 
   // UpdateWebGL ----------------------------------------------------------
-  function updateWebGL(time) {
-    gl.clearColor(0.15, 0.2, 0.5, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-
-    // Update Scene based on song data
-    if (fft != null && sound != null && sound.isPlaying()) {
-      // Song is playing
-      var spectrum = fft.analyze();
-      var waveform = fft.waveform();
-      updateScene(scene, spectrum, waveform, scaleFactor);
-
-      //var s = Math.abs(fft.waveform()[0]) * 10;
-      //scene.particles.scale = [s, s, s];
-      //updateToWorldMatrix(scene.particles);
-    }
-
-    // Draw Scene
-    drawScene(gl, scene);
-
-    // Reschedule the next frame.
-    window.requestAnimationFrame(updateWebGL);
-  }
-  window.requestAnimationFrame(updateWebGL);
+  // function updateWebGL(time) {
+  //   gl.clearColor(0.15, 0.2, 0.5, 1.0);
+  //   gl.clear(gl.COLOR_BUFFER_BIT);
+  //
+  //   var waves = analyzer.waveform();
+  //   console.log('waves');
+  //   console.log(waves);
+  //
+  //   // Update Scene based on song data
+  //   if (fft != null && sound != null && sound.isPlaying()) {
+  //     // Song is playing
+  //     var spectrum = fft.analyze();
+  //     var waveform = fft.waveform();
+  //     updateScene(scene, spectrum, waveform, scaleFactor);
+  //
+  //     //var s = Math.abs(fft.waveform()[0]) * 10;
+  //     //scene.particles.scale = [s, s, s];
+  //     //updateToWorldMatrix(scene.particles);
+  //   }
+  //
+  //   // Draw Scene
+  //   drawScene(gl, scene);
+  //
+  //   // Reschedule the next frame.
+  //   window.requestAnimationFrame(updateWebGL);
+  // }
+  // window.requestAnimationFrame(updateWebGL);
 
 
   // NOT SURE WE WANT TO GO ON CHANGE, PROBABLY ON BUTTON PRESS, BUT TESTING FOR NOW
@@ -356,8 +368,6 @@
   });
 
   </script>
-
-  <script src="js/bundle.js" charset="utf-8"></script>
 
 </body>
 
