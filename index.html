@@ -29,9 +29,9 @@
 
 <body>
 
-  <label for="js-song">Song:</label>
+  <!-- <label for="js-song">Song:</label>
   <input type="file" id="js-song">
-  <button id="play">Play</button>
+  <button id="play">Play</button> -->
 
   <div align="center">
     <canvas tabindex="1" id="webglCanvas" style="border: none; background-color: black;" width="800" height="600"></canvas>
@@ -52,7 +52,7 @@
   <script id="fragmentShader--basic" type="x-shader/x-fragment">
     precision highp float;
     // uniform vec3 color;
-    
+
     vec3 color = vec3(1.0);
     void main() {
       gl_FragColor = vec4(color, 1.0);
@@ -66,7 +66,7 @@
   // create particle object centered at [x], [y], [z] with scale [s]
   function createParticle(x, y, z, s) {
     var particle = {};
-    
+
     // Instantiate particle
     particle.position = [x, y, z];
     particle.scale = [s, s, s];
@@ -89,7 +89,7 @@
   function createParticleSheet(numX, numY, minX, maxX, minY, maxY) {
     var width = maxX - minX;
     var height = maxY - minY;
-    
+
     var particles = {};
     particles.list = [];
     particles.position = [0, 0, 0];
@@ -204,7 +204,7 @@
       var scale = vec3.fromValues(sx,sy,sz);
       mat4.fromScaling(S, scale);
     }
-    
+
     // Update [object.toWorld] matrix
     object.toWorld = mat4.create();
     mat4.mul(object.toWorld, T, S);
@@ -221,7 +221,7 @@
    */
   function updateCamToWorldMatrix(camera) {
     var [rx, ry, rz] = camera.rotation;
-    
+
     var Rx = mat4.create();
     mat4.fromXRotation(Rx, rx);
     var Ry = mat4.create();
@@ -275,7 +275,7 @@
   var particles = createParticleSheet(bins, bins, -1, 1, -1, 1);
 
   // Create shape
-  var cube = createShape(gl, basic_shader, cubeData, true);
+  var cube = createShape(gl, basic_shader, cubeData, false);
 
   // Create scene
   var scene = createScene(camera, particles, cube);
@@ -284,7 +284,7 @@
   function updateWebGL(time) {
     gl.clearColor(0.15, 0.2, 0.5, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    
+
     // Update Scene based on song data
     if (fft != null && sound != null && sound.isPlaying()) {
       // Song is playing
@@ -352,6 +352,10 @@
   });
 
   </script>
+
+  <script src="js/modules.js" charset="utf-8"></script>
+  <script src="js/bundle.js" charset="utf-8"></script>
+
 </body>
 
 </html>
