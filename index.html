@@ -322,51 +322,6 @@
   // window.requestAnimationFrame(updateWebGL);
 
 
-  // NOT SURE WE WANT TO GO ON CHANGE, PROBABLY ON BUTTON PRESS, BUT TESTING FOR NOW
-
-  $('#js-song').on('change', function() {
-
-      var url = $(this).val();
-      var song = url.split('\\').pop();
-      console.log(song);
-
-      var s = function(p) {
-
-        p.preload = function() {
-          p.soundFormats('m4a');
-          sound = p.loadSound('assets/'+song);
-        }
-
-        p.setup = function() {
-          fft = new p5.FFT();
-          fft.smoothing = smoothing;
-          fft.bins = bins;
-          sound.amp(0.2);
-        }
-
-        p.draw = function() {
-          var spectrum = fft.analyze();
-          var waveform = fft.waveform();
-        }
-
-        p.togglePlay = function() {
-          if ( sound.isPlaying() ) {
-            sound.pause();
-            $('#play').html('Play');
-          } else {
-            sound.play();
-            $('#play').html('Pause');
-          }
-        }
-
-        $('#play').on('click', p.togglePlay);
-
-      }
-
-      var myp5 = new p5(s);
-
-  });
-
   </script>
 
 </body>
