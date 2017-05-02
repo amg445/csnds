@@ -1,24 +1,38 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var song_url;
+
+var analyze = require('web-audio-analyser');
+
 require('soundcloud-badge')({
     client_id: '69c7d2345ab042057a4f19617b8028bb'
-  , song: 'https://soundcloud.com/upcastmusic/echosmith-cool-kids'
+  , song: 'https://soundcloud.com/itndylan/lemons-dylan'
   , dark: true
   , getFonts: true
 }, function(err, src, data, div) {
   if (err) throw err
 
-  // Play the song on
-  // a modern browser
-  var audio = new Audio
-  audio.src = src
-  audio.play()
+  song_url = src;
+  init()
 
-  // Metadata related to the song
-  // retrieved by the API.
   console.log(data)
 })
 
-},{"soundcloud-badge":7}],2:[function(require,module,exports){
+
+function init() {
+  var audio  = new Audio
+  audio.crossOrigin = 'Anonymous'
+  audio.src = song_url
+  audio.loop = true
+
+  audio.addEventListener('canplay', function() {
+    console.log('playing!')
+    analyser = analyze(audio, { audible: true, stereo: false })
+    audio.play()
+    console.log(analyser);
+  })
+}
+
+},{"soundcloud-badge":7,"web-audio-analyser":9}],2:[function(require,module,exports){
 (function (global){
 if (typeof window !== "undefined") {
     module.exports = window
@@ -325,7 +339,7 @@ function badge(options, callback) {
   return div
 }
 
-},{"fs":10,"google-fonts":3,"insert-css":4,"minstache":5,"soundcloud-resolve":8}],8:[function(require,module,exports){
+},{"fs":11,"google-fonts":3,"insert-css":4,"minstache":5,"soundcloud-resolve":8}],8:[function(require,module,exports){
 var qs  = require('querystring')
 var xhr = require('xhr')
 
@@ -358,7 +372,87 @@ function resolve(id, goal, callback) {
   })
 }
 
-},{"querystring":13,"xhr":9}],9:[function(require,module,exports){
+},{"querystring":14,"xhr":10}],9:[function(require,module,exports){
+var AudioContext = window.AudioContext || window.webkitAudioContext
+
+module.exports = WebAudioAnalyser
+
+function WebAudioAnalyser(audio, ctx, opts) {
+  if (!(this instanceof WebAudioAnalyser)) return new WebAudioAnalyser(audio, ctx, opts)
+  if (!(ctx instanceof AudioContext)) (opts = ctx), (ctx = null)
+
+  opts = opts || {}
+  this.ctx = ctx = ctx || new AudioContext
+
+  if (!(audio instanceof AudioNode)) {
+    audio = (audio instanceof Audio || audio instanceof HTMLAudioElement)
+      ? ctx.createMediaElementSource(audio)
+      : ctx.createMediaStreamSource(audio)
+  }
+
+  this.analyser = ctx.createAnalyser()
+  this.stereo   = !!opts.stereo
+  this.audible  = opts.audible !== false
+  this.wavedata = null
+  this.freqdata = null
+  this.splitter = null
+  this.merger   = null
+  this.source   = audio
+
+  if (!this.stereo) {
+    this.output = this.source
+    this.source.connect(this.analyser)
+    if (this.audible)
+      this.analyser.connect(ctx.destination)
+  } else {
+    this.analyser = [this.analyser]
+    this.analyser.push(ctx.createAnalyser())
+
+    this.splitter = ctx.createChannelSplitter(2)
+    this.merger   = ctx.createChannelMerger(2)
+    this.output   = this.merger
+
+    this.source.connect(this.splitter)
+
+    for (var i = 0; i < 2; i++) {
+      this.splitter.connect(this.analyser[i], i, 0)
+      this.analyser[i].connect(this.merger, 0, i)
+    }
+
+    if (this.audible)
+      this.merger.connect(ctx.destination)
+  }
+}
+
+WebAudioAnalyser.prototype.waveform = function(output, channel) {
+  if (!output) output = this.wavedata || (
+    this.wavedata = new Uint8Array((this.analyser[0] || this.analyser).frequencyBinCount)
+  )
+
+  var analyser = this.stereo
+    ? this.analyser[channel || 0]
+    : this.analyser
+
+  analyser.getByteTimeDomainData(output)
+
+  return output
+}
+
+WebAudioAnalyser.prototype.frequencies = function(output, channel) {
+  if (!output) output = this.freqdata || (
+    this.freqdata = new Uint8Array((this.analyser[0] || this.analyser).frequencyBinCount)
+  )
+
+  var analyser = this.stereo
+    ? this.analyser[channel || 0]
+    : this.analyser
+
+  analyser.getByteFrequencyData(output)
+
+  return output
+}
+
+},{}],10:[function(require,module,exports){
 var window = require("global/window")
 var once = require("once")
 
@@ -464,9 +558,9 @@ function createXHR(options, callback) {
 
 function noop() {}
 
-},{"global/window":2,"once":6}],10:[function(require,module,exports){
+},{"global/window":2,"once":6}],11:[function(require,module,exports){
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -552,7 +646,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -639,10 +733,10 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":11,"./encode":12}]},{},[1]);
+},{"./decode":12,"./encode":13}]},{},[1]);
