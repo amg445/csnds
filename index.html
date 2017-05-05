@@ -27,7 +27,15 @@
   <script language="javascript" type="text/javascript" src="js/boilerplate.js"></script>
 
   <style>
-    canvas {margin-top: 50px;}
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      border: none;
+      width: 100%;
+      height: 100vh;
+      z-index: -1;
+    }
   </style>
 </head>
 
@@ -38,289 +46,79 @@
   <input type="file" id="js-song">
   <button id="play">Play</button> -->
 
-  <p id="js-pause" style="float: right;">pause</p>
+  <p id="js-pause" style="float: right; z-index: 10;">pause</p>
 
   <div align="center">
-    <canvas tabindex="1" id="webglCanvas" style="border: none; background-color: black;" width="800" height="600"></canvas>
+    <canvas tabindex="1" id="webglCanvas" width="800" height="600"></canvas>
   </div>
 
-  <script>var analyzer;</script>
-
-  <script src="js/bundle.js" charset="utf-8"></script>
+  <!-- <script src="js/bundle.js" charset="utf-8"></script> -->
 
   <script id="vertexShader--basic" type="x-shader/x-vertex">
-    attribute vec3 position;
-
-    uniform mat4 projection;
-    uniform mat4 toWorld;
-    uniform mat4 toCam;
+    attribute vec3 coordinates;
 
     void main() {
-      gl_Position = projection * toCam * toWorld * vec4(position, 1.0);
+      gl_Position = vec4(coordinates, 1.0);
     }
   </script>
 
   <script id="fragmentShader--basic" type="x-shader/x-fragment">
-    precision highp float;
-    // uniform vec3 color;
-
-    vec3 color = vec3(1.0);
     void main() {
-      gl_FragColor = vec4(color, 1.0);
+      gl_FragColor = vec4(0.0, 0.0, 0.0, 0.1);
     }
   </script>
 
   <script>
 
-  $('#js-pause').on('click', function() { console.log('p'); if(Audio){audio.pause();} });
-  // Scene Objects  ---------------------------------------------------
+         var canvas = $('#webglCanvas');
+         var gl = initializeWebGL(canvas);
 
-  // create particle object centered at [x], [y], [z] with scale [s]
-  function createParticle(x, y, z, s) {
-    var particle = {};
+         /*======= Defining and storing the geometry ======*/
 
-    // Instantiate particle
-    particle.position = [x, y, z];
-    particle.scale = [s, s, s];
+         var radius = 5;
+         var res = 10;
+         var vertices = [];
 
-    // Create [particle.toWorld] matrix
-    updateToWorldMatrix(particle);
+         for (var i = 0; i <= res; i++) {
+            var angle=Math.PI/180*i;
+            var x = (radius) * Math.cos(angle);
+            var y = (radius) * Math.sin(angle);
+            var z=0;
+            vertices.push(x);
+            vertices.push(y);
+            vertices.push(z);
+          }
 
-    return particle;
-  }
 
-  /*
-   * create 2D sheet of particles with properties:
-   * - [numX]
-   * - [numY]
-   * - [minX]
-   * - [maxX]
-   * - [minY]
-   * - [maxY]
-   */
-  function createParticleSheet(numX, numY, minX, maxX, minY, maxY) {
-    var width = maxX - minX;
-    var height = maxY - minY;
+         var vertex_buffer = gl.createBuffer();
 
-    var particles = {};
-    particles.list = [];
-    particles.position = [0, 0, 0];
-    particles.scale = [1, 1, 1];
+         gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
 
-    for (var i = 0; i < numX; i++) {
-      particles.list[i] = [];
-      for (var j = 0; j < numY; j++) {
-        // Create particle
-        var x = ((i / (numX-1)) * width) + minX;
-        var y = ((j / (numY-1)) * height) + minY;
-        particles.list[i][j] = createParticle(x, y, 0, 0.01);
-      }
-    }
+         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-    // Create [particles.toWorld]
-    updateToWorldMatrix(particles);
+         gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-    return particles;
-  }
 
-  /**
-   * Offset the particle to [value]
-   * [particle] is offset along the z axis
-   */
-  function moveParticle(particle, value) {
-    particle.position[2] = value;
+         var shaderProgram = createGlslProgram(gl,'vertexShader--basic', 'fragmentShader--basic');
+         gl.useProgram(shaderProgram);
 
-    updateToWorldMatrix(particle);
-  }
+         gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
 
-  /**
-   * create the scene for our visualization
-   * the [scene] object has the following fields:
-   * - [camera]
-   * - [particles]
-   * - [shape]: shape for each particle
-   */
-  function createScene(camera, particles, shape) {
-    var scene = {
-      camera: camera,
-      particles: particles,
-      shape: shape
-    };
+         var coord = gl.getAttribLocation(shaderProgram, "coordinates");
 
-    return scene;
-  }
+         gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
 
-  /**
-   * draw all the objects in the scene
-   * [scene] has the following properties:
-   * - [particles]
-   *   - [list]
-   *   - [toWorld]
-   * - [camera]
-   *   - [toWorld]
-   *   - [projection]
-   */
-  function drawScene(gl, scene) {
-    // Draw each particle
-    for (var i = 0; i < particles.list.length; i++) {
-      for (var j = 0; j < particles.list[i].length; j++) {
-        var particle = particles.list[i][j];
-        var toWorld = mat4.create();
-        mat4.mul(toWorld, particles.toWorld, particle.toWorld);
-        drawShape(gl, scene.shape, camera, toWorld);
-      }
-    }
-  }
+         gl.enableVertexAttribArray(coord);
 
-  /**
-   * update scene according to music data
-   * [spectrum] - amplitudes across frequency spectrum
-   *              range: [0, 255]
-   * [waveform] - snapshot of amplitude readings
-   *              range: [-1.0, +1.0]
-   * [scale] - scale factor for particle offset
-   */
-  function updateScene(scene, spectrum, waveform, scale) {
-    // Scale [waveform] by [spectrum]
-    for (var i = 0; i < scene.particles.list.length; i++) {
-      for (var j = 0; j < scene.particles.list[i].length; j++) {
-        var particle = scene.particles.list[i][j];
-        var spectrumAmp = spectrum[i];
-        var waveformAmp = waveform[j];
+         gl.clearColor(0.5, 0.5, 0.5, 0.9);
 
-        var v = (spectrumAmp / 255) * (waveformAmp + .1) * scale;
-        //console.log("spectrumAmp: " + spectrumAmp);
-        //console.log("waveformAmp: " + waveformAmp);
-        //console.log("v: " + v + "\n");
-        moveParticle(particle, v);
-      }
-    }
-  }
+         gl.enable(gl.DEPTH_TEST);
 
-  /**
-   * update [object.toWorld] matrix according to the [object] properties:
-   * - [position]: array [x, y, z]
-   * - [scale]: array [sx, sy, sz] or null
-   */
-  function updateToWorldMatrix(object) {
-    // Create Translation matrix
-    var [x, y, z] = object.position;
-    var translation = vec3.fromValues(x,y,z);
-    var T = mat4.create();
-    mat4.fromTranslation(T, translation);
+         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // Create Scale Matrix
-    var S = mat4.create();
-    if (object.scale != null) {
-      var [sx, sy, sz] = object.scale;
-      var scale = vec3.fromValues(sx,sy,sz);
-      mat4.fromScaling(S, scale);
-    }
+         gl.viewport(0,0,canvas[0].width,canvas[0].height);
 
-    // Update [object.toWorld] matrix
-    object.toWorld = mat4.create();
-    mat4.mul(object.toWorld, T, S);
-
-    return object;
-  }
-
-  /**
-   * update [camera.toWorld] so that [camera] is always looking directly at the
-   * origin
-   * [camera] has following properties:
-   * - [distance]: distance from origin
-   * - [rotation]: array [rx, ry, rz] rotation about each axis
-   */
-  function updateCamToWorldMatrix(camera) {
-    var [rx, ry, rz] = camera.rotation;
-
-    var Rx = mat4.create();
-    mat4.fromXRotation(Rx, rx);
-    var Ry = mat4.create();
-    mat4.fromYRotation(Ry, ry);
-    var Rz = mat4.create();
-    mat4.fromZRotation(Rz, rz);
-
-    // Rotation Rz * Ry * Rx
-    var R = mat4.create();
-    mat4.mul(R, Ry, Rx);
-    mat4.mul(R, Rz, R);
-
-    // Create Translation matrix
-    var translation = vec3.fromValues(0.0, 0.0, camera.distance);
-    var T = mat4.create();
-    mat4.fromTranslation(T, translation);
-
-    // Update [camera.toWorld] matrix (T * R)
-    camera.toWorld = mat4.create();
-    mat4.mul(camera.toWorld, R, T);
-
-    return camera;
-  }
-
-  // WebGL --------------------------------------------------------------
-  // Global Vars
-  var gl = initializeWebGL($("#webglCanvas"));
-  var basic_shader = createGlslProgram(gl, "vertexShader--basic", "fragmentShader--basic");
-  var fft = null;
-  var sound = null;
-  var smoothing = 0.99;   // range: (0.0, 1.0), def: 0.8
-  var bins = 32;   // range: [16, 1024], def: 1024 - MUST be power of 2
-  var scaleFactor = 4;
-
-  // Create Projection Matrix (Perspective Camera)
-  var perspectiveMatrix = mat4.create();
-  var fovy = (45.0 / 180.0) * Math.PI;
-  var aspect = $("#webglCanvas").attr("width") / $("#webglCanvas").attr("height");
-  var near = 0.1;
-  var far = 100.0;
-  mat4.perspective(perspectiveMatrix, fovy, aspect, near, far);
-
-  // Create Camera
-  var camera = {};
-  camera.distance = 3.0;
-  camera.rotation = [Math.PI/3.0, 0.0, Math.PI/3.0];
-  camera.projection = perspectiveMatrix;
-  updateCamToWorldMatrix(camera);
-
-  // Create particles
-  var particles = createParticleSheet(bins, bins, -1, 1, -1, 1);
-
-  // Create shape
-  var cube = createShape(gl, basic_shader, cubeData, false);
-
-  // Create scene
-  var scene = createScene(camera, particles, cube);
-
-  // UpdateWebGL ----------------------------------------------------------
-  // function updateWebGL(time) {
-  //   gl.clearColor(0.15, 0.2, 0.5, 1.0);
-  //   gl.clear(gl.COLOR_BUFFER_BIT);
-  //
-  //   var waves = analyzer.waveform();
-  //   console.log('waves');
-  //   console.log(waves);
-  //
-  //   // Update Scene based on song data
-  //   if (fft != null && sound != null && sound.isPlaying()) {
-  //     // Song is playing
-  //     var spectrum = fft.analyze();
-  //     var waveform = fft.waveform();
-  //     updateScene(scene, spectrum, waveform, scaleFactor);
-  //
-  //     //var s = Math.abs(fft.waveform()[0]) * 10;
-  //     //scene.particles.scale = [s, s, s];
-  //     //updateToWorldMatrix(scene.particles);
-  //   }
-  //
-  //   // Draw Scene
-  //   drawScene(gl, scene);
-  //
-  //   // Reschedule the next frame.
-  //   window.requestAnimationFrame(updateWebGL);
-  // }
-  // window.requestAnimationFrame(updateWebGL);
-
+         gl.drawArrays(gl.LINE, 0, 10);
 
   </script>
 
