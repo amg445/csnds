@@ -25,16 +25,29 @@
   <script language="javascript" type="text/javascript" src="js/gl-matrix-min.js"></script>
   <script language="javascript" type="text/javascript" src="js/preloadjs-0.6.2.min.js"></script>
   <script language="javascript" type="text/javascript" src="js/boilerplate.js"></script>
+
+  <style>
+    body { background-color: black; color: white; }
+    button { 
+      color: black; 
+      background-color: white;
+      display: block;
+      margin-top: 10px; 
+      padding-left: 18px; padding-right: 18px;
+      border: none;
+    }
+
+  </style>
 </head>
 
 <body>
 
-  <label for="js-song">Song:</label>
+  <label for="js-song">Choose Song:</label>
   <input type="file" id="js-song">
   <button id="play">Play</button>
 
   <div align="center">
-    <canvas tabindex="1" id="webglCanvas" style="border: none; background-color: black;" width="800" height="600"></canvas>
+    <canvas tabindex="1" id="webglCanvas" style="border: none; background-color: black;" width="1000" height="800"></canvas>
   </div>
 
   <script id="vertexShader--basic" type="x-shader/x-vertex">
@@ -288,7 +301,7 @@
   // UpdateWebGL ----------------------------------------------------------
   var prevTime = 0;
   function updateWebGL(time) {
-    gl.clearColor(0.15, 0.2, 0.5, 1.0);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     
     // Update Scene based on song data (time in ms)
