@@ -56,6 +56,7 @@
     uniform mat4 projection;
     uniform mat4 toWorld;
     uniform mat4 toCam;
+    uniform vec3 color;
 
     void main() {
       gl_Position = projection * toCam * toWorld * vec4(position, 1.0);
@@ -64,9 +65,8 @@
 
   <script id="fragmentShader--basic" type="x-shader/x-fragment">
     precision highp float;
-    // uniform vec3 color;
+    uniform vec3 color;
     
-    vec3 color = vec3(1.0);
     void main() {
       gl_FragColor = vec4(color, 1.0);
     }
@@ -77,12 +77,14 @@
   // Scene Objects  ---------------------------------------------------
 
   // create particle object centered at [x], [y], [z] with scale [s]
-  function createParticle(x, y, z, s) {
+  function createParticle(x, y, z, s, c) {
     var particle = {};
     
     // Instantiate particle
     particle.position = [x, y, z];
     particle.scale = [s, s, s];
+    particle.baseColor = vec3.fromValues(c[0], c[1], c[2]);
+    particle.color = vec3.fromValues(c[0], c[1], c[2]);
 
     // Create [particle.toWorld] matrix
     updateToWorldMatrix(particle);
@@ -114,7 +116,8 @@
         // Create particle
         var x = ((i / (numX-1)) * width) + minX;
         var y = ((j / (numY-1)) * height) + minY;
-        particles.list[i][j] = createParticle(x, y, 0, 0.01);
+        var color = [Math.abs(x), Math.abs(y), Math.abs((x + y) / 2)];
+        particles.list[i][j] = createParticle(x, y, 0, 0.01, color);
       }
     }
 
@@ -130,6 +133,9 @@
    */
   function moveParticle(particle, value) {
     particle.position[2] = value;
+    var colorScale = vec3.fromValues(Math.random(), Math.random(), Math.random());
+    vec3.scale(colorScale, colorScale, 6 * value);
+    particle.color = vec3.add(particle.color, particle.baseColor, colorScale);
 
     updateToWorldMatrix(particle);
   }
@@ -168,7 +174,7 @@
         var particle = particles.list[i][j];
         var toWorld = mat4.create();
         mat4.mul(toWorld, particles.toWorld, particle.toWorld);
-        drawShape(gl, scene.shape, camera, toWorld);
+        drawShape(gl, scene.shape, camera, toWorld, particle.color);
       }
     }
   }

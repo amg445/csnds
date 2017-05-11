@@ -123,7 +123,7 @@ function createShape(gl, shader, data, faces) {
 }
 
 //function drawShape(gl, shape, program, camera, toWorld, faces) {
-function drawShape(gl, shape, camera, toWorld) {
+function drawShape(gl, shape, camera, toWorld, color) {
     var program = shape.shader;
     var faces = shape.faces;
 
@@ -140,6 +140,9 @@ function drawShape(gl, shape, camera, toWorld) {
     var toCam = mat4.create();
     mat4.invert(toCam, camera.toWorld);
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "toCam"), false, toCam);
+
+    var colorLocation = gl.getUniformLocation(program, "color");
+    gl.uniform3fv(colorLocation, color);
 
     if (faces) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.triIndexBuffer);
