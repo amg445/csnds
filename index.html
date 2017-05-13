@@ -248,26 +248,61 @@
   }
 
   /**
+   * update [object.position] according to [object]'s properties:
+   * - [radius]
+   * - [theta]
+   * - [phi]
+   * - [origin]
+   */
+  function updateSphericalPosition(object) {
+    object.position = [
+      object.radius * Math.sin(object.phi) * Math.sin(object.theta),
+      object.radius * Math.cos(object.phi),
+      object.radius * Math.sin(object.phi) * Math.cos(object.theta)
+    ];
+    return object;
+  }
+
+  /**
    * update [camera.toWorld] so that [camera] is always looking directly at the
    * origin
    * [camera] has following properties:
-   * - [distance]: distance from origin
-   * - [rotation]: array [rx, ry, rz] rotation about each axis
+   * - [radius]: distance from origin
+   * - [theta]
+   * - [phi]
    */
   function updateCamToWorldMatrix(camera) {
-    var [rx, ry, rz] = camera.rotation;
+    // Update camera position
+    updateSphericalPosition(camera);
+
+    // Update toWorld Matrix
+    var position = vec3.fromValues(camera.position[0],
+                                   camera.position[1],
+                                   camera.position[2]);
+    var direction = vec3.create();
+    vec3.negate(direction, position);
+
+    var forward = vec3.fromValues(0, 0, -1);
+    var rotAxis = vec3.create();
+    vec3.cross(rotAxis, direction, forward);
+    var rotAngle = vec3.angle(direction, forward);
+
+    var R = mat4.create();
+    mat4.fromRotation(R, rotAngle, rotAxis);
+
+    //var [rx, ry, rz] = camera.rotation;
     
-    var Rx = mat4.create();
-    mat4.fromXRotation(Rx, rx);
-    var Ry = mat4.create();
-    mat4.fromYRotation(Ry, ry);
-    var Rz = mat4.create();
-    mat4.fromZRotation(Rz, rz);
+    //var Rx = mat4.create();
+    //mat4.fromXRotation(Rx, rx);
+    //var Ry = mat4.create();
+    //mat4.fromYRotation(Ry, ry);
+    //var Rz = mat4.create();
+    //mat4.fromZRotation(Rz, rz);
 
     // Rotation Rz * Ry * Rx
-    var R = mat4.create();
-    mat4.mul(R, Ry, Rx);
-    mat4.mul(R, Rz, R);
+    //var R = mat4.create();
+    //mat4.mul(R, Ry, Rx);
+    //mat4.mul(R, Rz, R);
 
     // Create Translation matrix
     var translation = vec3.fromValues(0.0, 0.0, camera.radius);
@@ -305,9 +340,12 @@
   camera.radius = 3.0;
   camera.theta = 0.0;
   camera.phi = 0.0;
-  camera.focus = [0.0, 0.0, 0.0];
+  camera.origin = [0.0, 0.0, 0.0];
   camera.projection = perspectiveMatrix;
+  camera.position = [0,0,0];
+  camera.scale = [1,1,1];
   updateCamToWorldMatrix(camera);
+  //updateToWorldMatrix(camera);
 
   // Create particles
   var particles = createParticleSheet(bins, bins, -1, 1, -1, 1);
@@ -349,6 +387,55 @@
     window.requestAnimationFrame(updateWebGL);
   }
   window.requestAnimationFrame(updateWebGL);
+
+  /**
+   * Move rotate camera from WASD, SHIFT, SPACEBAR
+   * - W/S: rotate up/down
+   * - A/D: rotate left/right
+   * - SHIFT/SPACEBAR: zoom in/out
+   */
+  document.addEventListener('keydown', function(event) {
+
+    var v = 0.01;
+
+    switch (event.keyCode) {
+
+      // W - rotate up - decr phi
+      case 87: console.log("W");
+               camera.phi -= v;
+               break;
+
+      // S - rotate down - incr phi
+      case 83: console.log("S");
+               camera.phi += v;
+               break;
+
+      // A - rotate left - decr theta
+      case 65: console.log("A");
+               camera.theta -= v;
+               break;
+
+      // D - rotate right - incr theta
+      case 68: console.log("D");
+               camera.theta += v;
+               break;
+
+      // SHIFT - zoom out - incr radius
+      case 16: console.log("shift");
+               camera.radius += v;
+               break;
+
+      // SPACEBAR - zoom in - decr radius
+      case 32: console.log("spacebar");
+               camera.radius -= v;
+               break;
+
+      // Not a movement key - do nothing
+      default: return;
+    }
+
+    updateCamToWorldMatrix(camera);
+  });
 
 
   // NOT SURE WE WANT TO GO ON CHANGE, PROBABLY ON BUTTON PRESS, BUT TESTING FOR NOW

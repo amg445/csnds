@@ -127,6 +127,7 @@ function drawShape(gl, shape, camera, toWorld, color) {
     var program = shape.shader;
     var faces = shape.faces;
 
+    gl.enable(gl.DEPTH_TEST); 
     gl.useProgram(program);
     gl.bindBuffer(gl.ARRAY_BUFFER, shape.vertexBuffer);
 
@@ -155,4 +156,5 @@ function drawShape(gl, shape, camera, toWorld, color) {
     }
 
     gl.useProgram(null);
+    gl.disable(gl.DEPTH_TEST);
 }
