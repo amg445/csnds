@@ -95,13 +95,14 @@
 
         if (fft != null && sound != null && sound.isPlaying()) {
           var waveform = fft.waveform();
-          var wh = Math.abs(waveform[0]);
-          console.log(wh);
+          var bass  = Math.abs(waveform[0]);
+          var snare = Math.abs(waveform[4]);
+          var hit   = Math.abs(waveform[9]);
         }
 
-        var sinData = updatePoints(0,wh);
-        var cosData = updatePoints(1,wh);
-        var phiData = updatePoints(2,wh);
+        var sinData = updatePoints(0,.1);
+        var cosData = updatePoints(1,snare);
+        var phiData = updatePoints(2,.1);
 
         var vertexData = phiData.concat(sinData,cosData);
 
