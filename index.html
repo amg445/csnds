@@ -141,10 +141,10 @@
 
   /**
    * Offset the particle to [value]
-   * [particle] is offset along the z axis
+   * [particle] is offset along the y axis
    */
   function moveParticle(particle, value) {
-    particle.position[2] = value;
+    particle.position[1] = value;
     var colorScale = vec3.fromValues(Math.random(), Math.random(), Math.random());
     vec3.scale(colorScale, colorScale, 6 * value);
     particle.color = vec3.add(particle.color, particle.baseColor, colorScale);
@@ -270,7 +270,7 @@
     mat4.mul(R, Rz, R);
 
     // Create Translation matrix
-    var translation = vec3.fromValues(0.0, 0.0, camera.distance);
+    var translation = vec3.fromValues(0.0, 0.0, camera.radius);
     var T = mat4.create();
     mat4.fromTranslation(T, translation);
 
@@ -302,9 +302,10 @@
 
   // Create Camera
   var camera = {};
-  camera.distance = 3.0;
+  camera.radius = 3.0;
+  camera.theta = 0.0;
+  camera.phi = 0.0;
   camera.focus = [0.0, 0.0, 0.0];
-  camera.rotation = [Math.PI/3.0, 0.0, Math.PI/3.0];
   camera.projection = perspectiveMatrix;
   updateCamToWorldMatrix(camera);
 
