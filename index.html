@@ -39,40 +39,53 @@
     // * Creating a vertex buffer *
     // ****************************
     //
-    var count = 360;
+    var res = 360;
     var vertexData = [];
     var radius = .5;
     var wavePercent = .5;
 
-    for (var i=0; i<count; i++) {
-        var angle = Math.PI/180*i;
+    var waves_amount=12;
+    var wave_height=0.1*radius;
+    var radius_addon = 0;
 
-        var waves_amount=12;
-        var wave_height=0.1*radius;
-        var radius_addon = 0;
+    var counter = 0;
+    var speed_incrementer=counter/100;
 
-        if(i<wavePercent*count){
-          var radius_addon=wave_height*Math.sin(angle*waves_amount);
+    function updatePoints() {
+      var newPoints = [];
+      for (var i = 0; i <=  res; i++) {
+        var angle=Math.PI/180*i;
+        var radius_addon=0;
+        var speed_incrementer=counter/100;
+
+        if(i<wavePercent*res||i==res){
+          radius_addon=wave_height*wavePercent*Math.sin((angle+speed_incrementer)*waves_amount);
         }
 
         var x = (radius+radius_addon) * Math.cos(angle);
         var y = (radius+radius_addon) * Math.sin(angle);
-        var z = 0;
+        var z=0;
 
-        vertexData.push(x);
-        vertexData.push(y);
-        vertexData.push(z);
+        newPoints.push(x);
+        newPoints.push(y);
+        newPoints.push(z);
+      }
+
+      return newPoints;
     }
 
-    var vertexArray = new Float32Array(vertexData);
-    var vertexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, vertexArray, gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
     function updateWebGL() {
         gl.clearColor(0.0, 0.0, 0.0, 0.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
+        counter++;
+        var vertexData = updatePoints();
+
+        var vertexArray = new Float32Array(vertexData);
+        var vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, vertexArray, gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
         // ***************************
         // * Drawing line primitives *
@@ -84,7 +97,7 @@
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
         gl.vertexAttribPointer(vertPositionLocation, 3, gl.FLOAT, false, 3*4, 0);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
-        gl.drawArrays(gl.LINE_STRIP, 0, count);
+        gl.drawArrays(gl.LINE_STRIP, 0, res);
         gl.useProgram(null);
 
         window.requestAnimationFrame(updateWebGL);
