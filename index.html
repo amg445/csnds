@@ -48,10 +48,13 @@
     var wave_height=0.1*radius;
     var radius_addon = 0;
 
+    var smoothing_amount=0.14;
+    var smooth_pct=1;
+
     var counter = 0;
-    var speed_incrementer=counter/100;
 
     function updatePoints() {
+
       var newPoints = [];
       for (var i = 0; i <=  res; i++) {
         var angle=Math.PI/180*i;
@@ -62,8 +65,8 @@
           radius_addon=wave_height*wavePercent*Math.sin((angle+speed_incrementer)*waves_amount);
         }
 
-        var x = (radius+radius_addon) * Math.cos(angle);
-        var y = (radius+radius_addon) * Math.sin(angle);
+        var x = (radius+radius_addon) * Math.cos(angle+speed_incrementer);
+        var y = (radius+radius_addon) * Math.sin(angle+speed_incrementer);
         var z=0;
 
         newPoints.push(x);
