@@ -248,110 +248,26 @@
   }
 
   /**
-   * update [object.position] according to [object]'s properties:
-   * - [radius]
-   * - [theta]
-   * - [phi]
-   * - [origin]
+   * update [scene] to move camera around by [offset]
    */
-  function updateSphericalPosition(object) {
-    object.position = [
-      object.radius * Math.sin(object.phi) * Math.sin(object.theta),
-      object.radius * Math.cos(object.phi),
-      object.radius * Math.sin(object.phi) * Math.cos(object.theta)
-    ];
-    return object;
+  function updateSceneOffset(scene, offset) {
+    var [x, y, z] = offset;
+    var v = Math.PI/500;
+    var Rx = mat4.create();
+    mat4.fromXRotation(Rx, x*v);
+    mat4.mul(scene.particles.toWorld, Rx, scene.particles.toWorld);
+
+    var Ry = mat4.create();
+    mat4.fromYRotation(Ry, y*v);
+    mat4.mul(scene.particles.toWorld, scene.particles.toWorld, Ry);
+
+    var Tz = mat4.create();
+    var offsetZ = vec3.fromValues(0, 0, z/50);
+    vec3.add(scene.camera.position, scene.camera.position, offsetZ);
+    updateToWorldMatrix(scene.camera);
   }
 
-  /**
-   * update [camera] position based on [camera.offset]
-   * - [radius]
-   * - [position]
-   * - [offset]
-   */
-  function updateCamPosition(camera) {
-    // offset in u, v directions
-    var offsetUV = vec3.fromValues(camera.offset[0], camera.offset[1], 0);
-    var radius2 = camera.radius + camera.offset[2];
-
-    var position = vec3.fromValues(camera.position[0],
-                                   camera.position[1],
-                                   camera.position[2]);
-
-    var position2 = vec3.create();
-    vec3.add(position2, position, offsetUV);
-    vec3.normalize(position2, position2);
-    vec3.scale(position2, position2, radius2);
-    
-    camera.position = position2;
-    camera.radius = radius2;
-  }
-
-  /**
-   * update [camera.toWorld] so that [camera] is always looking directly at the
-   * origin
-   * [camera] has following properties:
-   * - [position]: position in world space
-   */
-  function updateCamToWorldMatrix(camera) {
-    console.log("cam: " + camera.position);
-
-    var dir = vec3.create();
-    vec3.normalize(dir, camera.position);
-
-    var forward = vec3.fromValues(0, 0, 1);
-    var axis = vec3.create();
-    vec3.cross(axis, dir, forward);
-    var angle = vec3.angle(dir, forward);
-
-    var R = mat4.create();
-    mat4.fromRotation(R, angle, axis);
-    console.log("camera.position: " + camera.position);
-    console.log("axis: " + axis);
-    console.log("angle: " + angle);
-
-    var T = mat4.create();
-    mat4.fromTranslation(T, vec3.fromValues(0, 0, camera.radius));
-    
-    camera.toWorld = mat4.create();
-    vec4.mul(camera.toWorld, R, T);
-
-    camera.toCam = mat4.create();
-    mat4.invert(camera.toCam, camera.toWorld);
-
-    var x = vec3.fromValues(0, 0, 1);
-    var x2 = vec3.create();
-    vec3.transformMat3(x2, x, camera.toCam);
-    console.log("x : " + x);
-    console.log("x2: " + x2);
-    console.log("camera.toCam: " + camera.toCam);
-    //camera.toWorld = T
-    
-    //var forward = vec3.fromValues(0, 0, 1);
-    //var rotAxis = vec3.create();
-    //vec3.cross(rotAxis, direction, forward);
-    //var rotAngle = vec3.angle(direction, forward);
-
-    //var R = mat4.create();
-    //mat4.fromRotation(R, rotAngle, rotAxis);
-
-    // Create Translation matrix
-    //var translation = vec3.fromValues(0.0, 0.0, camera.radius);
-    //var T = mat4.create();
-    //mat4.fromTranslation(T, translation);
-
-    // Update [camera.toWorld] matrix (T * R)
-    //camera.toWorld = mat4.create();
-    //mat4.mul(camera.toWorld, R, T);
-    //camera.toWorld = T;
-
-    // Reset camera offset
-    camera.offset = [0,0,0];
-
-    return camera;
-  }
-
-  // WebGL --------------------------------------------------------------
+  // WebGL --------------------------------------------------------------------
   // Global Vars
   var gl = initializeWebGL($("#webglCanvas"));
   var basic_shader = createGlslProgram(gl, "vertexShader--basic", "fragmentShader--basic");
@@ -361,6 +277,7 @@
   var bins = 64;   // range: [16, 1024], def: 1024 - MUST be power of 2
   var scaleFactor = 4;  // scale factor (amplitude) for visulization
   var threshold = 0.01;  // threshold visualization value must be above to move
+  var offset = [0,0,0];   // offset for controlling camera movement
 
   // Create Projection Matrix (Perspective Camera)
   var perspectiveMatrix = mat4.create();
@@ -377,10 +294,10 @@
   //camera.phi = 0.0;
   camera.origin = [0.0, 0.0, 0.0];
   camera.projection = perspectiveMatrix;
-  camera.position = vec3.fromValues(1,1,1);
+  camera.position = vec3.fromValues(0, 0, 3);
   camera.radius = vec3.length(camera.position);
-  camera.offset = [0,0,0];
-  updateCamToWorldMatrix(camera);
+  camera.scale = [1,1,1];
+  updateToWorldMatrix(camera);
 
   // Create particles
   var particles = createParticleSheet(bins, bins, -1, 1, -1, 1);
@@ -391,7 +308,7 @@
   // Create scene
   var scene = createScene(camera, particles, cube);
 
-  // UpdateWebGL ----------------------------------------------------------
+  // UpdateWebGL --------------------------------------------------------------
   var prevTime = 0;
   function updateWebGL(time) {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -415,7 +332,8 @@
     }
 
     // Update Camera Position if it has been offset
-    updateCamToWorldMatrix(camera);
+    updateSceneOffset(scene, offset);
+    offset = [0, 0, 0];
 
     // Draw Scene
     drawScene(gl, scene);
@@ -434,38 +352,38 @@
    */
   document.addEventListener('keydown', function(event) {
 
-    var s = 0.01;
+    var s = 1;
     
     switch (event.keyCode) {
 
-      // W - rotate up - incr v
+      // W - rotate up - incr x
       case 87: console.log("W");
-               camera.offset[1] += s;
+               offset[0] += s;
                break;
 
-      // S - rotate down - decr v
+      // S - rotate down - decr x
       case 83: console.log("S");
-               camera.offset[1] -= s;
+               offset[0] -= s;
                break;
 
-      // A - rotate left - decr u
+      // A - rotate left - incr y
       case 65: console.log("A");
-               camera.offset[0] -= s;
+               offset[1] += s;
                break;
 
-      // D - rotate right - incr u
+      // D - rotate right - incr y
       case 68: console.log("D");
-               camera.offset[0] += s;
+               offset[1] -= s;
                break;
 
-      // Q - zoom out - decr w
+      // Q - zoom out - incr z
       case 81: console.log("Q");
-               camera.offset[2] -= s;
+               offset[2] += s;
                break;
 
-      // E - zoom in - incr w
+      // E - zoom in - decr z
       case 69: console.log("E");
-               camera.radius += s;
+               offset[2] -= s;
                break;
 
       // Not a movement key - do nothing
