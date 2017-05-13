@@ -35,10 +35,6 @@
     var gl = initializeWebGL(canvas);
     var program = createGlslProgram(gl, "vertexShader", "fragmentShader");
 
-    // ****************************
-    // * Creating a vertex buffer *
-    // ****************************
-    //
     var res = 360;
     var vertexData = [];
     var radius = .5;
@@ -62,9 +58,14 @@
         var speed_incrementer=counter/50;
 
         if(i<wavePercent*res||i==res){
+
           if(waveType == 0) radius_addon=wave_height*wavePercent*Math.sin((angle+speed_incrementer)*waves_amount);
           if(waveType == 1) radius_addon=wave_height*wavePercent*Math.cos((angle+speed_incrementer)*waves_amount);
-          if(waveType == 2) radius_addon=wave_height*wavePercent*Math.cos((angle+Math.PI/180*120+speed_incrementer)*waves_amount);
+          if(waveType == 2) radius_addon=wave_height*wavePercent*Math.cos((angle+30+speed_incrementer)*waves_amount);
+
+          // if(waveType == 0) radius_addon=wave_height*wavePercent*Math.sin((angle+speed_incrementer)*waves_amount);
+          // if(waveType == 1) radius_addon=wave_height*wavePercent*Math.cos((angle+speed_incrementer)*waves_amount);
+          // if(waveType == 2) radius_addon=wave_height*wavePercent*Math.cos((angle+Math.PI/180*120+speed_incrementer)*waves_amount);
         }
 
         var x = (radius+radius_addon) * Math.cos(angle+speed_incrementer);
@@ -88,9 +89,7 @@
         var cosData = updatePoints(1);
         var phiData = updatePoints(2);
 
-        var c = sinData.concat(cosData);
-
-        var vertexData = c.concat(phiData);
+        var vertexData = phiData.concat(sinData,cosData);
 
         var vertexArray = new Float32Array(vertexData);
         var vertexBuffer = gl.createBuffer();
@@ -98,10 +97,6 @@
         gl.bufferData(gl.ARRAY_BUFFER, vertexArray, gl.STATIC_DRAW);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-        // ***************************
-        // * Drawing line primitives *
-        // ***************************
-        //
         gl.useProgram(program);
         var vertPositionLocation = gl.getAttribLocation(program, "t");
         gl.enableVertexAttribArray(vertPositionLocation);
