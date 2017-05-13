@@ -1,127 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CS 4621: Final</title>
 
-  <title>CS 4621: Final Project -- Music Visualizer</title>
-
-  <!-- Bootstrap -->
-  <link href="css/bootstrap.min.css" rel="stylesheet">
-  <link href="css/cs4620.css" rel="stylesheet">
-  <link href="css/jquery-ui.min.css" rel="stylesheet">
-  <link href="css/jquery-ui.theme.min.css" rel="stylesheet">
-  <link href="css/jquery-ui.structure.min.css" rel="stylesheet">
-
-  <script
-  src="https://code.jquery.com/jquery-3.2.1.min.js"
-  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-  crossorigin="anonymous">
-  </script>
-
-  <script language="javascript" type="text/javascript" src="js/p5.js"></script>
-  <script language="javascript" type="text/javascript" src="js/p5.sound.js"></script>
-  <script language="javascript" type="text/javascript" src="js/gl-matrix-min.js"></script>
-  <script language="javascript" type="text/javascript" src="js/preloadjs-0.6.2.min.js"></script>
-  <script language="javascript" type="text/javascript" src="js/boilerplate.js"></script>
-
-  <style>
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      border: none;
-      width: 100%;
-      height: 100vh;
-      z-index: -1;
-    }
-  </style>
+    <script src="js/boilerplate.js" charset="utf-8"></script>
 </head>
-
-
 <body>
 
-  <!-- <label for="js-song">Song:</label>
-  <input type="file" id="js-song">
-  <button id="play">Play</button> -->
+    <canvas id="webglCanvas" style="border: none; background-color: black;" width="512" height="512"></canvas>
 
-  <p id="js-pause" style="float: right; z-index: 10;">pause</p>
+<script src="../js/jquery-3.1.1.min.js"></script>
 
-  <div align="center">
-    <canvas tabindex="1" id="webglCanvas" width="800" height="600"></canvas>
-  </div>
+<script id="fragmentShader" type="x-shader/x-fragment">
+    precision highp float;
+    void main() {
+        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }
+</script>
 
-  <!-- <script src="js/bundle.js" charset="utf-8"></script> -->
-
-  <script id="vertexShader--basic" type="x-shader/x-vertex">
-    attribute vec3 coordinates;
+<script id="vertexShader" type="x-shader/x-vertex">
+    attribute vec3 t;
 
     void main() {
-      gl_Position = vec4(coordinates, 1.0);
+        gl_Position = vec4(t, 1.0);
     }
-  </script>
+</script>
 
-  <script id="fragmentShader--basic" type="x-shader/x-fragment">
-    void main() {
-      gl_FragColor = vec4(0.0, 0.0, 0.0, 0.1);
+<script>
+
+    var canvas = $('#webglCanvas');
+    var gl = initializeWebGL(canvas);
+    var program = createGlslProgram(gl, "vertexShader", "fragmentShader");
+
+    // ****************************
+    // * Creating a vertex buffer *
+    // ****************************
+    //
+    var count = 360;
+    var vertexData = [];
+    var radius = .5;
+    var wavePercent = .5;
+
+    for (var i=0; i<count; i++) {
+        var angle = Math.PI/180*i;
+
+        var waves_amount=12;
+        var wave_height=0.1*radius;
+        var radius_addon = 0;
+
+        if(i<wavePercent*count){
+          var radius_addon=wave_height*Math.sin(angle*waves_amount);
+        }
+
+        var x = (radius+radius_addon) * Math.cos(angle);
+        var y = (radius+radius_addon) * Math.sin(angle);
+        var z = 0;
+
+        vertexData.push(x);
+        vertexData.push(y);
+        vertexData.push(z);
     }
-  </script>
 
-  <script>
+    var vertexArray = new Float32Array(vertexData);
+    var vertexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, vertexArray, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-         var canvas = $('#webglCanvas');
-         var gl = initializeWebGL(canvas);
+    function updateWebGL() {
+        gl.clearColor(0.0, 0.0, 0.0, 0.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
 
-         /*======= Defining and storing the geometry ======*/
+        // ***************************
+        // * Drawing line primitives *
+        // ***************************
+        //
+        gl.useProgram(program);
+        var vertPositionLocation = gl.getAttribLocation(program, "t");
+        gl.enableVertexAttribArray(vertPositionLocation);
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+        gl.vertexAttribPointer(vertPositionLocation, 3, gl.FLOAT, false, 3*4, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        gl.drawArrays(gl.LINE_STRIP, 0, count);
+        gl.useProgram(null);
 
-         var radius = 5;
-         var res = 10;
-         var vertices = [];
+        window.requestAnimationFrame(updateWebGL);
+    }
 
-         for (var i = 0; i <= res; i++) {
-            var angle=Math.PI/180*i;
-            var x = (radius) * Math.cos(angle);
-            var y = (radius) * Math.sin(angle);
-            var z=0;
-            vertices.push(x);
-            vertices.push(y);
-            vertices.push(z);
-          }
-
-
-         var vertex_buffer = gl.createBuffer();
-
-         gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-
-         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-         gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-
-         var shaderProgram = createGlslProgram(gl,'vertexShader--basic', 'fragmentShader--basic');
-         gl.useProgram(shaderProgram);
-
-         gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-
-         var coord = gl.getAttribLocation(shaderProgram, "coordinates");
-
-         gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
-
-         gl.enableVertexAttribArray(coord);
-
-         gl.clearColor(0.5, 0.5, 0.5, 0.9);
-
-         gl.enable(gl.DEPTH_TEST);
-
-         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-         gl.viewport(0,0,canvas[0].width,canvas[0].height);
-
-         gl.drawArrays(gl.LINE, 0, 10);
-
-  </script>
+    window.requestAnimationFrame(updateWebGL);
+</script>
 
 </body>
-
 </html>
