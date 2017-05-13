@@ -344,6 +344,48 @@
   }
   window.requestAnimationFrame(updateWebGL);
 
+
+
+  // Events -------------------------------------------------------------------
+  var dragging = false;   // whether or not user is dragging the camera
+  var mousePos;   // [screenX, screenY]
+  var mouseTime;  // time of last mouse event
+
+  /**
+   * Move rotate camera with click events
+   */
+  //$("#webglCanvas").addEventListener('mousedown', function(event) {
+  document.addEventListener('mousedown', function(event) {
+    mousePos = [event.clientX, event.clientY];
+    mouseTime = event.time;
+    dragging = true;
+  });
+
+  //$("#webglCanvas").addEventListener('mouseup', function(event) {
+  document.addEventListener('mouseup', function(event) {
+    dragging = false;
+  });
+
+  //$("#webglCanvas").addEventListener('mousemove', function(event) {
+  document.addEventListener('mousemove', function(event) {
+    if (dragging) {
+      var [prevX, prevY] = mousePos;
+
+      var dx = event.clientX - prevX;
+      var dy = event.clientY - prevY;
+
+      offset[1] += dx;
+      offset[0] += dy;
+
+      mousePos = [event.clientX, event.clientY];
+    }
+  });
+
+  //$("webglCanavs").addEventListener('wheel', function(event) {
+  document.addEventListener('wheel', function(event) {
+    offset[2] += event.deltaX;
+  });
+
   /**
    * Move rotate camera from WASD, SHIFT, SPACEBAR
    * - W/S: rotate up/down
