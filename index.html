@@ -6,9 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CS 4621: Final</title>
 
+    <script language="javascript" type="text/javascript" src="js/p5.js"></script>
+    <script language="javascript" type="text/javascript" src="js/p5.sound.js"></script>
     <script src="js/boilerplate.js" charset="utf-8"></script>
 </head>
 <body>
+
+  <label for="js-song">Choose Song:</label>
+  <input type="file" id="js-song">
 
     <canvas id="webglCanvas" style="border: none; background-color: black;" width="512" height="512"></canvas>
 
@@ -35,10 +40,12 @@
     var gl = initializeWebGL(canvas);
     var program = createGlslProgram(gl, "vertexShader", "fragmentShader");
 
+    var fft = null;
+
     var res = 360;
     var vertexData = [];
     var radius = .5;
-    var wavePercent = .5;
+    var wavePercent = .3;
 
     var waves_amount=12;
     var wave_height=0.2*radius;
@@ -49,7 +56,7 @@
 
     var counter = 0;
 
-    function updatePoints(waveType) {
+    function updatePoints(waveType,wave_height) {
 
       var newPoints = [];
       for (var i = 0; i <=  res; i++) {
@@ -85,9 +92,16 @@
         gl.clearColor(0.0, 0.0, 0.0, 0.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         counter++;
-        var sinData = updatePoints(0);
-        var cosData = updatePoints(1);
-        var phiData = updatePoints(2);
+
+        if (fft != null && sound != null && sound.isPlaying()) {
+          var waveform = fft.waveform();
+          var wh = Math.abs(waveform[0]);
+          console.log(wh);
+        }
+
+        var sinData = updatePoints(0,wh);
+        var cosData = updatePoints(1,wh);
+        var phiData = updatePoints(2,wh);
 
         var vertexData = phiData.concat(sinData,cosData);
 
@@ -110,6 +124,32 @@
     }
 
     window.requestAnimationFrame(updateWebGL);
+
+
+
+    $('#js-song').on('change', function() {
+      var url = $(this).val();
+      var song = url.split('\\').pop();
+      console.log(song);
+      var s = function(p) {
+        p.preload = function() {
+          p.soundFormats('m4a');
+          sound = p.loadSound('assets/'+song);
+        }
+        p.setup = function() {
+          fft = new p5.FFT(.8,16);
+          sound.amp(0.2);
+          sound.play();
+        }
+        p.draw = function() {
+          var spectrum = fft.analyze();
+          var waveform = fft.waveform();
+        }
+
+        $('#play').on('click', p.togglePlay);
+      }
+      var myp5 = new p5(s);
+    });
 </script>
 
 </body>
