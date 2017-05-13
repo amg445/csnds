@@ -48,7 +48,6 @@
     var wavePercent = .3;
 
     var waves_amount=12;
-    var wave_height=0.2*radius;
     var radius_addon = 0;
 
     var smoothing_amount=0.14;
@@ -64,15 +63,16 @@
         var radius_addon=0;
         var speed_incrementer=counter/50;
 
+        if(i<wavePercent*res*smoothing_amount) smooth_pct=i/(wavePercent*res*smoothing_amount);
+        if(i>wavePercent*res*(1-smoothing_amount)&&i<=wavePercent*res) smooth_pct=(wavePercent*res-i)/(wavePercent*res*smoothing_amount);
+        if(i==res) smooth_pct=0;
+
         if(i<wavePercent*res||i==res){
 
-          if(waveType == 0) radius_addon=wave_height*wavePercent*Math.sin((angle+speed_incrementer)*waves_amount);
-          if(waveType == 1) radius_addon=wave_height*wavePercent*Math.cos((angle+speed_incrementer)*waves_amount);
-          if(waveType == 2) radius_addon=wave_height*wavePercent*Math.cos((angle+30+speed_incrementer)*waves_amount);
+          if(waveType == 0) radius_addon=wave_height*wavePercent*smooth_pct*Math.sin((angle+speed_incrementer)*waves_amount);
+          if(waveType == 1) radius_addon=wave_height*wavePercent*smooth_pct*Math.cos((angle+speed_incrementer)*waves_amount);
+          if(waveType == 2) radius_addon=wave_height*wavePercent*smooth_pct*Math.cos((angle+30+speed_incrementer)*waves_amount);
 
-          // if(waveType == 0) radius_addon=wave_height*wavePercent*Math.sin((angle+speed_incrementer)*waves_amount);
-          // if(waveType == 1) radius_addon=wave_height*wavePercent*Math.cos((angle+speed_incrementer)*waves_amount);
-          // if(waveType == 2) radius_addon=wave_height*wavePercent*Math.cos((angle+Math.PI/180*120+speed_incrementer)*waves_amount);
         }
 
         var x = (radius+radius_addon) * Math.cos(angle+speed_incrementer);
@@ -100,9 +100,9 @@
           var hit   = Math.abs(waveform[9]);
         }
 
-        var sinData = updatePoints(0,.1);
+        var sinData = updatePoints(0,.2);
         var cosData = updatePoints(1,snare);
-        var phiData = updatePoints(2,.1);
+        var phiData = updatePoints(2,.2);
 
         var vertexData = phiData.concat(sinData,cosData);
 
