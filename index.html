@@ -107,15 +107,15 @@
   /*
    * create 2D sheet of particles with properties:
    * - [numX]
-   * - [numY]
+   * - [numZ]
    * - [minX]
    * - [maxX]
-   * - [minY]
-   * - [maxY]
+   * - [minZ]
+   * - [maxZ]
    */
-  function createParticleSheet(numX, numY, minX, maxX, minY, maxY) {
+  function createParticleSheet(numX, numZ, minX, maxX, minZ, maxZ) {
     var width = maxX - minX;
-    var height = maxY - minY;
+    var height = maxZ - minZ;
     
     var particles = {};
     particles.list = [];
@@ -124,12 +124,12 @@
 
     for (var i = 0; i < numX; i++) {
       particles.list[i] = [];
-      for (var j = 0; j < numY; j++) {
+      for (var j = 0; j < numZ; j++) {
         // Create particle
         var x = ((i / (numX-1)) * width) + minX;
-        var y = ((j / (numY-1)) * height) + minY;
-        var color = [Math.abs(x), Math.abs(y), Math.abs((x + y) / 2)];
-        particles.list[i][j] = createParticle(x, y, 0, 0.01, color);
+        var z = ((j / (numZ-1)) * height) + minZ;
+        var color = [Math.abs(x), Math.abs(z), Math.abs((x + z) / 2)];
+        particles.list[i][j] = createParticle(x, 0, z, 0.01, color);
       }
     }
 
@@ -303,6 +303,7 @@
   // Create Camera
   var camera = {};
   camera.distance = 3.0;
+  camera.focus = [0.0, 0.0, 0.0];
   camera.rotation = [Math.PI/3.0, 0.0, Math.PI/3.0];
   camera.projection = perspectiveMatrix;
   updateCamToWorldMatrix(camera);
