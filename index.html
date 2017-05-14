@@ -48,6 +48,10 @@
       width: 50%;
     }
 
+    select{
+      margin: 10px;
+    }
+
     canvas{margin-top: 50px;}
 
 
@@ -101,6 +105,8 @@
   </script>
 
   <script>
+
+  var analyzer;
 
   function getSongFromURL() {
     var hash = window.location.hash;
@@ -240,8 +246,8 @@
     for (var i = 0; i < scene.particles.list.length; i++) {
       for (var j = 0; j < scene.particles.list[i].length; j++) {
         var particle = scene.particles.list[i][j];
-        var spectrumAmp = spectrum[i];
-        var waveformAmp = waveform[j];
+        var spectrumAmp = spectrum[i]/50;
+        var waveformAmp = waveform[j]/50;
 
         var v = (spectrumAmp / 255) * waveformAmp * scale;
         //console.log("spectrumAmp: " + spectrumAmp);
@@ -366,6 +372,15 @@
         //updateToWorldMatrix(scene.particles);
       }
     }
+
+    if(analyzer){
+      var waves = analyzer.waveform();
+      var spec = waves.map(function(m) {
+        var val = m/255; return val; });
+      console.log(waves);
+      updateScene(scene, waves, waves, scaleFactor,threshold);
+    }
+
 
     // Update Camera Position if it has been offset
     updateSceneOffset(scene, offset);
