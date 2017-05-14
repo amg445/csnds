@@ -319,7 +319,7 @@
   var bins = 64;   // range: [16, 1024], def: 1024 - MUST be power of 2
   var scaleFactor = 4;  // scale factor (amplitude) for visulization
   var threshold = 0.01;  // threshold visualization value must be above to move
-  var offset = [0,0,0];   // offset for controlling camera movement
+  var offset = [50,-190,0];   // offset for controlling camera movement
 
   // Create Projection Matrix (Perspective Camera)
   var perspectiveMatrix = mat4.create();
@@ -405,20 +405,17 @@
   /**
    * Move rotate camera with click events
    */
-  //$("#webglCanvas").addEventListener('mousedown', function(event) {
-  document.addEventListener('mousedown', function(event) {
+  $("#webglCanvas").on('mousedown', function(event) {
     mousePos = [event.clientX, event.clientY];
     mouseTime = event.time;
     dragging = true;
   });
 
-  //$("#webglCanvas").addEventListener('mouseup', function(event) {
-  document.addEventListener('mouseup', function(event) {
+  $("#webglCanvas").on('mouseup mouseleave', function(event) {
     dragging = false;
   });
 
-  //$("#webglCanvas").addEventListener('mousemove', function(event) {
-  document.addEventListener('mousemove', function(event) {
+  $("#webglCanvas").on('mousemove', function(event) {
     if (dragging) {
       var [prevX, prevY] = mousePos;
 
@@ -433,10 +430,10 @@
   });
 
 
-$("#webglCanvas").on("wheel mousewheel", function(e) {
-  e.preventDefault();
-  offset[2] += event.deltaX;
-});
+  $("#webglCanvas").on("wheel", function(event) {
+    event.preventDefault();
+    offset[2] += event.originalEvent.deltaY;
+  });
 
 
 
