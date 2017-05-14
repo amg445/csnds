@@ -382,7 +382,7 @@
   });
 
 
-$("#webglCanvas").bind("wheel mousewheel", function(e) {
+$("#webglCanvas").on("wheel mousewheel", function(e) {
   e.preventDefault();
   offset[2] += event.deltaX;
 });
