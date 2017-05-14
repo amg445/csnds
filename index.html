@@ -354,20 +354,17 @@
   /**
    * Move rotate camera with click events
    */
-  //$("#webglCanvas").addEventListener('mousedown', function(event) {
-  document.addEventListener('mousedown', function(event) {
+  $("#webglCanvas").on('mousedown', function(event) {
     mousePos = [event.clientX, event.clientY];
     mouseTime = event.time;
     dragging = true;
   });
 
-  //$("#webglCanvas").addEventListener('mouseup', function(event) {
-  document.addEventListener('mouseup', function(event) {
+  $("#webglCanvas").on('mouseup', function(event) {
     dragging = false;
   });
 
-  //$("#webglCanvas").addEventListener('mousemove', function(event) {
-  document.addEventListener('mousemove', function(event) {
+  $("#webglCanvas").on('mousemove', function(event) {
     if (dragging) {
       var [prevX, prevY] = mousePos;
 
@@ -382,10 +379,10 @@
   });
 
 
-$("#webglCanvas").on("wheel mousewheel", function(e) {
-  e.preventDefault();
-  offset[2] += event.deltaX;
-});
+  $("#webglCanvas").on("wheel", function(event) {
+    event.preventDefault();
+    offset[2] += event.originalEvent.deltaY;
+  });
 
 
 
