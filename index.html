@@ -277,7 +277,7 @@
   var bins = 64;   // range: [16, 1024], def: 1024 - MUST be power of 2
   var scaleFactor = 4;  // scale factor (amplitude) for visulization
   var threshold = 0.01;  // threshold visualization value must be above to move
-  var offset = [0,0,0];   // offset for controlling camera movement
+  var offset = [50,-190,0];   // offset for controlling camera movement
 
   // Create Projection Matrix (Perspective Camera)
   var perspectiveMatrix = mat4.create();
@@ -360,7 +360,7 @@
     dragging = true;
   });
 
-  $("#webglCanvas").on('mouseup', function(event) {
+  $("#webglCanvas").on('mouseup mouseleave', function(event) {
     dragging = false;
   });
 
