@@ -28,11 +28,11 @@
 
   <style>
     body { background-color: white; color: black; }
-    button { 
-      color: black; 
+    button {
+      color: black;
       background-color: white;
       display: block;
-      margin-top: 10px; 
+      margin-top: 10px;
       padding-left: 18px; padding-right: 18px;
       border: none;
     }
@@ -40,10 +40,10 @@
     #play-bar {
       display: black;
       margin-left: auto; margin-right: auto;
-      margin-bottom: 25px; 
+      margin-bottom: 25px;
       width: 50%;
     }
-    
+
 
   </style>
 </head>
@@ -78,7 +78,7 @@
   <script id="fragmentShader--basic" type="x-shader/x-fragment">
     precision highp float;
     uniform vec3 color;
-    
+
     void main() {
       gl_FragColor = vec4(color, 1.0);
     }
@@ -91,7 +91,7 @@
   // create particle object centered at [x], [y], [z] with scale [s]
   function createParticle(x, y, z, s, c) {
     var particle = {};
-    
+
     // Instantiate particle
     particle.position = [x, y, z];
     particle.scale = [s, s, s];
@@ -116,7 +116,7 @@
   function createParticleSheet(numX, numZ, minX, maxX, minZ, maxZ) {
     var width = maxX - minX;
     var height = maxZ - minZ;
-    
+
     var particles = {};
     particles.list = [];
     particles.position = [0, 0, 0];
@@ -239,7 +239,7 @@
       var scale = vec3.fromValues(sx,sy,sz);
       mat4.fromScaling(S, scale);
     }
-    
+
     // Update [object.toWorld] matrix
     object.toWorld = mat4.create();
     mat4.mul(object.toWorld, T, S);
@@ -381,10 +381,13 @@
     }
   });
 
-  //$("webglCanavs").addEventListener('wheel', function(event) {
-  document.addEventListener('wheel', function(event) {
-    offset[2] += event.deltaX;
-  });
+
+$("#webglCanvas").bind("wheel mousewheel", function(e) {
+  e.preventDefault();
+  offset[2] += event.deltaX;
+});
+
+
 
   /**
    * Move rotate camera from WASD, SHIFT, SPACEBAR
@@ -395,7 +398,7 @@
   document.addEventListener('keydown', function(event) {
 
     var s = 1;
-    
+
     switch (event.keyCode) {
 
       // W - rotate up - incr x
@@ -458,7 +461,7 @@
           $('#slide').attr('max', sound.duration());
           $('#slide').on('input', function() {
             var pause = sound.isPaused();
-            sound.jump($(this).val()); 
+            sound.jump($(this).val());
             if (pause) { sound.pause(); }
           });
         }
