@@ -37,6 +37,10 @@
       border: none;
     }
 
+    .song-select{
+      float: right;
+    }
+
     #play-bar {
       display: black;
       margin-left: auto; margin-right: auto;
@@ -44,23 +48,35 @@
       width: 50%;
     }
 
+    canvas{margin-top: 50px;}
+
 
   </style>
 </head>
 
 <body>
 
-  <label for="js-song">Choose Song:</label>
-  <input type="file" id="js-song">
+  <!-- <label for="js-song">Choose Song:</label>
+  <input type="file" id="js-song"> -->
 
-  <div id="play-bar">
+  <!-- <div id="play-bar">
     <button id="play">Play</button>
     <input type="range" id="slide" value="0" />
+  </div> -->
+
+  <div>
+    <select name="" id="js-songs" class="song-select">
+      <option value="https://soundcloud.com/itndylan/lemons-dylan">Lemons</option>
+      <option value="https://soundcloud.com/lidogotsongs/feel-it-still-lido-remix">Feel it Still</option>
+      <option value="https://soundcloud.com/liluzivert/15-xo-tour-llif3">XO TOUR lLif3</option>
+    </select>
   </div>
 
   <div align="center">
     <canvas tabindex="1" id="webglCanvas" style="border: none; background-color: black;" width="1000" height="800"></canvas>
   </div>
+
+  <script src="js/bundle.js" charset="utf-8"></script>
 
   <script id="vertexShader--basic" type="x-shader/x-vertex">
     attribute vec3 position;
@@ -85,6 +101,26 @@
   </script>
 
   <script>
+
+  function getSongFromURL() {
+    var hash = window.location.hash;
+    return hash.substring(1);
+  }
+
+  $('#js-songs').on('change', function(){
+    if(window.location.hash != ""){
+      var cur = window.location.href;
+      var id = cur.indexOf('#');
+      var cur = cur.substring(0,id);
+    } else {
+      var cur = window.location.href;
+    }
+    var url = this.value;
+    var newURL = cur+"#"+url;
+    console.log(newURL);
+    window.location.href = newURL;
+    location.reload();
+  })
 
   // Scene Objects  ---------------------------------------------------
 
