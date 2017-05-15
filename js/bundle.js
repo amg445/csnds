@@ -3,12 +3,17 @@ var song_url;
 var audio;
 
 var analyze = require('web-audio-analyser');
-var scr     = require('soundcloud-resolve');
 
 
 function getSongFromURL() {
   var hash = window.location.hash;
   var song = hash.substring(1);
+
+  console.log(song);
+
+  if (song == "") {
+    song = 'https://soundcloud.com/verzache/conscious';
+  }
 
   $('#js-songs option').each(function(){
     var val = this.value;
@@ -36,7 +41,6 @@ require('soundcloud-badge')({
   song_url = src;
   init()
 
-  console.log(data)
 })
 
 
@@ -51,8 +55,6 @@ function init() {
     console.log('playing!')
     analyzer = analyze(audio, { audible: true, stereo: false })
     var waves = analyzer.waveform();
-    console.log(waves);
-    console.log(analyzer);
     var spec = waves.map(function(m) {
       var val = m/255; return val; });
     audio.play()
@@ -92,7 +94,7 @@ function init() {
 // }
 // window.requestAnimationFrame(updateWebGL);
 
-},{"soundcloud-badge":7,"soundcloud-resolve":8,"web-audio-analyser":9}],2:[function(require,module,exports){
+},{"soundcloud-badge":7,"web-audio-analyser":9}],2:[function(require,module,exports){
 (function (global){
 if (typeof window !== "undefined") {
     module.exports = window
