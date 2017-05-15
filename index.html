@@ -294,8 +294,8 @@
     for (var i = 0; i < scene.particles.list.length; i++) {
       for (var j = 0; j < scene.particles.list[i].length; j++) {
         var particle = scene.particles.list[i][j];
-        var spectrumAmp = spectrum[i]/100;
-        var waveformAmp = waveform[j]/100;
+        var spectrumAmp = spectrum[i]/30;
+        var waveformAmp = waveform[j]/30;
 
         var vNoise = 0.5 * PerlinNoise.noise((i+inc)/30,(j+inc)/30,.5);
 
