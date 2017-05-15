@@ -438,22 +438,22 @@
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    if (sound != null && sound.isPlaying()) {
-      $('#slide').val(sound.currentTime());
-    }
+    //if (sound != null && sound.isPlaying()) {
+      //$('#slide').val(sound.currentTime());
+    //}
     // Update Scene based on song data (time in ms)
-    if (time - prevTime > 9) {
-      if (fft != null && sound != null && sound.isPlaying()) {
+    //if (time - prevTime > 9) {
+      //if (fft != null && sound != null && sound.isPlaying()) {
         // Song is playing
-        var spectrum = fft.analyze();
-        var waveform = fft.waveform();
-        updateScene(scene, spectrum, waveform, scaleFactor, threshold);
+        //var spectrum = fft.analyze();
+        //var waveform = fft.waveform();
+        //updateScene(scene, spectrum, waveform, scaleFactor, threshold);
 
         //var s = Math.abs(fft.waveform()[0]) * 10;
         //scene.particles.scale = [s, s, s];
         //updateToWorldMatrix(scene.particles);
-      }
-    }
+      //}
+    //}
 
     if(analyzer){
       var waves = analyzer.waveform();
