@@ -299,19 +299,19 @@
     for (var i = 0; i < scene.particles.list.length; i++) {
       for (var j = 0; j < scene.particles.list[i].length; j++) {
         var particle = scene.particles.list[i][j];
-        var spectrumAmp = spectrum[i]/100;
-        var waveformAmp = waveform[j]/100;
+        var spectrumAmp = spectrum[i]/30;
+        var waveformAmp = waveform[j]/30;
 
-        var v = PerlinNoise.noise((i+inc)/30,(j+inc)/30,.5);
-
-        // var v = (spectrumAmp / 255) * waveformAmp * scale;
-        //console.log("spectrumAmp: " + spectrumAmp);
-        //console.log("waveformAmp: " + waveformAmp);
+        var v = PerlinNoise.noise((i+inc)/50,(j+inc)/50,.5);
+        var v2 = (spectrumAmp / 255) * waveformAmp * scale;
+        // console.log("spectrumAmp: " + spectrumAmp);
+        // console.log("waveformAmp: " + waveformAmp);
         //console.log("v: " + v + "\n");
-        if (v > threshold) {
-          moveParticle(particle, v);
+        // console.log(v2);
+        if (v2 > threshold) {
+          moveParticle(particle, v+v2);
         } else {
-          moveParticle(particle, 0);
+          moveParticle(particle, v);
         }
       }
     }
