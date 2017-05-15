@@ -246,6 +246,8 @@
    *              range: [-1.0, +1.0]
    * [scale] - scale factor for particle offset
    */
+
+   var inc = 0;
   function updateScene(scene, spectrum, waveform, scale, threshold) {
     // Scale [waveform] by [spectrum]
     for (var i = 0; i < scene.particles.list.length; i++) {
@@ -254,7 +256,7 @@
         var spectrumAmp = spectrum[i]/100;
         var waveformAmp = waveform[j]/100;
 
-        var v = PerlinNoise.noise(i/20,j/20,.5);
+        var v = PerlinNoise.noise((i+inc)/50,(j+inc)/50,.5);
 
         // var v = (spectrumAmp / 255) * waveformAmp * scale;
         //console.log("spectrumAmp: " + spectrumAmp);
@@ -375,6 +377,7 @@
   // UpdateWebGL --------------------------------------------------------------
   var prevTime = 0;
   function updateWebGL(time) {
+    inc++;
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -480,7 +483,7 @@
     }
 
     var s = 3;
-    
+
     // W - rotate up - incr x
     if (map[87]) {
        offset[0] += s;
