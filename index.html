@@ -72,8 +72,9 @@
     <select name="" id="js-songs" class="song-select">
       <option value="https://soundcloud.com/itndylan/lemons-dylan">Lemons</option>
       <option value="https://soundcloud.com/lidogotsongs/feel-it-still-lido-remix">Feel it Still</option>
-      <option value="https://soundcloud.com/liluzivert/15-xo-tour-llif3">XO TOUR lLif3</option>
+      <option value="https://soundcloud.com/liluzivert/15-xo-tour-llif3">XO TOUR Lif3</option>
       <option value="https://soundcloud.com/green-mountain-boys/power-moves-rough">Power Moves [Rough]</option>
+      <option value="https://soundcloud.com/travisscott-2/11-grey">Grey - Travis Scott</option>
     </select>
   </div>
 
@@ -301,6 +302,16 @@
   function updateSceneOffset(scene, offset) {
     var [x, y, z] = offset;
     var v = Math.PI/500;
+
+    // Check if flipped
+    var vec = vec3.fromValues(0, 1, 0);
+    var vecTrans = vec3.create();
+    vec3.transformMat4(vecTrans, vec, scene.particles.toWorld);
+    var angle = vec3.angle(vec, vecTrans);
+    if (angle > Math.PI/2) {
+      y = -y;
+    }
+
     var Rx = mat4.create();
     mat4.fromXRotation(Rx, x*v);
     mat4.mul(scene.particles.toWorld, Rx, scene.particles.toWorld);
@@ -312,6 +323,11 @@
     var Tz = mat4.create();
     var offsetZ = vec3.fromValues(0, 0, z/50);
     vec3.add(scene.camera.position, scene.camera.position, offsetZ);
+    if (scene.camera.position[2] < 0) {
+      scene.camera.position[2] = 0;
+    } else if (scene.camera.position[2] > 100) {
+      scene.camera.position[2] = 100;
+    }
     updateToWorldMatrix(scene.camera);
   }
 
@@ -442,106 +458,119 @@
   });
 
 
-
+  var map = {
+    87: false,
+    83: false,
+    65: false,
+    68: false,
+    81: false,
+    69: false
+  };
   /**
    * Move rotate camera from WASD, SHIFT, SPACEBAR
    * - W/S: rotate up/down
    * - A/D: rotate left/right
    * - Q/E: zoom in/out
    */
-  document.addEventListener('keydown', function(event) {
+  $("#webglCanvas").on('keydown', function(event) {
 
-    var s = 1;
+    // Update map
+    if (event.keyCode in map) {
+      map[event.keyCode] = true;
+    }
 
-    switch (event.keyCode) {
+    var s = 3;
+    
+    // W - rotate up - incr x
+    if (map[87]) {
+       offset[0] += s;
+    }
 
-      // W - rotate up - incr x
-      case 87: console.log("W");
-               offset[0] += s;
-               break;
+    // S - rotate down - decr x
+    if (map[83]) {
+       offset[0] -= s;
+    }
 
-      // S - rotate down - decr x
-      case 83: console.log("S");
-               offset[0] -= s;
-               break;
+    // A - rotate left - incr y
+    if (map[65]) {
+       offset[1] += s;
+    }
 
-      // A - rotate left - incr y
-      case 65: console.log("A");
-               offset[1] += s;
-               break;
+    // D - rotate right - incr y
+    if (map[68]) {
+       offset[1] -= s;
+    }
 
-      // D - rotate right - incr y
-      case 68: console.log("D");
-               offset[1] -= s;
-               break;
+    // Q - zoom out - incr z
+    if (map[81]) {
+       offset[2] += s/2;
+    }
 
-      // Q - zoom out - incr z
-      case 81: console.log("Q");
-               offset[2] += s;
-               break;
+    // E - zoom in - decr z
+    if (map[69]) {
+       offset[2] -= s/2;
+    }
+  });
 
-      // E - zoom in - decr z
-      case 69: console.log("E");
-               offset[2] -= s;
-               break;
-
-      // Not a movement key - do nothing
-      default: return;
+  $("#webglCanvas").on('keyup', function(event) {
+    // Update map
+    if (event.keyCode in map) {
+      map[event.keyCode] = false;
     }
   });
 
 
   // NOT SURE WE WANT TO GO ON CHANGE, PROBABLY ON BUTTON PRESS, BUT TESTING FOR NOW
 
-  $('#js-song').on('change', function() {
-
-      var url = $(this).val();
-      var song = url.split('\\').pop();
-      console.log(song);
-
-      var s = function(p) {
-
-        p.preload = function() {
-          p.soundFormats('m4a');
-          sound = p.loadSound('assets/'+song);
-        }
-
-        p.setup = function() {
-          fft = new p5.FFT();
-          fft.smoothing = smoothing;
-          fft.bins = bins;
-          sound.amp(0.2);
-          sound.pause();
-          $('#slide').attr('max', sound.duration());
-          $('#slide').on('input', function() {
-            var pause = sound.isPaused();
-            sound.jump($(this).val());
-            if (pause) { sound.pause(); }
-          });
-        }
-
-        p.draw = function() {
-          var spectrum = fft.analyze();
-          var waveform = fft.waveform();
-        }
-
-        p.togglePlay = function() {
-          if ( sound.isPlaying() ) {
-            sound.pause();
-            $('#play').html('Play');
-          } else {
-            sound.play();
-            $('#play').html('Pause');
-          }
-        }
-
-        $('#play').on('click', p.togglePlay);
-
-      }
-
-      var myp5 = new p5(s);
-
-  });
+  //$('#js-song').on('change', function() {
+//
+      //var url = $(this).val();
+      //var song = url.split('\\').pop();
+      //console.log(song);
+//
+      //var s = function(p) {
+//
+        //p.preload = function() {
+          //p.soundFormats('m4a');
+          //sound = p.loadSound('assets/'+song);
+        //}
+//
+        //p.setup = function() {
+          //fft = new p5.FFT();
+          //fft.smoothing = smoothing;
+          //fft.bins = bins;
+          //sound.amp(0.2);
+          //sound.pause();
+          //$('#slide').attr('max', sound.duration());
+          //$('#slide').on('input', function() {
+            //var pause = sound.isPaused();
+            //sound.jump($(this).val());
+            //if (pause) { sound.pause(); }
+          //});
+        //}
+//
+        //p.draw = function() {
+          //var spectrum = fft.analyze();
+          //var waveform = fft.waveform();
+        //}
+//
+        //p.togglePlay = function() {
+          //if ( sound.isPlaying() ) {
+            //sound.pause();
+            //$('#play').html('Play');
+          //} else {
+            //sound.play();
+            //$('#play').html('Pause');
+          //}
+        //}
+//
+        //$('#play').on('click', p.togglePlay);
+//
+      //}
+//
+      //var myp5 = new p5(s);
+//
+  //});
 
   </script>
 </body>
