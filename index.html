@@ -351,18 +351,25 @@
     var [x, y, z] = offset;
     var v = Math.PI/500;
 
-    // Check if flipped
+    var Rx = mat4.create();
+    mat4.fromXRotation(Rx, x*v);
+    mat4.mul(scene.particles.toWorld, Rx, scene.particles.toWorld);
+
+    // Keep rotation around x bound by 180 degrees
     var vec = vec3.fromValues(0, 1, 0);
     var vecTrans = vec3.create();
     vec3.transformMat4(vecTrans, vec, scene.particles.toWorld);
     var angle = vec3.angle(vec, vecTrans);
     if (angle > Math.PI/2) {
-      y = -y;
+      var sign = 1;
+      if (vecTrans[2] < 0) {
+        sign = -1;
+      }
+      // Stop rotation around x
+      var RxBack = mat4.create();
+      mat4.fromXRotation(RxBack, sign * ((Math.PI/2) - angle) );
+      mat4.mul(scene.particles.toWorld, RxBack, scene.particles.toWorld);
     }
-
-    var Rx = mat4.create();
-    mat4.fromXRotation(Rx, x*v);
-    mat4.mul(scene.particles.toWorld, Rx, scene.particles.toWorld);
 
     var Ry = mat4.create();
     mat4.fromYRotation(Ry, y*v);
