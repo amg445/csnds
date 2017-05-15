@@ -9,11 +9,11 @@ function getSongFromURL() {
   var hash = window.location.hash;
   var song = hash.substring(1);
 
-  console.log(song);
-
   if (song == "") {
     song = 'https://soundcloud.com/verzache/conscious';
   }
+
+  console.log(song);
 
   $('#js-songs option').each(function(){
     var val = this.value;
@@ -26,7 +26,18 @@ function getSongFromURL() {
 
 //TODO: Make it play again...
 // only pauses for now bc its annoying listen to 1000 times
-$('#js-pause').on('click', function() { console.log('p'); if(Audio){audio.pause();} });
+$('.js-pause').on('click', function() {
+  var status = $(this).text();
+  console.log(status);
+   if(Audio && status == "Pause"){
+     audio.pause();
+     this.innerHTML = 'Play';
+   }
+   else if (status == "Play"){
+     audio.play();
+     this.innerHTML = 'Pause';
+   }
+ });
 
 var song = getSongFromURL();
 

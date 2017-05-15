@@ -69,7 +69,7 @@
   </div> -->
 
   <div>
-    <p class="js-pause" style="float: right;">pause</p>
+    <p class="js-pause" style="float: right;">Pause</p>
   </div>
 
   <div>
@@ -381,7 +381,7 @@
   // UpdateWebGL --------------------------------------------------------------
   var prevTime = 0;
   function updateWebGL(time) {
-    inc++;
+    // inc++;
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -404,8 +404,7 @@
 
     if(analyzer){
       var waves = analyzer.waveform();
-      var spec = waves.map(function(m) {
-        var val = m/255; return val; });
+      if($('.js-pause').text() == 'Pause') inc += waves[0]/70;
       updateScene(scene, waves, waves, scaleFactor,threshold);
     }
 
