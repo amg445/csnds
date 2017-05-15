@@ -75,13 +75,6 @@
       font-weight: 700;
     }
 
-    .song-full{
-      margin: 10px auto;
-      font-size: 24px;
-      text-align: center;
-      font-weight: bold;
-      margin-top: 10px;
-    }
 
 
 
@@ -89,14 +82,6 @@
 </head>
 
 <body>
-
-  <!-- <label for="js-song">Choose Song:</label>
-  <input type="file" id="js-song"> -->
-
-  <!-- <div id="play-bar">
-    <button id="play">Play</button>
-    <input type="range" id="slide" value="0" />
-  </div> -->
 
 
   <div>
@@ -116,8 +101,6 @@
   <div class="song-btns">
     <p class="js-pause">Pause</p>
   </div>
-
-  <p class="song-full">SCROLL 4 FULLSCREEN!</p>
 
   <div class="flex">
     <canvas tabindex="1" id="webglCanvas" style="border: none; background-color: black;" width="1000" height="600"></canvas>
@@ -583,58 +566,6 @@
     }
   });
 
-
-  // NOT SURE WE WANT TO GO ON CHANGE, PROBABLY ON BUTTON PRESS, BUT TESTING FOR NOW
-
-  //$('#js-song').on('change', function() {
-//
-      //var url = $(this).val();
-      //var song = url.split('\\').pop();
-      //console.log(song);
-//
-      //var s = function(p) {
-//
-        //p.preload = function() {
-          //p.soundFormats('m4a');
-          //sound = p.loadSound('assets/'+song);
-        //}
-//
-        //p.setup = function() {
-          //fft = new p5.FFT();
-          //fft.smoothing = smoothing;
-          //fft.bins = bins;
-          //sound.amp(0.2);
-          //sound.pause();
-          //$('#slide').attr('max', sound.duration());
-          //$('#slide').on('input', function() {
-            //var pause = sound.isPaused();
-            //sound.jump($(this).val());
-            //if (pause) { sound.pause(); }
-          //});
-        //}
-//
-        //p.draw = function() {
-          //var spectrum = fft.analyze();
-          //var waveform = fft.waveform();
-        //}
-//
-        //p.togglePlay = function() {
-          //if ( sound.isPlaying() ) {
-            //sound.pause();
-            //$('#play').html('Play');
-          //} else {
-            //sound.play();
-            //$('#play').html('Pause');
-          //}
-        //}
-//
-        //$('#play').on('click', p.togglePlay);
-//
-      //}
-//
-      //var myp5 = new p5(s);
-//
-  //});
 
   </script>
 </body>
