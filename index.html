@@ -82,6 +82,7 @@
   </div>
 
   <script src="js/bundle.js" charset="utf-8"></script>
+  <script src="js/perlin.js" charset="utf-8"></script>
 
   <script id="vertexShader--basic" type="x-shader/x-vertex">
     attribute vec3 position;
@@ -101,7 +102,9 @@
     uniform vec3 color;
 
     void main() {
-      gl_FragColor = vec4(color, 1.0);
+      // changed the color to white bc it was flashy
+      // gl_FragColor = vec4(color,1.0);
+      gl_FragColor = vec4(1.0,1.0,1.0, 1.0);
     }
   </script>
 
@@ -247,10 +250,12 @@
     for (var i = 0; i < scene.particles.list.length; i++) {
       for (var j = 0; j < scene.particles.list[i].length; j++) {
         var particle = scene.particles.list[i][j];
-        var spectrumAmp = spectrum[i]/50;
-        var waveformAmp = waveform[j]/50;
+        var spectrumAmp = spectrum[i]/100;
+        var waveformAmp = waveform[j]/100;
 
-        var v = (spectrumAmp / 255) * waveformAmp * scale;
+        var v = PerlinNoise.noise(i/20,j/20,.5);
+
+        // var v = (spectrumAmp / 255) * waveformAmp * scale;
         //console.log("spectrumAmp: " + spectrumAmp);
         //console.log("waveformAmp: " + waveformAmp);
         //console.log("v: " + v + "\n");
