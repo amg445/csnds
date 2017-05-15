@@ -378,10 +378,14 @@
     var Tz = mat4.create();
     var offsetZ = vec3.fromValues(0, 0, z/50);
     vec3.add(scene.camera.position, scene.camera.position, offsetZ);
-    if (scene.camera.position[2] < 0) {
-      scene.camera.position[2] = 0;
-    } else if (scene.camera.position[2] > 100) {
-      scene.camera.position[2] = 100;
+    
+    // Check min/max zoom
+    var min = 0.5;
+    var max = 30;
+    if (scene.camera.position[2] < min) {
+      scene.camera.position[2] = min;
+    } else if (scene.camera.position[2] > max) {
+      scene.camera.position[2] = max;
     }
     updateToWorldMatrix(scene.camera);
   }
