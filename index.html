@@ -20,8 +20,6 @@
   crossorigin="anonymous">
   </script>
 
-  <script language="javascript" type="text/javascript" src="js/p5.js"></script>
-  <script language="javascript" type="text/javascript" src="js/p5.sound.js"></script>
   <script language="javascript" type="text/javascript" src="js/gl-matrix-min.js"></script>
   <script language="javascript" type="text/javascript" src="js/preloadjs-0.6.2.min.js"></script>
   <script language="javascript" type="text/javascript" src="js/boilerplate.js"></script>
@@ -306,6 +304,9 @@
         //console.log("waveformAmp: " + waveformAmp);
         //console.log("v: " + v + "\n");
         //console.log("threshold: " + threshold);
+
+        //vNoise = PerlinNoise.noise((i+inc)/50,(j+inc)/50,.5);
+        //vSound = (spectrumAmp / 255) * waveformAmp * scale;
 
         var v = vNoise + vSound;
         //console.log("vSound: " + vSound);
