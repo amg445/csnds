@@ -70,14 +70,10 @@
       font-weight: 700;
     }
 
-
-
-
   </style>
 </head>
 
 <body>
-
 
   <div>
     <select name="" id="js-songs" class="song-select">
@@ -89,9 +85,6 @@
       <option value="https://soundcloud.com/travisscott-2/11-grey">Grey - Travis Scott</option>
     </select>
   </div>
-
-
-
 
   <div class="song-btns">
     <p class="js-pause">Pause</p>
@@ -120,11 +113,48 @@
   <script id="fragmentShader--basic" type="x-shader/x-fragment">
     precision highp float;
     uniform vec3 color;
+    uniform float displacement;
+
+    vec4 aqua = vec4(0.0, 0.81, 0.79, 1.0);
+    vec4 white = vec4(1.0);
+    vec4 purp = vec4(0.68, 0.0, 0.65, 1.0);
 
     void main() {
-      // changed the color to white bc it was flashy
-      gl_FragColor = vec4(color,1.0);
-      // gl_FragColor = vec4(1.0,1.0,1.0, 1.0);
+      if (displacement == 1.0) {
+        if (color.x > color.y && color.x > color.z) {
+          gl_FragColor = aqua;
+        } else if (color.y > color.x && color.y > color.z) {
+          gl_FragColor = white;
+        } else {
+          gl_FragColor = purp;
+        }
+      } else {
+        gl_FragColor = purp;
+      }
+
+
+    }
+  </script>
+
+  <script id="vertexShader--background" type="x-shader/x-vertex">
+    attribute vec3 vert_position;
+    attribute vec2 vert_texCoord;
+
+    varying vec2 texCoord;
+
+    void main() {
+      gl_Position = vec4(vert_position, 1.0);
+      texCoord = vert_texCoord;
+    }
+  </script>
+
+  <script id="fragmentShader--background" type="x-shader/x-fragment">
+    precision highp float;
+
+    varying vec2 texCoord;
+
+    void main() {
+      gl_FragColor = ((3.0 - texCoord.x) / 4.5 * vec4(1.0)) + vec4(1.0, 0.27, 0.73, 1.0);
     }
   </script>
 
@@ -165,6 +195,7 @@
     particle.scale = [s, s, s];
     particle.baseColor = vec3.fromValues(c[0], c[1], c[2]);
     particle.color = vec3.fromValues(c[0], c[1], c[2]);
+    particle.displacement = 0.0;
 
     // Create [particle.toWorld] matrix
     updateToWorldMatrix(particle);
@@ -254,7 +285,7 @@
         var particle = particles.list[i][j];
         var toWorld = mat4.create();
         mat4.mul(toWorld, particles.toWorld, particle.toWorld);
-        drawShape(gl, scene.shape, camera, toWorld, particle.color);
+        drawShape(gl, scene.shape, camera, toWorld, particle.color, particle.displacement);
       }
     }
   }
@@ -270,6 +301,7 @@
   var inc = 0;
   function updateScene(scene, spectrum, waveform, scale, threshold) {
     // Scale [waveform] by [spectrum]
+    var displaced = 0;
     for (var i = 0; i < scene.particles.list.length; i++) {
       for (var j = 0; j < scene.particles.list[i].length; j++) {
         var particle = scene.particles.list[i][j];
@@ -292,11 +324,16 @@
 
         if (vSound > threshold) {
           moveParticle(particle, v);
+          particle.displacement = 1.0;
+          displaced++;
         } else {
           moveParticle(particle, vNoise);
+          particle.displacement = 0.0;
         }
       }
     }
+    if (displaced >= scene.particles.list.length * scene.particles.list[0].length / 2) { setWire(); }
+    else { setCube(); }
   }
 
   /**
@@ -376,6 +413,7 @@
   // Global Vars
   var gl = initializeWebGL($("#webglCanvas"));
   var basic_shader = createGlslProgram(gl, "vertexShader--basic", "fragmentShader--basic");
+  var background_shader = createGlslProgram(gl, "vertexShader--background", "fragmentShader--background");
   //var fft = null;
   //var sound = null;
   var smoothing = 0.99;   // range: (0.0, 1.0), def: 0.8
@@ -410,17 +448,32 @@
 
   // Create shape
   var cube = createShape(gl, basic_shader, cubeData, true);
+  var wireframe = createShape(gl, basic_shader, cubeData, false);
 
   // Create scene
-  var scene = createScene(camera, particles, cube);
+  var cubescene = createScene(camera, particles, cube);
+  var wirescene = createScene(camera, particles, wireframe);
+
+  var scenetype = 'cube';
+
+  var setCube = function () { scenetype = 'cube'; };
+  var setWire = function () { scenetype = 'wire'; };
+
+  function getScene(type) {
+    switch (type) {
+      case 'cube':  return cubescene;
+      case 'wire': return wirescene;
+      default: return cubescene;
+    }
+  }
 
   // UpdateWebGL --------------------------------------------------------------
   var prevTime = 0;
   function updateWebGL(time) {
-    // inc++;
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
 
+    scene = getScene(scenetype);
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
 
 
     if(canPlay){
@@ -428,6 +481,7 @@
       analyser.getByteFrequencyData(freqArray);  // Frequency data
       if($('.js-pause').text() == 'Pause') inc += .5;
       updateScene(scene, waveArray, freqArray, scaleFactor,threshold);
+      drawBackground(background_shader);
     }
 
 
