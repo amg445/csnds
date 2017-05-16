@@ -154,9 +154,9 @@
     vec4 litepink = vec4(255.0,	182.0, 193.0, 255.0) / 255.0;
 
     void main() {
-      float r = 2.0 + (0.25 * abs(sin(time/bpm)));
+      float r = 2.5 + (0.55 * abs(sin(time/bpm)));
       // adjust by 5/3 to make circular
-      float t = max(0.0, (r * r) - (25.0 * position.x * position.x) - (9.0 * position.y * position.y));
+      float t = max(0.0, 0.1 * ((r * r) - (25.0 * position.x * position.x) - (9.0 * position.y * position.y)));
       t = min(t, .8);
       gl_FragColor = (1.0 - t) * blue + t * litepink;
     }
