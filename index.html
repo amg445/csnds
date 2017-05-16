@@ -506,12 +506,14 @@
     gl.clear(gl.COLOR_BUFFER_BIT);
 
 
-    if(canPlay && (time - prevTime) > 100) {
-      prevTime = time;
+    if(canPlay && (time - prevTime) > 75) {
       analyser.getByteTimeDomainData(waveArray); // Wavalength data
       analyser.getByteFrequencyData(freqArray);  // Frequency data
-      if($('.js-pause').text() == 'Pause') inc += .5;
-      updateScene(scene, freqArray, waveArray, scaleFactor, threshold);
+      if ($('.js-pause').text() == 'Pause') {
+        inc += .5;
+        updateScene(scene, freqArray, waveArray, scaleFactor, threshold);
+        prevTime = time;
+      }
     }
 
     drawBackground(background_shader, time);
