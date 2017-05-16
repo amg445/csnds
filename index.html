@@ -335,7 +335,7 @@
         //vSound = (spectrumAmp / 255) * waveformAmp * scale;
 
         //var v = vNoise + 7 * vSound;
-        var v = vNoise + 8 * (vSound - threshold);
+        var v = vNoise + 9 * (vSound - threshold);
         //console.log("vSound: " + vSound);
 
         if (vSound > threshold) {
@@ -438,7 +438,7 @@
   var smoothing = 0.99;   // range: (0.0, 1.0), def: 0.8
   var bins = 64;   // range: [16, 1024], def: 1024 - MUST be power of 2
   var scaleFactor = 4;  // scale factor (amplitude) for visulization
-  var threshold = 0.018;  // threshold visualization value must be above to move
+  var threshold = 0.020;  // threshold visualization value must be above to move
   var offset = [50,-190,0];   // offset for controlling camera movement
   var analyser;
 
@@ -498,13 +498,15 @@
     gl.clear(gl.COLOR_BUFFER_BIT);
 
 
-    if(canPlay){
+    if(canPlay && (time - prevTime) > 100) {
+      prevTime = time;
       analyser.getByteTimeDomainData(waveArray); // Wavalength data
       analyser.getByteFrequencyData(freqArray);  // Frequency data
       if($('.js-pause').text() == 'Pause') inc += .5;
       updateScene(scene, waveArray, freqArray, scaleFactor,threshold);
-      drawBackground(scene.background_shader);
     }
+
+    drawBackground(scene.background_shader);
 
 
     // Update Camera Position if it has been offset
@@ -515,7 +517,7 @@
     drawScene(gl, scene);
 
     // Reschedule the next frame.
-    prevTime = time;
+    //prevTime = time;
     window.requestAnimationFrame(updateWebGL);
   }
   window.requestAnimationFrame(updateWebGL);

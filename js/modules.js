@@ -69,7 +69,8 @@ function init() {
     var source = audioCtx.createMediaElementSource(audio);
     source.connect(analyser);
 
-    analyser.fftSize = 2048;
+    analyser.fftSize = 2*bins;
+    analyser.smoothingTimeConstant = 0;
     bufferLength = analyser.frequencyBinCount;
     waveArray = new Uint8Array(bufferLength);
     freqArray = new Uint8Array(bufferLength);
