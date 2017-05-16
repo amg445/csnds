@@ -94,7 +94,6 @@
     uniform mat4 projection;
     uniform mat4 toWorld;
     uniform mat4 toCam;
-    uniform vec3 color;
 
     void main() {
       gl_Position = projection * toCam * toWorld * vec4(position, 1.0);
@@ -103,7 +102,6 @@
 
   <script id="fragmentShader--basic" type="x-shader/x-fragment">
     precision highp float;
-    uniform vec3 color;
     uniform float displacement;
 
     vec4 aqua = vec4(0.0, 207.0, 202.0, 255.0) / 255.0;
@@ -111,18 +109,12 @@
     vec4 purp = vec4(59.0, 38.0, 130.0, 255.0) / 255.0;
 
     void main() {
-      gl_FragColor = purp;
-      //if (displacement == 1.0) {
-        //if (color.x > color.y && color.x > color.z) {
-          //gl_FragColor = aqua;
-        //} else if (color.y > color.x && color.y > color.z) {
-          //gl_FragColor = white;
-        //} else {
-          //gl_FragColor = purp;
-        //}
-      //} else {
-        //gl_FragColor = purp;
-      //}
+      // gl_FragColor = purp;
+      if (displacement == 1.0) {
+        gl_FragColor = aqua;
+      } else {
+        gl_FragColor = purp;
+      }
 
 
     }
@@ -150,17 +142,13 @@
     varying vec2 texCoord;
     varying vec3 position;
 
-    vec2 resolution = vec2(1.0);
     vec4 pink = vec4(1.0, 0.27, 0.73, 1.0);
     vec4 white = vec4(1.0);
 
     void main() {
-      vec2 p = position.xy;
-      float r = length(p) *  2.0;
-      float t = sin(time / 1000.0) * exp(-r * r / 2.0);
+      float t = (position.x * position.x) + (position.y * position.y) * sin(time / 500.0); // divide by bpm when michael gets it
       vec4 color1 = vec4(1., .8, .8, 1.), color2 = vec4(.2, .2, 1., 1.);
       gl_FragColor = (1.0 - t) * color1 + t * color2;
-      // gl_FragColor = vec4(p.x, p.y, 0.0, 1.0);
     }
   </script>
 
@@ -199,8 +187,6 @@
     // Instantiate particle
     particle.position = [x, y, z];
     particle.scale = [s, s, s];
-    particle.baseColor = vec3.fromValues(c[0], c[1], c[2]);
-    particle.color = vec3.fromValues(c[0], c[1], c[2]);
     particle.displacement = 0.0;
 
     // Create [particle.toWorld] matrix
@@ -250,10 +236,6 @@
    */
   function moveParticle(particle, value, dir) {
     particle.position[1] = dir * value;
-    var colorScale = vec3.fromValues(Math.random(), Math.random(), Math.random());
-    vec3.scale(colorScale, colorScale, 6 * value);
-    particle.color = vec3.add(particle.color, particle.baseColor, colorScale);
-
     updateToWorldMatrix(particle);
   }
 
@@ -291,7 +273,7 @@
         var particle = particles.list[i][j];
         var toWorld = mat4.create();
         mat4.mul(toWorld, particles.toWorld, particle.toWorld);
-        drawShape(gl, scene.shape, camera, toWorld, particle.color, particle.displacement);
+        drawShape(gl, scene.shape, camera, toWorld, particle.displacement);
       }
     }
   }
@@ -305,7 +287,7 @@
    * [scale] - scale factor for particle offset
    */
   var inc = 0;
-  function updateScene(scene, spectrum, waveform, scale, threshold) {
+  function updateScene(scene, spectrum, waveform, scale, threshold, time) {
     // Scale [waveform] by [spectrum]
     var soundA = 2;
     var noiseA = 0.3;
@@ -478,7 +460,7 @@
   function getScene(type) {
     switch (type) {
       case 'cube':  return cubescene;
-      case 'wire': return wirescene;
+      case 'wire': return cubescene;
       default: return cubescene;
     }
   }

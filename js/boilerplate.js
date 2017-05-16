@@ -123,7 +123,7 @@ function createShape(gl, shader, data, faces) {
 }
 
 //function drawShape(gl, shape, program, camera, toWorld, faces) {
-function drawShape(gl, shape, camera, toWorld, color, displacement) {
+function drawShape(gl, shape, camera, toWorld, displacement) {
     var program = shape.shader;
     var faces = shape.faces;
 
@@ -142,9 +142,6 @@ function drawShape(gl, shape, camera, toWorld, color, displacement) {
     var toCam = mat4.create();
     mat4.invert(toCam, camera.toWorld);
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "toCam"), false, toCam);
-
-    var colorLocation = gl.getUniformLocation(program, "color");
-    gl.uniform3fv(colorLocation, color);
 
     var displacementLocation = gl.getUniformLocation(program, "displacement");
     gl.uniform1f(displacementLocation, displacement);
