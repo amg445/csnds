@@ -78,7 +78,6 @@
 
 <body>
 
-
   <div>
     <select name="" id="js-songs" class="song-select">
       <option value="https://soundcloud.com/verzache/conscious">Conscious</option>
@@ -89,9 +88,6 @@
       <option value="https://soundcloud.com/travisscott-2/11-grey">Grey - Travis Scott</option>
     </select>
   </div>
-
-
-
 
   <div class="song-btns">
     <p class="js-pause">Pause</p>
@@ -310,6 +306,7 @@
   var inc = 0;
   function updateScene(scene, spectrum, waveform, scale, threshold) {
     // Scale [waveform] by [spectrum]
+    var displaced = 0;
     for (var i = 0; i < scene.particles.list.length; i++) {
       for (var j = 0; j < scene.particles.list[i].length; j++) {
         var particle = scene.particles.list[i][j];
@@ -332,11 +329,14 @@
 
         if (vSound > threshold) {
           moveParticle(particle, v);
+          displaced++;
         } else {
           moveParticle(particle, vNoise);
         }
       }
     }
+    if (displaced >= scene.particles.list.length * scene.particles.list[0].length / 2) { setWire(); }
+    else { setCube(); }
   }
 
   /**
@@ -452,9 +452,24 @@
 
   // Create shape
   var cube = createShape(gl, basic_shader, cubeData, true);
+  var wireframe = createShape(gl, basic_shader, cubeData, false);
 
   // Create scene
-  var scene = createScene(camera, particles, cube);
+  var cubescene = createScene(camera, particles, cube);
+  var wirescene = createScene(camera, particles, wireframe);
+  
+  var scenetype = 'cube';
+
+  var setCube = function () { scenetype = 'cube'; };
+  var setWire = function () { scenetype = 'wire'; };
+  
+  function getScene(type) { 
+    switch (type) {
+      case 'cube':  return cubescene;
+      case 'wire': return wirescene;
+      default: return cubescene;
+    }
+  }
 
   // UpdateWebGL --------------------------------------------------------------
   var prevTime = 0;
@@ -481,6 +496,8 @@
         //updateToWorldMatrix(scene.particles);
       //}
     //}
+
+    var scene = getScene(scenetype);
 
     if(analyzer){
       var waves = analyzer.waveform();
