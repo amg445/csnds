@@ -23,10 +23,7 @@
   <script language="javascript" type="text/javascript" src="js/gl-matrix-min.js"></script>
   <script language="javascript" type="text/javascript" src="js/preloadjs-0.6.2.min.js"></script>
   <script language="javascript" type="text/javascript" src="js/boilerplate.js"></script>
-  <script
-  src="https://code.jquery.com/color/jquery.color-2.1.2.min.js"
-  integrity="sha256-H28SdxWrZ387Ldn0qogCzFiUDDxfPiNIyJX7BECQkDE="
-  crossorigin="anonymous"></script>
+
 
   <style>
     body { background-color: white; color: black; font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
@@ -123,8 +120,8 @@
     vec4 purp = vec4(59.0, 38.0, 130.0, 255.0) / 255.0;
 
     void main() {
-      if (displacement == 1.0) { 
-        if (color.x > color.y && color.x > color.z) { 
+      if (displacement == 1.0) {
+        if (color.x > color.y && color.x > color.z) {
           gl_FragColor = aqua;
         } else if (color.y > color.x && color.y > color.z) {
           gl_FragColor = white;
@@ -135,7 +132,7 @@
         gl_FragColor = purp;
       }
 
-      
+
     }
   </script>
 
@@ -162,29 +159,11 @@
   </script>
 
   <script>
-
-  $(document).ready(function(){
-      var scroll_pos = 0;
-      var animation_begin_pos = 0;
-      var animation_end_pos = 100;
-      var beginning_color = new $.Color( 'rgb(255,255,255)' );
-      var ending_color = new $.Color( 'rgb(0,0,0)' ); ;
-      $(document).scroll(function() {
-          scroll_pos = $(this).scrollTop();
-          if(scroll_pos >= animation_begin_pos && scroll_pos <= animation_end_pos ) {
-              var percentScrolled = scroll_pos / ( animation_end_pos - animation_begin_pos );
-              var newRed = beginning_color.red() + ( ( ending_color.red() - beginning_color.red() ) * percentScrolled );
-              var newGreen = beginning_color.green() + ( ( ending_color.green() - beginning_color.green() ) * percentScrolled );
-              var newBlue = beginning_color.blue() + ( ( ending_color.blue() - beginning_color.blue() ) * percentScrolled );
-              var newColor = new $.Color( newRed, newGreen, newBlue );
-              $('body').animate({ backgroundColor: newColor }, 0);
-          } else if ( scroll_pos > animation_end_pos ) {
-               $('body').animate({ backgroundColor: ending_color }, 0);
-          } else if ( scroll_pos < animation_begin_pos ) {
-               $('body').animate({ backgroundColor: beginning_color }, 0);
-          } else { }
-      });
-  });
+  var canPlay = false;
+  var analyser;
+  var waveArray;
+  var freqArray;
+  var bufferLength;
 
   function getSongFromURL() {
     var hash = window.location.hash;
@@ -418,7 +397,7 @@
     var Tz = mat4.create();
     var offsetZ = vec3.fromValues(0, 0, z/50);
     vec3.add(scene.camera.position, scene.camera.position, offsetZ);
-    
+
     // Check min/max zoom
     var min = 0.5;
     var max = 30;
@@ -442,8 +421,7 @@
   var scaleFactor = 4;  // scale factor (amplitude) for visulization
   var threshold = 0.18;  // threshold visualization value must be above to move
   var offset = [50,-190,0];   // offset for controlling camera movement
-  var analyzer;
-  //analyzer.fftSize = bins;
+  var analyser;
 
   // Create Projection Matrix (Perspective Camera)
   var perspectiveMatrix = mat4.create();
@@ -475,13 +453,13 @@
   // Create scene
   var cubescene = createScene(camera, particles, cube);
   var wirescene = createScene(camera, particles, wireframe);
-  
+
   var scenetype = 'cube';
 
   var setCube = function () { scenetype = 'cube'; };
   var setWire = function () { scenetype = 'wire'; };
-  
-  function getScene(type) { 
+
+  function getScene(type) {
     switch (type) {
       case 'cube':  return cubescene;
       case 'wire': return wirescene;
@@ -492,35 +470,18 @@
   // UpdateWebGL --------------------------------------------------------------
   var prevTime = 0;
   function updateWebGL(time) {
-    // inc++;
+
+    scene = getScene(scenetype);
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    drawBackground(background_shader);
 
-    //if (sound != null && sound.isPlaying()) {
-      //$('#slide').val(sound.currentTime());
-    //}
-    // Update Scene based on song data (time in ms)
-    //if (time - prevTime > 9) {
-      //if (fft != null && sound != null && sound.isPlaying()) {
-        // Song is playing
-        //var spectrum = fft.analyze();
-        //var waveform = fft.waveform();
-        //updateScene(scene, spectrum, waveform, scaleFactor, threshold);
-
-        //var s = Math.abs(fft.waveform()[0]) * 10;
-        //scene.particles.scale = [s, s, s];
-        //updateToWorldMatrix(scene.particles);
-      //}
-    //}
-
-    var scene = getScene(scenetype);
-
-    if(analyzer){
-      var waves = analyzer.waveform();
-      if($('.js-pause').text() == 'Pause') inc += waves[0]/70;
-      updateScene(scene, waves, waves, scaleFactor,threshold);
+    if(canPlay){
+      analyser.getByteTimeDomainData(waveArray); // Wavalength data
+      analyser.getByteFrequencyData(freqArray);  // Frequency data
+      if($('.js-pause').text() == 'Pause') inc += .5;
+      updateScene(scene, waveArray, freqArray, scaleFactor,threshold);
+      drawBackground(background_shader);
     }
 
 
@@ -541,8 +502,8 @@
 
   // Events -------------------------------------------------------------------
   var dragging = false;   // whether or not user is dragging the camera
-  var mousePos;   // [screenX, screenY]
-  var mouseTime;  // time of last mouse event
+  var mousePos;           // [screenX, screenY]
+  var mouseTime;          // time of last mouse event
 
   /**
    * Move rotate camera with click events

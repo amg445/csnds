@@ -2,7 +2,7 @@
 var song_url;
 var audio;
 
-var analyze = require('web-audio-analyser');
+
 
 function getSongFromURL() {
   var hash = window.location.hash;
@@ -59,19 +59,29 @@ function init() {
   audio.crossOrigin = 'Anonymous'
   audio.src = song_url
   audio.loop = true
-  dogs = true;
+  document.body.appendChild(audio);
+
 
   audio.addEventListener('canplay', function() {
-    console.log('playing!')
-    analyzer = analyze(audio, { audible: true, stereo: false })
-    var waves = analyzer.waveform();
-    var spec = waves.map(function(m) {
-      var val = m/255; return val; });
-    audio.play()
+    console.log('playing!');
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+
+    var source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+
+    analyser.fftSize = 2048;
+    bufferLength = analyser.frequencyBinCount;
+    waveArray = new Uint8Array(bufferLength);
+    freqArray = new Uint8Array(bufferLength);
+
+    source.connect(audioCtx.destination);
+    canPlay = true;
+    audio.play();
   })
 }
 
-},{"soundcloud-badge":7,"web-audio-analyser":9}],2:[function(require,module,exports){
+},{"soundcloud-badge":7}],2:[function(require,module,exports){
 (function (global){
 if (typeof window !== "undefined") {
     module.exports = window
@@ -378,7 +388,7 @@ function badge(options, callback) {
   return div
 }
 
-},{"fs":11,"google-fonts":3,"insert-css":4,"minstache":5,"soundcloud-resolve":8}],8:[function(require,module,exports){
+},{"fs":10,"google-fonts":3,"insert-css":4,"minstache":5,"soundcloud-resolve":8}],8:[function(require,module,exports){
 var qs  = require('querystring')
 var xhr = require('xhr')
 
@@ -411,87 +421,7 @@ function resolve(id, goal, callback) {
   })
 }
 
-},{"querystring":14,"xhr":10}],9:[function(require,module,exports){
-var AudioContext = window.AudioContext || window.webkitAudioContext
-
-module.exports = WebAudioAnalyser
-
-function WebAudioAnalyser(audio, ctx, opts) {
-  if (!(this instanceof WebAudioAnalyser)) return new WebAudioAnalyser(audio, ctx, opts)
-  if (!(ctx instanceof AudioContext)) (opts = ctx), (ctx = null)
-
-  opts = opts || {}
-  this.ctx = ctx = ctx || new AudioContext
-
-  if (!(audio instanceof AudioNode)) {
-    audio = (audio instanceof Audio || audio instanceof HTMLAudioElement)
-      ? ctx.createMediaElementSource(audio)
-      : ctx.createMediaStreamSource(audio)
-  }
-
-  this.analyser = ctx.createAnalyser()
-  this.stereo   = !!opts.stereo
-  this.audible  = opts.audible !== false
-  this.wavedata = null
-  this.freqdata = null
-  this.splitter = null
-  this.merger   = null
-  this.source   = audio
-
-  if (!this.stereo) {
-    this.output = this.source
-    this.source.connect(this.analyser)
-    if (this.audible)
-      this.analyser.connect(ctx.destination)
-  } else {
-    this.analyser = [this.analyser]
-    this.analyser.push(ctx.createAnalyser())
-
-    this.splitter = ctx.createChannelSplitter(2)
-    this.merger   = ctx.createChannelMerger(2)
-    this.output   = this.merger
-
-    this.source.connect(this.splitter)
-
-    for (var i = 0; i < 2; i++) {
-      this.splitter.connect(this.analyser[i], i, 0)
-      this.analyser[i].connect(this.merger, 0, i)
-    }
-
-    if (this.audible)
-      this.merger.connect(ctx.destination)
-  }
-}
-
-WebAudioAnalyser.prototype.waveform = function(output, channel) {
-  if (!output) output = this.wavedata || (
-    this.wavedata = new Uint8Array((this.analyser[0] || this.analyser).frequencyBinCount)
-  )
-
-  var analyser = this.stereo
-    ? this.analyser[channel || 0]
-    : this.analyser
-
-  analyser.getByteTimeDomainData(output)
-
-  return output
-}
-
-WebAudioAnalyser.prototype.frequencies = function(output, channel) {
-  if (!output) output = this.freqdata || (
-    this.freqdata = new Uint8Array((this.analyser[0] || this.analyser).frequencyBinCount)
-  )
-
-  var analyser = this.stereo
-    ? this.analyser[channel || 0]
-    : this.analyser
-
-  analyser.getByteFrequencyData(output)
-
-  return output
-}
-
-},{}],10:[function(require,module,exports){
+},{"querystring":13,"xhr":9}],9:[function(require,module,exports){
 var window = require("global/window")
 var once = require("once")
 
@@ -597,9 +527,9 @@ function createXHR(options, callback) {
 
 function noop() {}
 
-},{"global/window":2,"once":6}],11:[function(require,module,exports){
+},{"global/window":2,"once":6}],10:[function(require,module,exports){
 
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -685,7 +615,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -772,10 +702,10 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":12,"./encode":13}]},{},[1]);
+},{"./decode":11,"./encode":12}]},{},[1]);

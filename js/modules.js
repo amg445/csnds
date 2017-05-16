@@ -1,7 +1,7 @@
 var song_url;
 var audio;
 
-var analyze = require('web-audio-analyser');
+
 
 function getSongFromURL() {
   var hash = window.location.hash;
@@ -58,14 +58,24 @@ function init() {
   audio.crossOrigin = 'Anonymous'
   audio.src = song_url
   audio.loop = true
-  dogs = true;
+  document.body.appendChild(audio);
+
 
   audio.addEventListener('canplay', function() {
-    console.log('playing!')
-    analyzer = analyze(audio, { audible: true, stereo: false })
-    var waves = analyzer.waveform();
-    var spec = waves.map(function(m) {
-      var val = m/255; return val; });
-    audio.play()
+    console.log('playing!');
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+
+    var source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+
+    analyser.fftSize = 2048;
+    bufferLength = analyser.frequencyBinCount;
+    waveArray = new Uint8Array(bufferLength);
+    freqArray = new Uint8Array(bufferLength);
+
+    source.connect(audioCtx.destination);
+    canPlay = true;
+    audio.play();
   })
 }
