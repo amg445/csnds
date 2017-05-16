@@ -307,17 +307,23 @@
   var inc = 0;
   function updateScene(scene, spectrum, waveform, scale, threshold) {
     // Scale [waveform] by [spectrum]
+    var soundA = 2;
+    var noiseA = 0.3;
     var displaced = 0;
     for (var i = 0; i < scene.particles.list.length; i++) {
       for (var j = 0; j < scene.particles.list[i].length; j++) {
         var particle = scene.particles.list[i][j];
-        var spectrumAmp = spectrum[i]/100;
-        var waveformAmp = waveform[j]/100;
 
-        var vNoise = 0.5 * PerlinNoise.noise((i+inc)/30,(j+inc)/30,.5);
+        //console.log("freq: " + spectrum[i]);
+        //console.log("wave: " + waveform[j]);
+
+        var spectrumAmp = spectrum[i]/255;
+        var waveformAmp = waveform[j]/255;
+
+        var vNoise = noiseA * PerlinNoise.noise((i+inc)/30,(j+inc)/30,.5);
 
         //var vSound = 5 * (spectrumAmp / 255) * waveformAmp * scale;
-        var vSound = (spectrumAmp / 255) * scale;
+        var vSound = scale * spectrumAmp;
         //console.log("spectrumAmp: " + spectrumAmp);
         //console.log("waveformAmp: " + waveformAmp);
         //console.log("v: " + v + "\n");
@@ -327,7 +333,7 @@
         //vSound = (spectrumAmp / 255) * waveformAmp * scale;
 
         //var v = vNoise + 7 * vSound;
-        var v = vNoise + 9 * (vSound - threshold);
+        var v = vNoise + soundA * (vSound - threshold);
         //console.log("vSound: " + vSound);
 
         if (vSound > threshold) {
@@ -428,7 +434,7 @@
   //var sound = null;
   var smoothing = 0.99;   // range: (0.0, 1.0), def: 0.8
   var bins = 64;   // range: [16, 1024], def: 1024 - MUST be power of 2
-  var scaleFactor = 4;  // scale factor (amplitude) for visulization
+  var scaleFactor = 0.1;  // scale factor (amplitude) for visulization
   var threshold = 0.020;  // threshold visualization value must be above to move
   var offset = [50,-190,0];   // offset for controlling camera movement
   var analyser;
@@ -491,7 +497,7 @@
       analyser.getByteTimeDomainData(waveArray); // Wavalength data
       analyser.getByteFrequencyData(freqArray);  // Frequency data
       if($('.js-pause').text() == 'Pause') inc += .5;
-      updateScene(scene, waveArray, freqArray, scaleFactor,threshold);
+      updateScene(scene, freqArray, waveArray, scaleFactor, threshold);
     }
 
     drawBackground(background_shader, time);
