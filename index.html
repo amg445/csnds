@@ -291,11 +291,14 @@
    * [scale] - scale factor for particle offset
    */
   var inc = 0;
-  function updateScene(scene, spectrum, waveform, scale, threshold, time) {
+  function updateScene(scene, spectrum, waveform) {
     // Scale [waveform] by [spectrum]
     var soundAmp = 2;
     var noiseAmp = 0.3;
     var displaced = 0;
+    var scale = 0.1;
+    var threshold = 0.0;
+
     for (var i = 0; i < scene.particles.list.length; i++) {
       var wVal = ( waveform[i] - (255.0/2.0) ) / (255.0/2.0); // range: [-1, 1];
 
@@ -312,7 +315,7 @@
           var r = val / half;
           var x = ( Math.abs(j - half) ) / half;
           var y = Math.sqrt(Math.pow(r, 2) - Math.pow(x, 2));
-          waveformVal = 2 * y;
+          waveformVal = y;
           
           // Set particle.waveform
           particle.waveform = true;
@@ -327,20 +330,25 @@
         var thresholdSpectrum = 0.5;
         var spectrumSound = 0;
         if (spectrumVal > thresholdSpectrum) {
-          spectrumSound = scale * (spectrumVal - thresholdSpectrum);
+          spectrumSound = spectrumVal - thresholdSpectrum;
           particle.spectrum = true;
         } else {
           particle.spectrum = false;
         }
-        var waveformSound = scale * waveformVal;
 
-        var vSound = spectrumSound + waveformSound;
+        // Waveform
+        var thresholdWaveform = 0.01;
+        var waveformSound = 0;
+        if (waveformVal > thresholdWaveform) {
+          waveformSound = 2.5 * (waveformVal - thresholdWaveform);
+        }
+
+        var vSound = scale * (spectrumSound + waveformSound);
 
         // Noise
         var vNoise = noiseAmp * PerlinNoise.noise((i+inc)/30,(j+inc)/30,.5);
 
         // Final Value
-        threshold = 0;
         var v = vNoise + soundAmp * (vSound - threshold);
 
         if (vSound > threshold) {
@@ -448,7 +456,6 @@
   //var sound = null;
   var smoothing = 0.99;   // range: (0.0, 1.0), def: 0.8
   var bins = 64;   // range: [16, 1024], def: 1024 - MUST be power of 2
-  var scaleFactor = 0.1;  // scale factor (amplitude) for visulization
   var threshold = 0.020;  // threshold visualization value must be above to move
   var offset = [50,-190,0];   // offset for controlling camera movement
   var analyser;
@@ -511,7 +518,7 @@
       analyser.getByteFrequencyData(freqArray);  // Frequency data
       if ($('.js-pause').text() == 'Pause') {
         inc += .5;
-        updateScene(scene, freqArray, waveArray, scaleFactor, threshold);
+        updateScene(scene, freqArray, waveArray);
         prevTime = time;
       }
     }
