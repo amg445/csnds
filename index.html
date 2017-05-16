@@ -73,9 +73,6 @@
       font-weight: 700;
     }
 
-
-
-
   </style>
 </head>
 
@@ -128,6 +125,28 @@
       // changed the color to white bc it was flashy
       gl_FragColor = vec4(color,1.0);
       // gl_FragColor = vec4(1.0,1.0,1.0, 1.0);
+    }
+  </script>
+
+  <script id="vertexShader--background" type="x-shader/x-vertex">
+    attribute vec3 vert_position;
+    attribute vec2 vert_texCoord;
+
+    varying vec2 texCoord;
+
+    void main() {
+      gl_Position = vec4(vert_position, 1.0);
+      texCoord = vert_texCoord;
+    }
+  </script>
+
+  <script id="fragmentShader--background" type="x-shader/x-fragment">
+    precision highp float;
+
+    varying vec2 texCoord;
+
+    void main() {
+      gl_FragColor = 0.5 * (2.0 - abs(texCoord.x) - abs(texCoord.y)) * vec4(0.7, 0.7, 0.7, 1.0);
     }
   </script>
 
@@ -397,6 +416,7 @@
   // Global Vars
   var gl = initializeWebGL($("#webglCanvas"));
   var basic_shader = createGlslProgram(gl, "vertexShader--basic", "fragmentShader--basic");
+  var background_shader = createGlslProgram(gl, "vertexShader--background", "fragmentShader--background");
   //var fft = null;
   //var sound = null;
   var smoothing = 0.99;   // range: (0.0, 1.0), def: 0.8
@@ -440,8 +460,10 @@
   var prevTime = 0;
   function updateWebGL(time) {
     // inc++;
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
+
+    drawBackground(background_shader);
 
     //if (sound != null && sound.isPlaying()) {
       //$('#slide').val(sound.currentTime());
