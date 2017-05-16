@@ -123,7 +123,7 @@ function createShape(gl, shader, data, faces) {
 }
 
 //function drawShape(gl, shape, program, camera, toWorld, faces) {
-function drawShape(gl, shape, camera, toWorld, color, displacement) {
+function drawShape(gl, shape, camera, toWorld, displacement) {
     var program = shape.shader;
     var faces = shape.faces;
 
@@ -143,9 +143,6 @@ function drawShape(gl, shape, camera, toWorld, color, displacement) {
     mat4.invert(toCam, camera.toWorld);
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "toCam"), false, toCam);
 
-    var colorLocation = gl.getUniformLocation(program, "color");
-    gl.uniform3fv(colorLocation, color);
-
     var displacementLocation = gl.getUniformLocation(program, "displacement");
     gl.uniform1f(displacementLocation, displacement);
 
@@ -163,7 +160,7 @@ function drawShape(gl, shape, camera, toWorld, color, displacement) {
     gl.disable(gl.DEPTH_TEST);
 }
 
-function drawBackground(program) {
+function drawBackground(program, time) {
     var vertexData = [
         -1.0, -1.0, 0.0,  // Lower left
         0.0,  0.0,
@@ -200,6 +197,9 @@ function drawBackground(program) {
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
     gl.useProgram(program);
+
+    var timeLocation = gl.getUniformLocation(program, "time");
+    gl.uniform1f(timeLocation, time);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
