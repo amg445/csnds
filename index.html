@@ -132,6 +132,10 @@
   </script>
 
   <script>
+  var canPlay = false;
+  var analyser;
+  var dataArray;
+  var bufferLength;
 
   $(document).ready(function(){
       var scroll_pos = 0;
@@ -381,7 +385,7 @@
     var Tz = mat4.create();
     var offsetZ = vec3.fromValues(0, 0, z/50);
     vec3.add(scene.camera.position, scene.camera.position, offsetZ);
-    
+
     // Check min/max zoom
     var min = 0.5;
     var max = 30;
@@ -404,8 +408,7 @@
   var scaleFactor = 4;  // scale factor (amplitude) for visulization
   var threshold = 0.18;  // threshold visualization value must be above to move
   var offset = [50,-190,0];   // offset for controlling camera movement
-  var analyzer;
-  //analyzer.fftSize = bins;
+  var analyser;
 
   // Create Projection Matrix (Perspective Camera)
   var perspectiveMatrix = mat4.create();
@@ -443,27 +446,16 @@
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    //if (sound != null && sound.isPlaying()) {
-      //$('#slide').val(sound.currentTime());
-    //}
-    // Update Scene based on song data (time in ms)
-    //if (time - prevTime > 9) {
-      //if (fft != null && sound != null && sound.isPlaying()) {
-        // Song is playing
-        //var spectrum = fft.analyze();
-        //var waveform = fft.waveform();
-        //updateScene(scene, spectrum, waveform, scaleFactor, threshold);
 
-        //var s = Math.abs(fft.waveform()[0]) * 10;
-        //scene.particles.scale = [s, s, s];
-        //updateToWorldMatrix(scene.particles);
-      //}
-    //}
 
-    if(analyzer){
-      var waves = analyzer.waveform();
-      if($('.js-pause').text() == 'Pause') inc += waves[0]/70;
-      updateScene(scene, waves, waves, scaleFactor,threshold);
+    if(canPlay){
+      console.log(canPlay);
+      console.log(analyser);
+      analyser.getByteTimeDomainData(dataArray);
+      console.log(dataArray);
+
+      // if($('.js-pause').text() == 'Pause') inc += waves[0]/70;
+      // updateScene(scene, waves, waves, scaleFactor,threshold);
     }
 
 
