@@ -188,6 +188,8 @@
     particle.position = [x, y, z];
     particle.scale = [s, s, s];
     particle.displacement = 0.0;
+    particle.waveform = false;
+    particle.spectrum = false;
 
     // Create [particle.toWorld] matrix
     updateToWorldMatrix(particle);
@@ -309,8 +311,14 @@
           var x = ( Math.abs(j - half) ) / half;
           var y = Math.sqrt(Math.pow(r, 2) - Math.pow(x, 2));
           waveformVal = 2 * y;
+          
+          // Set particle.waveform
+          particle.waveform = true;
         } else {
           waveformVal = 0;
+          
+          // Set particle.waveform flag
+          particle.waveform = false;
         }
 
         var vNoise = noiseAmp * PerlinNoise.noise((i+inc)/30,(j+inc)/30,.5);
@@ -326,9 +334,11 @@
           //else { moveParticle(particle, v, -0.3); }
           particle.displacement = 1.0;
           displaced++;
+          particle.spectrum = true;
         } else {
           moveParticle(particle, vNoise, 1.0);
           particle.displacement = 0.0;
+          particle.spectrum = false;
         }
       }
     }
