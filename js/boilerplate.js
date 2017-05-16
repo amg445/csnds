@@ -146,7 +146,7 @@ function drawShape(gl, shape, camera, toWorld, disType) {
     var waveformLocation = gl.getUniformLocation(program, "waveform");
     gl.uniform1f(waveformLocation, disType[0]);
 
-     var frequencyLocation = gl.getUniformLocation(program, "frequency");
+     var frequencyLocation = gl.getUniformLocation(program, "spectrum");
     gl.uniform1f(frequencyLocation, disType[1]);
 
     if (faces) {

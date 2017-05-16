@@ -104,7 +104,7 @@
     precision highp float;
 
     uniform bool waveform;
-    uniform bool frequency;
+    uniform bool spectrum;
 
     vec4 aqua = vec4(0.0, 207.0, 202.0, 255.0) / 255.0;
     vec4 white = vec4(1.0);
@@ -113,7 +113,7 @@
     void main() {
       if (waveform) {
         gl_FragColor = aqua;
-      } else if (frequency) {
+      } else if (spectrum) {
         gl_FragColor = white;
       } else {
         gl_FragColor = purp;
@@ -191,7 +191,7 @@
     particle.position = [x, y, z];
     particle.scale = [s, s, s];
     particle.waveform = false;
-    particle.frequency = false;
+    particle.spectrum = false;
 
     // Create [particle.toWorld] matrix
     updateToWorldMatrix(particle);
@@ -277,7 +277,7 @@
         var particle = particles.list[i][j];
         var toWorld = mat4.create();
         mat4.mul(toWorld, particles.toWorld, particle.toWorld);
-        drawShape(gl, scene.shape, camera, toWorld, [particle.waveform, particle.frequency]);
+        drawShape(gl, scene.shape, camera, toWorld, [particle.waveform, particle.spectrum]);
       }
     }
   }
@@ -313,8 +313,14 @@
           var x = ( Math.abs(j - half) ) / half;
           var y = Math.sqrt(Math.pow(r, 2) - Math.pow(x, 2));
           waveformVal = 2 * y;
+          
+          // Set particle.waveform
+          particle.waveform = true;
         } else {
           waveformVal = 0;
+          
+          // Set particle.waveform flag
+          particle.waveform = false;
         }
 
         var vNoise = noiseAmp * PerlinNoise.noise((i+inc)/30,(j+inc)/30,.5);
@@ -330,9 +336,16 @@
           //else { moveParticle(particle, v, -0.3); }
           particle.displacement = 1.0;
           displaced++;
+          if (scale * spectrumVal > threshold) {
+            particle.spectrum = true;
+          } else {
+            particle.spectrum = false;
+          }
         } else {
           moveParticle(particle, vNoise, 1.0);
           particle.displacement = 0.0;
+          particle.spectrum = false;
+          particle.waveform = false;
         }
       }
     }
