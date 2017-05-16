@@ -114,9 +114,9 @@
       if (waveform) {
         gl_FragColor = aqua;
       } else if (spectrum) {
-        gl_FragColor = white;
-      } else {
         gl_FragColor = purp;
+      } else {
+        gl_FragColor = white;
       }
 
 
@@ -147,11 +147,13 @@
 
     vec4 pink = vec4(1.0, 0.27, 0.73, 1.0);
     vec4 white = vec4(1.0);
+    vec4 blue = vec4(.2, .2, 1., 1.);
+    vec4 litepink = vec4(255.0,	182.0, 193.0, 255.0) / 255.0;
 
     void main() {
-      float t = (position.x * position.x) + (position.y * position.y) * sin(time / 500.0); // divide by bpm when michael gets it
-      vec4 color1 = vec4(1., .8, .8, 1.), color2 = vec4(.2, .2, 1., 1.);
-      gl_FragColor = (1.0 - t) * color1 + t * color2;
+      float r = 0.8 + (0.25 * abs(sin(time/1550.0)));
+      float t = max(0.0, (r * r) - (position.x * position.x) - (position.y * position.y));
+      gl_FragColor = (1.0 - t) * blue + t * litepink;
     }
   </script>
 
