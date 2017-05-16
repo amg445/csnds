@@ -127,6 +127,8 @@
     attribute vec3 vert_position;
     attribute vec2 vert_texCoord;
 
+    uniform mat4 projection;
+
     varying vec2 texCoord;
     varying vec3 position;
 
@@ -537,7 +539,7 @@
       //prevTime = time;
     }
 
-    drawBackground(background_shader, time, getBpm());
+    drawBackground(background_shader, time, getBpm(), camera.projection);
 
     // Update Camera Position if it has been offset
     updateSceneOffset(scene, offset);
