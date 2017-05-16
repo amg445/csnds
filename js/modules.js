@@ -1,6 +1,4 @@
 var song_url;
-var audio;
-
 
 
 function getSongFromURL() {

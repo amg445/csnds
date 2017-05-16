@@ -471,6 +471,7 @@
   var bins = 64;   // range: [16, 1024], def: 1024 - MUST be power of 2
   var offset = [50,-190,0];   // offset for controlling camera movement
   var analyser;
+  var audio;
 
   // Create Projection Matrix (Perspective Camera)
   var perspectiveMatrix = mat4.create();
@@ -523,6 +524,9 @@
   // UpdateWebGL --------------------------------------------------------------
   var prevTime = 0;
   function updateWebGL(time) {
+    if (canPlay) {
+      time = audio.currentTime * 1000;
+    }
 
     scene = getScene(scenetype);
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
