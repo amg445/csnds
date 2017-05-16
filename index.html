@@ -313,12 +313,12 @@
       for (var j = 0; j < scene.particles.list[i].length; j++) {
         var particle = scene.particles.list[i][j];
 
-        var spectrumVal = spectrum[i]/255.0;    // range: [0, 1]
+        var spectrumVal = spectrum[j]/255.0;    // range: [0, 1]
         var waveformVal = wVal;
 
         // Update waveformVal if particle is in the waveform range
-        var half = scene.particles.list[i].length / 2.0;
-        var val = (scene.particles.list[i].length / 3.0) * Math.abs(wVal);
+        var half = scene.particles.list[i].length * 3.0 / 4.0;
+        var val = (scene.particles.list[i].length / 4.0) * Math.abs(wVal);
         if (half-val < j && j < half+val) {
           var r = val / half;
           var x = ( Math.abs(j - half) ) / half;
@@ -335,7 +335,7 @@
         }
 
         // Spectrum (Frequency)
-        var thresholdSpectrum = 0.4;
+        var thresholdSpectrum = 0.7;
         var spectrumSound = 0;
         if (spectrumVal > thresholdSpectrum) {
           spectrumSound = spectrumVal - thresholdSpectrum;
@@ -348,10 +348,10 @@
         var thresholdWaveform = 0;
         var waveformSound = 0;
         if (waveformVal > thresholdWaveform) {
-          waveformSound = 4 * (waveformVal - thresholdWaveform);
+          waveformSound = 10 * (waveformVal - thresholdWaveform);
         }
 
-        var vSound = scale * (spectrumSound + waveformSound);
+        var vSound = scale * (7*spectrumSound + waveformSound);
 
         // Noise
         var vNoise = noiseAmp * PerlinNoise.noise((i+inc)/30,(j+inc)/30,.5);
@@ -525,7 +525,7 @@
   var prevTime = 0;
   function updateWebGL(time) {
     if (canPlay) {
-      time = audio.currentTime * 1000;
+      //time = audio.currentTime * 1000;
     }
 
     scene = getScene(scenetype);
@@ -538,11 +538,11 @@
       analyser.getByteFrequencyData(freqArray);  // Frequency data
       if ($('.js-pause').text() == 'Pause') {
         inc += .5;
-        updateScene(scene, freqArray, waveArray, time-prevTime);
-        prevTime = time;
+        //updateScene(scene, freqArray, waveArray, time-prevTime);
+        //prevTime = time;
       }
-      //updateScene(scene, freqArray, waveArray, time-prevTime);
-      //prevTime = time;
+      updateScene(scene, freqArray, waveArray, time-prevTime);
+      prevTime = time;
     }
 
     drawBackground(background_shader, time, getBpm(), camera.projection);
