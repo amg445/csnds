@@ -163,13 +163,13 @@ function drawShape(gl, shape, camera, toWorld, color) {
 function drawBackground(program) {
     var vertexData = [
         -1.0, -1.0, 0.0,  // Lower left
-        -1.0,  -1.0,
+        0.0,  0.0,
         1.0, -1.0, 0.0,  // Lower right
-        1.0,  -1.0,
+        0.0,  0.0,
         1.0,  1.0, 0.0,  // Top right
-        1.0,  1.0,
+        3.0,  3.0,
         -1.0,  1.0, 0.0,  // Top left
-        -1.0,  1.0
+        3.0,  3.0
     ];
     var vertexArray = new Float32Array(vertexData);
     var vertexBuffer = gl.createBuffer();

@@ -117,10 +117,19 @@
     precision highp float;
     uniform vec3 color;
 
+    vec4 aqua = vec4(0.0, 0.81, 0.79, 1.0);
+    vec4 white = vec4(1.0);
+    vec4 black = vec4(0.0);
+    vec4 purp = vec4(0.68, 0.0, 0.65, 1.0);
+
     void main() {
-      // changed the color to white bc it was flashy
-      gl_FragColor = vec4(color,1.0);
-      // gl_FragColor = vec4(1.0,1.0,1.0, 1.0);
+      if (color.x > color.y && color.x > color.z) { 
+        gl_FragColor = aqua;
+      } else if (color.y > color.x && color.y > color.z) {
+        gl_FragColor = white;
+      } else {
+        gl_FragColor = purp;
+      }
     }
   </script>
 
@@ -142,7 +151,7 @@
     varying vec2 texCoord;
 
     void main() {
-      gl_FragColor = 0.5 * (2.0 - abs(texCoord.x) - abs(texCoord.y)) * vec4(0.7, 0.7, 0.7, 1.0);
+      gl_FragColor = ((3.0 - texCoord.x) / 4.5 * vec4(1.0)) + vec4(1.0, 0.27, 0.73, 1.0);
     }
   </script>
 
