@@ -334,11 +334,16 @@
           //else { moveParticle(particle, v, -0.3); }
           particle.displacement = 1.0;
           displaced++;
-          particle.spectrum = true;
+          if (scale * spectrumVal > threshold) {
+            particle.spectrum = true;
+          } else {
+            particle.spectrum = false;
+          }
         } else {
           moveParticle(particle, vNoise, 1.0);
           particle.displacement = 0.0;
           particle.spectrum = false;
+          particle.waveform = false;
         }
       }
     }
