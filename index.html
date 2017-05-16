@@ -315,34 +315,36 @@
   var inc = 0;
   function updateScene(scene, spectrum, waveform, scale, threshold) {
     // Scale [waveform] by [spectrum]
-    var soundA = 2;
-    var noiseA = 0.3;
+    var soundAmp = 2;
+    var noiseAmp = 0.3;
     var displaced = 0;
     for (var i = 0; i < scene.particles.list.length; i++) {
+      var wVal = ( waveform[i] - (255.0/2.0) ) / (255.0/2.0); // range: [-1, 1];
+
       for (var j = 0; j < scene.particles.list[i].length; j++) {
         var particle = scene.particles.list[i][j];
 
-        //console.log("freq: " + spectrum[i]);
-        //console.log("wave: " + waveform[j]);
+        var spectrumVal = spectrum[i]/255.0;    // range: [0, 1]
+        var waveformVal = wVal;
 
-        var spectrumAmp = spectrum[i]/255;
-        var waveformAmp = waveform[j]/255;
+        // Update waveformVal if particle is in the waveform range
+        var half = scene.particles.list[i].length / 2.0;
+        var val = (scene.particles.list[i].length / 4.0) * Math.abs(wVal);
+        if (half-val < j && j < half+val) {
+          var r = val / half;
+          var x = ( Math.abs(j - half) ) / half;
+          var y = Math.sqrt(Math.pow(r, 2) - Math.pow(x, 2));
+          waveformVal = 2 * y;
+        } else {
+          waveformVal = 0;
+        }
 
-        var vNoise = noiseA * PerlinNoise.noise((i+inc)/30,(j+inc)/30,.5);
+        var vNoise = noiseAmp * PerlinNoise.noise((i+inc)/30,(j+inc)/30,.5);
 
-        //var vSound = 5 * (spectrumAmp / 255) * waveformAmp * scale;
-        var vSound = scale * spectrumAmp;
-        //console.log("spectrumAmp: " + spectrumAmp);
-        //console.log("waveformAmp: " + waveformAmp);
-        //console.log("v: " + v + "\n");
-        //console.log("threshold: " + threshold);
+        var vSound = scale * (spectrumVal + waveformVal);
 
-        //vNoise = PerlinNoise.noise((i+inc)/50,(j+inc)/50,.5);
-        //vSound = (spectrumAmp / 255) * waveformAmp * scale;
-
-        //var v = vNoise + 7 * vSound;
-        var v = vNoise + soundA * (vSound - threshold);
-        //console.log("vSound: " + vSound);
+        threshold = 0;
+        var v = vNoise + soundAmp * (vSound - threshold);
 
         if (vSound > threshold) {
           moveParticle(particle, v, 1.0);
