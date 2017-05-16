@@ -127,7 +127,7 @@
     }
   </script>
 
-  <script id="vertexShader--background" type="x-shader/x-vertex">
+  <script id="vertexShader--background1" type="x-shader/x-vertex">
     attribute vec3 vert_position;
     attribute vec2 vert_texCoord;
 
@@ -139,7 +139,29 @@
     }
   </script>
 
-  <script id="fragmentShader--background" type="x-shader/x-fragment">
+  <script id="fragmentShader--background1" type="x-shader/x-fragment">
+    precision highp float;
+
+    varying vec2 texCoord;
+
+    void main() {
+      gl_FragColor = ((3.0 - texCoord.x) / 4.5 * vec4(1.0)) + vec4(1.0, 0.27, 0.73, 1.0);
+    }
+  </script>
+
+  <script id="vertexShader--background2" type="x-shader/x-vertex">
+    attribute vec3 vert_position;
+    attribute vec2 vert_texCoord;
+
+    varying vec2 texCoord;
+
+    void main() {
+      gl_Position = vec4(vert_position, 1.0);
+      texCoord = vert_texCoord;
+    }
+  </script>
+
+  <script id="fragmentShader--background2" type="x-shader/x-fragment">
     precision highp float;
 
     varying vec2 texCoord;
@@ -233,8 +255,8 @@
    * Offset the particle to [value]
    * [particle] is offset along the y axis
    */
-  function moveParticle(particle, value) {
-    particle.position[1] = value;
+  function moveParticle(particle, value, dir) {
+    particle.position[1] = dir * value;
     var colorScale = vec3.fromValues(Math.random(), Math.random(), Math.random());
     vec3.scale(colorScale, colorScale, 6 * value);
     particle.color = vec3.add(particle.color, particle.baseColor, colorScale);
@@ -314,11 +336,12 @@
         //console.log("vSound: " + vSound);
 
         if (vSound > threshold) {
-          moveParticle(particle, v);
+          if (Math.random() > 0.5) { moveParticle(particle, v, 1.0); }
+          else { moveParticle(particle, v, -0.3); }
           particle.displacement = 1.0;
           displaced++;
         } else {
-          moveParticle(particle, vNoise);
+          moveParticle(particle, vNoise, 1.0);
           particle.displacement = 0.0;
         }
       }
@@ -404,7 +427,8 @@
   // Global Vars
   var gl = initializeWebGL($("#webglCanvas"));
   var basic_shader = createGlslProgram(gl, "vertexShader--basic", "fragmentShader--basic");
-  var background_shader = createGlslProgram(gl, "vertexShader--background", "fragmentShader--background");
+  var background_shader1 = createGlslProgram(gl, "vertexShader--background1", "fragmentShader--background1");
+  var background_shader2 = createGlslProgram(gl, "vertexShader--background2", "fragmentShader--background2");
   //var fft = null;
   //var sound = null;
   var smoothing = 0.99;   // range: (0.0, 1.0), def: 0.8
@@ -445,6 +469,9 @@
   var cubescene = createScene(camera, particles, cube);
   var wirescene = createScene(camera, particles, wireframe);
 
+  cubescene.background_shader = background_shader1;
+  wirescene.background_shader = background_shader2;
+
   var scenetype = 'cube';
 
   var setCube = function () { scenetype = 'cube'; };
@@ -472,7 +499,7 @@
       analyser.getByteFrequencyData(freqArray);  // Frequency data
       if($('.js-pause').text() == 'Pause') inc += .5;
       updateScene(scene, waveArray, freqArray, scaleFactor,threshold);
-      drawBackground(background_shader);
+      drawBackground(scene.background_shader);
     }
 
 
