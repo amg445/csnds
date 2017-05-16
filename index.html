@@ -111,17 +111,18 @@
     vec4 purp = vec4(59.0, 38.0, 130.0, 255.0) / 255.0;
 
     void main() {
-      if (displacement == 1.0) {
-        if (color.x > color.y && color.x > color.z) {
-          gl_FragColor = aqua;
-        } else if (color.y > color.x && color.y > color.z) {
-          gl_FragColor = white;
-        } else {
-          gl_FragColor = purp;
-        }
-      } else {
-        gl_FragColor = purp;
-      }
+      gl_FragColor = purp;
+      //if (displacement == 1.0) {
+        //if (color.x > color.y && color.x > color.z) {
+          //gl_FragColor = aqua;
+        //} else if (color.y > color.x && color.y > color.z) {
+          //gl_FragColor = white;
+        //} else {
+          //gl_FragColor = purp;
+        //}
+      //} else {
+        //gl_FragColor = purp;
+      //}
 
 
     }
@@ -323,7 +324,8 @@
 
         var vNoise = 0.5 * PerlinNoise.noise((i+inc)/30,(j+inc)/30,.5);
 
-        var vSound = 5 * (spectrumAmp / 255) * waveformAmp * scale;
+        //var vSound = 5 * (spectrumAmp / 255) * waveformAmp * scale;
+        var vSound = (spectrumAmp / 255) * scale;
         //console.log("spectrumAmp: " + spectrumAmp);
         //console.log("waveformAmp: " + waveformAmp);
         //console.log("v: " + v + "\n");
@@ -332,12 +334,14 @@
         //vNoise = PerlinNoise.noise((i+inc)/50,(j+inc)/50,.5);
         //vSound = (spectrumAmp / 255) * waveformAmp * scale;
 
-        var v = vNoise + vSound;
+        //var v = vNoise + 7 * vSound;
+        var v = vNoise + 8 * (vSound - threshold);
         //console.log("vSound: " + vSound);
 
         if (vSound > threshold) {
-          if (Math.random() > 0.5) { moveParticle(particle, v, 1.0); }
-          else { moveParticle(particle, v, -0.3); }
+          moveParticle(particle, v, 1.0);
+          //if (Math.random() > 0.5) { moveParticle(particle, v, 1.0); }
+          //else { moveParticle(particle, v, -0.3); }
           particle.displacement = 1.0;
           displaced++;
         } else {
@@ -434,7 +438,7 @@
   var smoothing = 0.99;   // range: (0.0, 1.0), def: 0.8
   var bins = 64;   // range: [16, 1024], def: 1024 - MUST be power of 2
   var scaleFactor = 4;  // scale factor (amplitude) for visulization
-  var threshold = 0.18;  // threshold visualization value must be above to move
+  var threshold = 0.018;  // threshold visualization value must be above to move
   var offset = [50,-190,0];   // offset for controlling camera movement
   var analyser;
 
@@ -454,7 +458,7 @@
   camera.origin = [0.0, 0.0, 0.0];
   camera.projection = perspectiveMatrix;
   camera.position = vec3.fromValues(0, 0, 3);
-  camera.radius = vec3.length(camera.position);
+  //camera.radius = vec3.length(camera.position);
   camera.scale = [1,1,1];
   updateToWorldMatrix(camera);
 
