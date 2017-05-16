@@ -128,47 +128,39 @@
     }
   </script>
 
-  <script id="vertexShader--background1" type="x-shader/x-vertex">
+  <script id="vertexShader--background" type="x-shader/x-vertex">
     attribute vec3 vert_position;
     attribute vec2 vert_texCoord;
 
     varying vec2 texCoord;
+    varying vec3 position;
 
     void main() {
       gl_Position = vec4(vert_position, 1.0);
       texCoord = vert_texCoord;
+      position = vert_position;
     }
   </script>
 
-  <script id="fragmentShader--background1" type="x-shader/x-fragment">
-    precision highp float;
+  <script id="fragmentShader--background" type="x-shader/x-fragment">
+    precision mediump float;
+
+    uniform float time;
 
     varying vec2 texCoord;
+    varying vec3 position;
+
+    vec2 resolution = vec2(1.0);
+    vec4 pink = vec4(1.0, 0.27, 0.73, 1.0);
+    vec4 white = vec4(1.0);
 
     void main() {
-      gl_FragColor = ((3.0 - texCoord.x) / 4.5 * vec4(1.0)) + vec4(1.0, 0.27, 0.73, 1.0);
-    }
-  </script>
-
-  <script id="vertexShader--background2" type="x-shader/x-vertex">
-    attribute vec3 vert_position;
-    attribute vec2 vert_texCoord;
-
-    varying vec2 texCoord;
-
-    void main() {
-      gl_Position = vec4(vert_position, 1.0);
-      texCoord = vert_texCoord;
-    }
-  </script>
-
-  <script id="fragmentShader--background2" type="x-shader/x-fragment">
-    precision highp float;
-
-    varying vec2 texCoord;
-
-    void main() {
-      gl_FragColor = ((3.0 - texCoord.x) / 4.5 * vec4(1.0)) + vec4(1.0, 0.27, 0.73, 1.0);
+      vec2 p = position.xy;
+      float r = length(p) *  2.0;
+      float t = sin(time / 1000.0) * exp(-r * r / 2.0);
+      vec4 color1 = vec4(1., .8, .8, 1.), color2 = vec4(.2, .2, 1., 1.);
+      gl_FragColor = (1.0 - t) * color1 + t * color2;
+      // gl_FragColor = vec4(p.x, p.y, 0.0, 1.0);
     }
   </script>
 
@@ -431,8 +423,7 @@
   // Global Vars
   var gl = initializeWebGL($("#webglCanvas"));
   var basic_shader = createGlslProgram(gl, "vertexShader--basic", "fragmentShader--basic");
-  var background_shader1 = createGlslProgram(gl, "vertexShader--background1", "fragmentShader--background1");
-  var background_shader2 = createGlslProgram(gl, "vertexShader--background2", "fragmentShader--background2");
+  var background_shader = createGlslProgram(gl, "vertexShader--background", "fragmentShader--background");
   //var fft = null;
   //var sound = null;
   var smoothing = 0.99;   // range: (0.0, 1.0), def: 0.8
@@ -473,9 +464,6 @@
   var cubescene = createScene(camera, particles, cube);
   var wirescene = createScene(camera, particles, wireframe);
 
-  cubescene.background_shader = background_shader1;
-  wirescene.background_shader = background_shader2;
-
   var scenetype = 'cube';
 
   var setCube = function () { scenetype = 'cube'; };
@@ -506,7 +494,7 @@
       updateScene(scene, waveArray, freqArray, scaleFactor,threshold);
     }
 
-    drawBackground(scene.background_shader);
+    drawBackground(background_shader, time);
 
 
     // Update Camera Position if it has been offset

@@ -163,7 +163,7 @@ function drawShape(gl, shape, camera, toWorld, color, displacement) {
     gl.disable(gl.DEPTH_TEST);
 }
 
-function drawBackground(program) {
+function drawBackground(program, time) {
     var vertexData = [
         -1.0, -1.0, 0.0,  // Lower left
         0.0,  0.0,
@@ -200,6 +200,9 @@ function drawBackground(program) {
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
     gl.useProgram(program);
+
+    var timeLocation = gl.getUniformLocation(program, "time");
+    gl.uniform1f(timeLocation, time);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
