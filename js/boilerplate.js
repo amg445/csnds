@@ -123,7 +123,7 @@ function createShape(gl, shader, data, faces) {
 }
 
 //function drawShape(gl, shape, program, camera, toWorld, faces) {
-function drawShape(gl, shape, camera, toWorld, color) {
+function drawShape(gl, shape, camera, toWorld, color, displacement) {
     var program = shape.shader;
     var faces = shape.faces;
 
@@ -145,6 +145,9 @@ function drawShape(gl, shape, camera, toWorld, color) {
 
     var colorLocation = gl.getUniformLocation(program, "color");
     gl.uniform3fv(colorLocation, color);
+
+    var displacementLocation = gl.getUniformLocation(program, "displacement");
+    gl.uniform1f(displacementLocation, displacement);
 
     if (faces) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.triIndexBuffer);

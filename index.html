@@ -116,20 +116,26 @@
   <script id="fragmentShader--basic" type="x-shader/x-fragment">
     precision highp float;
     uniform vec3 color;
+    uniform float displacement;
 
     vec4 aqua = vec4(0.0, 0.81, 0.79, 1.0);
     vec4 white = vec4(1.0);
-    vec4 black = vec4(0.0);
     vec4 purp = vec4(0.68, 0.0, 0.65, 1.0);
 
     void main() {
-      if (color.x > color.y && color.x > color.z) { 
-        gl_FragColor = aqua;
-      } else if (color.y > color.x && color.y > color.z) {
-        gl_FragColor = white;
+      if (displacement == 1.0) { 
+        if (color.x > color.y && color.x > color.z) { 
+          gl_FragColor = aqua;
+        } else if (color.y > color.x && color.y > color.z) {
+          gl_FragColor = white;
+        } else {
+          gl_FragColor = purp;
+        }
       } else {
         gl_FragColor = purp;
       }
+
+      
     }
   </script>
 
@@ -210,6 +216,7 @@
     particle.scale = [s, s, s];
     particle.baseColor = vec3.fromValues(c[0], c[1], c[2]);
     particle.color = vec3.fromValues(c[0], c[1], c[2]);
+    particle.displacement = 0.0;
 
     // Create [particle.toWorld] matrix
     updateToWorldMatrix(particle);
@@ -299,7 +306,7 @@
         var particle = particles.list[i][j];
         var toWorld = mat4.create();
         mat4.mul(toWorld, particles.toWorld, particle.toWorld);
-        drawShape(gl, scene.shape, camera, toWorld, particle.color);
+        drawShape(gl, scene.shape, camera, toWorld, particle.color, particle.displacement);
       }
     }
   }
@@ -338,9 +345,11 @@
 
         if (vSound > threshold) {
           moveParticle(particle, v);
+          particle.displacement = 1.0;
           displaced++;
         } else {
           moveParticle(particle, vNoise);
+          particle.displacement = 0.0;
         }
       }
     }
