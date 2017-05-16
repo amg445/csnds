@@ -323,10 +323,23 @@
           particle.waveform = false;
         }
 
+        // Spectrum (Frequency)
+        var thresholdSpectrum = 0.5;
+        var spectrumSound = 0;
+        if (spectrumVal > thresholdSpectrum) {
+          spectrumSound = scale * (spectrumVal - thresholdSpectrum);
+          particle.spectrum = true;
+        } else {
+          particle.spectrum = false;
+        }
+        var waveformSound = scale * waveformVal;
+
+        var vSound = spectrumSound + waveformSound;
+
+        // Noise
         var vNoise = noiseAmp * PerlinNoise.noise((i+inc)/30,(j+inc)/30,.5);
 
-        var vSound = scale * (spectrumVal + waveformVal);
-
+        // Final Value
         threshold = 0;
         var v = vNoise + soundAmp * (vSound - threshold);
 
