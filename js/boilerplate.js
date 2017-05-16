@@ -123,7 +123,7 @@ function createShape(gl, shader, data, faces) {
 }
 
 //function drawShape(gl, shape, program, camera, toWorld, faces) {
-function drawShape(gl, shape, camera, toWorld, displacement) {
+function drawShape(gl, shape, camera, toWorld, disType) {
     var program = shape.shader;
     var faces = shape.faces;
 
@@ -143,8 +143,11 @@ function drawShape(gl, shape, camera, toWorld, displacement) {
     mat4.invert(toCam, camera.toWorld);
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "toCam"), false, toCam);
 
-    var displacementLocation = gl.getUniformLocation(program, "displacement");
-    gl.uniform1f(displacementLocation, displacement);
+    var waveformLocation = gl.getUniformLocation(program, "waveform");
+    gl.uniform1f(waveformLocation, disType[0]);
+
+     var frequencyLocation = gl.getUniformLocation(program, "frequency");
+    gl.uniform1f(frequencyLocation, disType[1]);
 
     if (faces) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.triIndexBuffer);

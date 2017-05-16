@@ -102,16 +102,19 @@
 
   <script id="fragmentShader--basic" type="x-shader/x-fragment">
     precision highp float;
-    uniform float displacement;
+
+    uniform bool waveform;
+    uniform bool frequency;
 
     vec4 aqua = vec4(0.0, 207.0, 202.0, 255.0) / 255.0;
     vec4 white = vec4(1.0);
     vec4 purp = vec4(59.0, 38.0, 130.0, 255.0) / 255.0;
 
     void main() {
-      // gl_FragColor = purp;
-      if (displacement == 1.0) {
+      if (waveform) {
         gl_FragColor = aqua;
+      } else if (frequency) {
+        gl_FragColor = white;
       } else {
         gl_FragColor = purp;
       }
@@ -187,7 +190,8 @@
     // Instantiate particle
     particle.position = [x, y, z];
     particle.scale = [s, s, s];
-    particle.displacement = 0.0;
+    particle.waveform = false;
+    particle.frequency = false;
 
     // Create [particle.toWorld] matrix
     updateToWorldMatrix(particle);
@@ -273,7 +277,7 @@
         var particle = particles.list[i][j];
         var toWorld = mat4.create();
         mat4.mul(toWorld, particles.toWorld, particle.toWorld);
-        drawShape(gl, scene.shape, camera, toWorld, particle.displacement);
+        drawShape(gl, scene.shape, camera, toWorld, [particle.waveform, particle.frequency]);
       }
     }
   }
