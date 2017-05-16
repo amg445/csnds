@@ -331,7 +331,7 @@
         }
 
         // Spectrum (Frequency)
-        var thresholdSpectrum = 0.5;
+        var thresholdSpectrum = 0.4;
         var spectrumSound = 0;
         if (spectrumVal > thresholdSpectrum) {
           spectrumSound = spectrumVal - thresholdSpectrum;
@@ -526,7 +526,6 @@
 
 
     if(canPlay && (time - prevTime) > 33) {
-    //if(canPlay) {
       analyser.getByteTimeDomainData(waveArray); // Wavalength data
       analyser.getByteFrequencyData(freqArray);  // Frequency data
       if ($('.js-pause').text() == 'Pause') {
