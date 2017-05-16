@@ -71,12 +71,11 @@ function init() {
 
     analyser.fftSize = 2048;
     bufferLength = analyser.frequencyBinCount;
-    dataArray = new Uint8Array(bufferLength);
+    waveArray = new Uint8Array(bufferLength);
+    freqArray = new Uint8Array(bufferLength);
 
     source.connect(audioCtx.destination);
     canPlay = true;
     audio.play();
-
-    console.log(dataArray);
   })
 }
