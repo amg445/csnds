@@ -356,6 +356,14 @@
     return waveformSound;
   }
 
+  function normalizeWaveformVal(waveformVal) {
+    return ( waveformVal - (255.0/2.0) ) / (255.0/2.0); // range: [-1, 1];
+  }
+
+  function normalizeSpectrumVal(spectrumVal) {
+    return spectrumVal / 255.0;    // range: [0, 1]
+  }
+
   /**
    * update scene according to music data
    * [spectrum] - amplitudes across frequency spectrum
@@ -376,9 +384,10 @@
     //var decaySpeed = 0.0005;
     var decaySpeed = 0.05 / bpm;
     var beats = time * bpms;
+    var maxWaveformVal = normalizeWaveformVal( Math.max.apply(null, waveform) );
 
     for (var i = 0; i < scene.particles.list.length; i++) {
-      var waveformVal = ( waveform[i] - (255.0/2.0) ) / (255.0/2.0); // range: [-1, 1];
+      var waveformVal = normalizeWaveformVal(waveform[i]); // range: [-1, 1];
 
       for (var j = 0; j < scene.particles.list[i].length; j++) {
         var particle = scene.particles.list[i][j];
@@ -406,9 +415,11 @@
         var center2 = l * 3.0/4.0;
         var amp2 = l / 4.0;
         var scale2 = 3;
-        var waveformSound2 = getWaveformSound(center2, amp2, scale2, waveformVal, j);
+        var waveformSound2 = getWaveformSound(center2, amp2, scale2, maxWaveformVal, j);
         var intWaveSound2 = Math.round(waveformSound2);
-        if ( !(curI-intWaveSound2-1 < i && i < curI+intWaveSound2+1) ) {
+        if ( curI-intWaveSound2-1 < i && i < curI+intWaveSound2+1 ) {
+          waveformSound2 = waveformSound2 - Math.pow( (Math.abs(curI-i) / intWaveSound2/5), 2);
+        } else {
           waveformSound2 = 0;
         }
 
