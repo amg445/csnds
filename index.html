@@ -73,7 +73,7 @@
       <option data-bpm="775" value="https://soundcloud.com/liluzivert/15-xo-tour-llif3">XO TOUR Lif3</option>
       <option data-bpm="775" value="https://soundcloud.com/green-mountain-boys/power-moves-rough">Power Moves [Rough]</option>
       <option data-bpm="775" value="https://soundcloud.com/travisscott-2/11-grey">Grey - Travis Scott</option>
-      <option data-bpm="775" value="https://soundcloud.com/santandave/wanna-know-remix-feat-drake">Wanna Know - Dave</option>
+      <option data-bpm="100" value="https://soundcloud.com/santandave/wanna-know-remix-feat-drake">Wanna Know - Dave</option>
     </select>
   </div>
 
@@ -196,7 +196,8 @@
     float bpms = bpm / 60000.0;    // beats per ms
 
 
-    float r = radius + width * sin( time * bpms * pi / 10.0 );    // To change pulses per minute, multiply/divide inside sin()
+    //float r = radius + width * cos( time * bpms * pi );    // To change pulses per minute, multiply/divide inside sin()
+    float r = radius + width * abs( cos( time * bpms * (pi/2.0) + (pi/2.0) + 0.2 ));
 
     // adjust by 5/3 to make circular
     float t = max(0.0, hardness * ((r * r) - (25.0 * position.x * position.x) - (9.0 * position.y * position.y)));
