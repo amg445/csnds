@@ -89,7 +89,7 @@
   </div>
 
   <div style="float: right;">
-    <input type="checkbox" name="rotation" value="rotation">
+    <input type="checkbox" id="rotationCheckbox" name="rotation" value="rotation">
   </div>
 
   <div>
@@ -840,7 +840,7 @@
       analyser.getByteFrequencyData(freqArray);  // Frequency data
       if (!audio.paused) {
         // Rotate if user is not moving camera
-        if (!dragging) {
+        if (!dragging && $("#rotationCheckbox").is(":checked")) {
           offset[1] = -1;    // 1 is rotation around y speed right now
         }
 
