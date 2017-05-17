@@ -166,17 +166,22 @@ function drawShape(gl, shape, camera, toWorld, disType) {
 function drawBackground(program, time, bpm, camera) {
     var distance = camera.position[2];
     var vertexData = [
-        -1.0, -1.0, 0.0,  // Lower left
+        -1.0, -1.0, 0.99,  // Lower left
         0.0,  0.0,
-        1.0, -1.0, 0.0,  // Lower right
+        1.0, -1.0, 0.99,  // Lower right
         0.0,  0.0,
-        1.0,  1.0, 0.0,  // Top right
+        1.0,  1.0, 0.99,  // Top right
         3.0,  3.0,
-        -1.0,  1.0, 0.0,  // Top left
+        -1.0,  1.0, 0.99,  // Top left
         3.0,  3.0
     ];
     var vertexArray = new Float32Array(vertexData);
     var vertexBuffer = gl.createBuffer();
+
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LESS);
+    gl.useProgram(program);
+
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, vertexArray, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
@@ -200,8 +205,6 @@ function drawBackground(program, time, bpm, camera) {
     gl.vertexAttribPointer(vertTextureLocation, 2, gl.FLOAT, false, 4*5, 4*3);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-    gl.useProgram(program);
-
     var timeLocation = gl.getUniformLocation(program, "time");
     gl.uniform1f(timeLocation, time);
 
@@ -216,4 +219,5 @@ function drawBackground(program, time, bpm, camera) {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 
     gl.useProgram(null);
+    gl.disable(gl.DEPTH_TEST);
 }
