@@ -365,14 +365,17 @@
    * [scale] - scale factor for particle offset
    */
   var inc = 0;
-  function updateScene(scene, spectrum, waveform, prevTime, time) {
+  function updateScene(scene, spectrum, waveform, prevTime, time, bpm) {
     var dt = time - prevTime;
     var soundAmp = 2;
     var noiseAmp = 0.3;
     var displaced = 0;
     var scale = 0.1;
     var threshold = 0.0;
-    var decaySpeed = 0.0005;
+    var bpms = bpm / 60000;
+    //var decaySpeed = 0.0005;
+    var decaySpeed = 0.05 / bpm;
+    var beats = time * bpms;
 
     for (var i = 0; i < scene.particles.list.length; i++) {
       var waveformVal = ( waveform[i] - (255.0/2.0) ) / (255.0/2.0); // range: [-1, 1];
@@ -390,8 +393,16 @@
         var waveformSound1 = getWaveformSound(center1, amp1, scale1, waveformVal, j);
 
         // Waveform 2 ---------------------------------------------------------
-        var sin = Math.abs( Math.sin( (time / 1000.0) ) );
-        var curI = Math.round(l * sin);
+        //var sin = Math.abs( Math.sin( (time / 1000.0) ) );
+        var max = 4;
+        var sin = beats % (2.0*max);
+        if (sin >= max) {
+          sin = 2.0*max - sin; 
+        }
+        sin = sin / max;
+        var curI = Math.round( l * sin );
+        //var sin = Math.cos( time * bpms * Math.PI / 2.0 / 2.0);
+        //var curI = Math.round( l/2.0 + (l/2.0*sin) );
         var center2 = l * 3.0/4.0;
         var amp2 = l / 4.0;
         var scale2 = 3;
@@ -604,10 +615,10 @@
       analyser.getByteFrequencyData(freqArray);  // Frequency data
       if ($('.js-pause').text() == 'Pause') {
         inc += .5;
-        updateScene(scene, freqArray, waveArray, prevTime, time);
+        updateScene(scene, freqArray, waveArray, prevTime, time, getBpm());
         prevTime = time;
       }
-      //updateScene(scene, freqArray, waveArray, time-prevTime);
+      //updateScene(scene, freqArray, waveArray, time, time, getBpm());
       //prevTime = time;
     }
 
