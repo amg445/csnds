@@ -446,6 +446,149 @@
     return spectrumVal / 255.0;    // range: [0, 1]
   }
 
+  /*
+   * Particles Sweep laterally along the waveform
+   */
+  function getSoundValueSweep(id, dt, soundAmp, noiseAmp, displaced, scale,
+                          threshold, bpms, decaySpeed, decayAcceleration,
+                          beats, maxWaveformVal, waveformVal, particle,
+                          spectrumVal, l, i, j,
+                          scene, spectrum, waveform, prevTime, time, bpm) {
+    // Waveform 1 ---------------------------------------------------------
+    var center1 = l / 4.0;
+    var amp1 = l / 4.0;
+    var scale1 = 3;
+    var waveformSound1 = getWaveformSound(center1, amp1, scale1, waveformVal, j);
+
+    // Waveform 2 ---------------------------------------------------------
+    //var sin = Math.abs( Math.sin( (time / 1000.0) ) );
+    var max = 4;
+    var sin = beats % (2.0*max);
+    if (sin >= max) {
+      sin = 2.0*max - sin;
+    }
+    sin = sin / max;
+    var curI = Math.round( l * sin );
+    //var sin = Math.cos( time * bpms * Math.PI / 2.0 / 2.0);
+    //var curI = Math.round( l/2.0 + (l/2.0*sin) );
+    var center2 = l * 3.0/4.0;
+    var amp2 = l / 4.0;
+    var scale2 = 2;
+    var waveformSound2 = getWaveformSound(center2, amp2, scale2, maxWaveformVal, j);
+    var intWaveSound2 = Math.round(waveformSound2);
+    if ( !(curI-intWaveSound2-1 < i && i < curI+intWaveSound2+1) ) {
+      waveformSound2 = 0;
+    } else if (waveformSound2 != 0) {
+      particle.decay = true;
+      particle.yVelocity = 0.0015 * scale * waveformSound2;
+      particle.acceleration = -decayAcceleration;
+    }
+
+    // Update particle.waveform
+    if (waveformSound1 != 0) {
+      particle.waveform = true;
+    } else {
+      particle.waveform = false;
+    }
+
+    // Sound
+    return vSound = scale * (waveformSound2);
+  }
+
+  /*
+   * Particles over waveform in center
+   */
+  function getSoundValueCenter(id, dt, soundAmp, noiseAmp, displaced, scale,
+                          threshold, bpms, decaySpeed, decayAcceleration,
+                          beats, maxWaveformVal, waveformVal, particle,
+                          spectrumVal, l, i, j,
+                          scene, spectrum, waveform, prevTime, time, bpm) {
+    // Waveform 1 ---------------------------------------------------------
+    var center1 = l / 2.0;
+    var amp1 = l / 2.0;
+    var scale1 = 3;
+    var waveformSound1 = getWaveformSound(center1, amp1, scale1, waveformVal, j);
+
+    if (waveformSound1 != 0) {
+      particle.decay = true;
+      particle.yVelocity = 0.0015 * scale * waveformSound1;
+      particle.acceleration = -decayAcceleration;
+    }
+
+    // Update particle.waveform
+    if (waveformSound1 != 0) {
+      particle.waveform = true;
+    } else {
+      particle.waveform = false;
+    }
+
+    // Sound
+    return vSound = scale * (waveformSound1);
+  }
+
+  /*
+   * Sweeping - Default baseline
+   */
+  function getSoundValue(id, dt, soundAmp, noiseAmp, displaced, scale,
+                          threshold, bpms, decaySpeed, decayAcceleration,
+                          beats, maxWaveformVal, waveformVal, particle,
+                          spectrumVal, l, i, j,
+                          scene, spectrum, waveform, prevTime, time, bpm) {
+    // Waveform 1 ---------------------------------------------------------
+    var center1 = l / 4.0;
+    var amp1 = l / 4.0;
+    var scale1 = 3;
+    var waveformSound1 = getWaveformSound(center1, amp1, scale1, waveformVal, j);
+
+    // Waveform 2 ---------------------------------------------------------
+    //var sin = Math.abs( Math.sin( (time / 1000.0) ) );
+    var max = 4;
+    var sin = beats % (2.0*max);
+    if (sin >= max) {
+      sin = 2.0*max - sin;
+    }
+    sin = sin / max;
+    var curI = Math.round( l * sin );
+    //var sin = Math.cos( time * bpms * Math.PI / 2.0 / 2.0);
+    //var curI = Math.round( l/2.0 + (l/2.0*sin) );
+    var center2 = l * 3.0/4.0;
+    var amp2 = l / 4.0;
+    var scale2 = 2;
+    var waveformSound2 = getWaveformSound(center2, amp2, scale2, maxWaveformVal, j);
+    var intWaveSound2 = Math.round(waveformSound2);
+    if ( !(curI-intWaveSound2-1 < i && i < curI+intWaveSound2+1) ) {
+      waveformSound2 = 0;
+    } else if (waveformSound2 != 0) {
+      //var dist = Math.abs(curI - i);
+      //if (dist > 0) dist--;
+      //waveformSound2 = waveformSound2 - Math.pow( (dist / intWaveSound2/5), 2);
+      particle.decay = true;
+      particle.yVelocity = 0.0015 * scale * waveformSound2;
+      particle.acceleration = -decayAcceleration;
+    }
+
+    // Update particle.waveform
+    //if (waveformSound2 != 0 || waveformSound1 != 0) {
+    if (waveformSound1 != 0) {
+      particle.waveform = true;
+    } else {
+      particle.waveform = false;
+    }
+
+    // Spectrum (Frequency)
+    var thresholdSpectrum = 0.7;
+    var spectrumSound = 0;
+    if (spectrumVal > thresholdSpectrum) {
+      spectrumSound = spectrumVal - thresholdSpectrum;
+      //particle.spectrum = true;
+    } else {
+      particle.spectrum = false;
+    }
+
+    // Sound
+    return vSound = scale * (waveformSound2);
+  }
+
   /**
    * update scene according to music data
    * [spectrum] - amplitudes across frequency spectrum
@@ -455,7 +598,7 @@
    * [scale] - scale factor for particle offset
    */
   var inc = 0;
-  function updateScene(scene, spectrum, waveform, prevTime, time, bpm) {
+  function updateScene(scene, spectrum, waveform, prevTime, time, bpm, id) {
     var dt = time - prevTime;
     var soundAmp = 2;
     var noiseAmp = 0.3;
@@ -480,59 +623,37 @@
         var spectrumVal = spectrum[j]/255.0;    // range: [0, 1]
         var l = scene.particles.list[i].length;
 
-        // Waveform 1 ---------------------------------------------------------
-        var center1 = l / 4.0;
-        var amp1 = l / 4.0;
-        var scale1 = 3;
-        var waveformSound1 = getWaveformSound(center1, amp1, scale1, waveformVal, j);
-
-        // Waveform 2 ---------------------------------------------------------
-        //var sin = Math.abs( Math.sin( (time / 1000.0) ) );
-        var max = 4;
-        var sin = beats % (2.0*max);
-        if (sin >= max) {
-          sin = 2.0*max - sin;
-        }
-        sin = sin / max;
-        var curI = Math.round( l * sin );
-        //var sin = Math.cos( time * bpms * Math.PI / 2.0 / 2.0);
-        //var curI = Math.round( l/2.0 + (l/2.0*sin) );
-        var center2 = l * 3.0/4.0;
-        var amp2 = l / 4.0;
-        var scale2 = 2;
-        var waveformSound2 = getWaveformSound(center2, amp2, scale2, maxWaveformVal, j);
-        var intWaveSound2 = Math.round(waveformSound2);
-        if ( !(curI-intWaveSound2-1 < i && i < curI+intWaveSound2+1) ) {
-          waveformSound2 = 0;
-        } else if (waveformSound2 != 0) {
-          //var dist = Math.abs(curI - i);
-          //if (dist > 0) dist--;
-          //waveformSound2 = waveformSound2 - Math.pow( (dist / intWaveSound2/5), 2);
-          particle.decay = true;
-          particle.yVelocity = 0.0015 * scale * waveformSound2;
-          particle.acceleration = -decayAcceleration;
-        }
-
-        // Update particle.waveform
-        //if (waveformSound2 != 0 || waveformSound1 != 0) {
-        if (waveformSound1 != 0) {
-          particle.waveform = true;
-        } else {
-          particle.waveform = false;
-        }
-
-        // Spectrum (Frequency)
-        var thresholdSpectrum = 0.7;
-        var spectrumSound = 0;
-        if (spectrumVal > thresholdSpectrum) {
-          spectrumSound = spectrumVal - thresholdSpectrum;
-          //particle.spectrum = true;
-        } else {
-          particle.spectrum = false;
-        }
-
         // Sound
-        var vSound = scale * (waveformSound2);
+        var vSound = 0;
+        switch (id) {
+          case "cool1":
+            vSound = getSoundValue(id, dt, soundAmp, noiseAmp, displaced, scale,
+                                threshold, bpms, decaySpeed, decayAcceleration,
+                                beats, maxWaveformVal, waveformVal, particle,
+                                spectrumVal, l, i, j,
+                                scene, spectrum, waveform, prevTime, time, bpm);
+            break;
+          
+          case "cool2":
+            vSound = getSoundValueSweep(id, dt, soundAmp, noiseAmp, displaced, scale,
+                                threshold, bpms, decaySpeed, decayAcceleration,
+                                beats, maxWaveformVal, waveformVal, particle,
+                                spectrumVal, l, i, j,
+                                scene, spectrum, waveform, prevTime, time, bpm);
+            break;
+
+          case "cool3":
+            vSound = getSoundValueCenter(id, dt, soundAmp, noiseAmp, displaced, scale,
+                                threshold, bpms, decaySpeed, decayAcceleration,
+                                beats, maxWaveformVal, waveformVal, particle,
+                                spectrumVal, l, i, j,
+                                scene, spectrum, waveform, prevTime, time, bpm);
+            break;
+          
+          default:
+            vSound = 0;
+            break;
+        }
 
         // Noise
         var vNoise = noiseAmp * PerlinNoise.noise((i+inc)/30,(j+inc)/30,.5);
@@ -708,15 +829,6 @@
 
     var id = $('#js-visID').val();
 
-    switch(id){
-      case 'cool1':
-        inc += .5;
-        break;
-      case 'cool2':
-        inc += 2;
-        break;
-    }
-
     scene = getScene(scenetype);
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
     //gl.clear(gl.COLOR_BUFFER_BIT);
@@ -729,12 +841,9 @@
       if (!audio.paused) {
         inc += .5;
         if(Math.abs(prevTime - time) > 350) prevTime = time;
-        updateScene(scene, freqArray, waveArray, prevTime, time, getBpm());
+        updateScene(scene, freqArray, waveArray, prevTime, time, getBpm(), id);
         prevTime = time;
       }
-
-      //updateScene(scene, freqArray, waveArray, time, time, getBpm());
-      //prevTime = time;
     }
 
     drawBackground(background_shader, time, getBpm(), camera);
