@@ -345,11 +345,15 @@
         var waveformSound1 = getWaveformSound(center1, amp1, scale1, waveformVal, j);
 
         // Waveform 2 ---------------------------------------------------------
-        var sin = Math.abs( Math.sin( (time / 10000.0) ) );
-        var center2 = l * 3.0/4.0 - (l / 2.0 * sin);
+        var sin = Math.abs( Math.sin( (time / 1000.0) ) );
+        var curI = Math.round(l * sin);
+        var center2 = l * 3.0/4.0;
         var amp2 = l / 4.0;
         var scale2 = 3;
-        var waveformSound2 = getWaveformSound(center2, amp2, scale2, waveformVal, j);
+        var waveformSound2 = 0;
+        if (i == curI) {
+          waveformSound2 = getWaveformSound(center2, amp2, scale2, waveformVal, j);
+        }
 
         // Update particle.waveform
         //if (waveformSound2 != 0 || waveformSound1 != 0) {
