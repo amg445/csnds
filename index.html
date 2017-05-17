@@ -85,6 +85,14 @@
   </div>
 
   <div>
+    <button class="js-fullscreen" style="float: right;">Full Screen</button>
+  </div>
+
+  <div style="float: right;">
+    <input type="checkbox" name="rotation" value="rotation">
+  </div>
+
+  <div>
     <select name="" id="js-visID" class="song-select">
       <option value="cool1">Cool1</option>
       <option value="cool2">Cool2</option>
@@ -189,7 +197,6 @@
   vec4 sp1     = vec4(255.0, 238.0, 238.0, 255.0)/255.0;
   vec4 sp2     = vec4(221.0, 238.0, 187.0, 255.0)/255.0;
 
-
   // deep sea
   vec4 deep2 = vec4(20.0, 30.0, 48.0, 255.0)/255.0;
   vec4 deep1 = vec4(36.0, 59.0, 85.0, 255.0)/255.0;
@@ -221,6 +228,34 @@
   </script>
 
   <script>
+
+
+
+  $('.js-fullscreen').on('click', function(){
+    var el = document.getElementById('webglCanvas');
+    if(el.webkitRequestFullScreen) { el.webkitRequestFullScreen();}
+    else { el.mozRequestFullScreen(); }
+  });
+
+  $(document).on("webkitfullscreenchange mozfullscreenchange fullscreenchange", function( event ) {
+    console.log('change');
+
+    var isFullScreen = document.fullScreen     ||
+                       document.mozFullScreen  ||
+                       document.webkitIsFullScreen;
+
+    if ( isFullScreen ) {
+      var c = $('#webglCanvas');
+      c.css('height','100%');
+      c.css('width', '100%');
+    } else {
+      var c = $('#webglCanvas');
+      c.css('height','600px');
+      c.css('width', '1000px');
+    }
+
+});
+
   var canPlay = false;
   var analyser;
   var waveArray;
