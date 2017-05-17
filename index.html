@@ -47,7 +47,7 @@
     .flex{
       width: 100%;
       height: 90vh;
-      display: flex;
+      display: inline-flex;
       justify-content: center;
       align-items: center;
     }
@@ -62,8 +62,13 @@
       width: 1000px;
       display: block;
       margin: 0 auto;
-      margin-top: -40px;
+      margin-top: -100px;
     }
+
+    .canvas{
+      display: block;
+    }
+
 
   </style>
 </head>
@@ -71,7 +76,7 @@
 <body>
 
   <div>
-    <select name="" id="js-songs" class="song-select">
+    <select name="songs" id="js-songs" class="song-select">
         <option data-bpm="120" value="https://soundcloud.com/verzache/conscious">Conscious</option>
         <option data-bpm="120" value="https://soundcloud.com/itndylan/lemons-dylan">Lemons</option>
         <option data-bpm="120" value="https://soundcloud.com/lidogotsongs/feel-it-still-lido-remix">Feel it Still</option>
@@ -86,11 +91,11 @@
   </div>
 
   <div>
-    <button class="js-fullscreen" style="float: right;">Full Screen</button>
-  </div>
-
-  <div style="float: right;">
-    <input type="checkbox" id="rotationCheckbox" name="rotation" value="rotation">
+    <select name="colors" id="js-colors" style="float: right">
+      <option value="1">Deep Sea</option>
+      <option value="2">Sunset</option>
+      <option value="3">Scandenavian</option>
+    </select>
   </div>
 
   <div>
@@ -101,12 +106,29 @@
     </select>
   </div>
 
+
+  <div>
+    <button class="js-fullscreen" style="float: right;">Full Screen</button>
+  </div>
+
+
+
+  <div style="float: right;">
+    <input type="checkbox" id="rotationCheckbox" name="rotation" value="rotation">
+  </div>
+
   <div class="song-btns">
     <p style="margin-top: 3px;">Controls</p>
   </div>
 
   <div class="flex">
-    <canvas tabindex="1" id="webglCanvas" style="border: none; background-color: black;" width="1000" height="600"></canvas>
+      <canvas tabindex="1" id="webglCanvas" style="border: none; background-color: black;" width="1000" height="600" class="canvas"></canvas>
+  </div>
+
+  <div style="margin-top: 50px">
+    <input type="range" class="js-acceleration" value="0"/>
+    <input type="range" class="js-velocity"/>
+    <input type="range" class="js-rotationSpeed"/>
   </div>
 
   <script src="js/bundle.js" charset="utf-8"></script>
@@ -229,7 +251,6 @@
   </script>
 
   <script>
-
 
 
   $('.js-fullscreen').on('click', function(){
@@ -864,6 +885,7 @@
     return bpm;
   }
 
+
   // UpdateWebGL --------------------------------------------------------------
   var prevTime = 0;
   function updateWebGL(time) {
@@ -880,9 +902,11 @@
 
 
     if(canPlay) {
+      $(".js-scrubber").attr("max", audio.duration);
       analyser.getByteTimeDomainData(waveArray); // Wavalength data
       analyser.getByteFrequencyData(freqArray);  // Frequency data
       if (!audio.paused) {
+        // $('.js-time').text(audio.currentTime + "/" + audio.duration);
         // Rotate if user is not moving camera
         if (!dragging && $("#rotationCheckbox").is(":checked")) {
           offset[1] = -1;    // 1 is rotation around y speed right now
@@ -894,6 +918,7 @@
         prevTime = time;
       }
     }
+
 
     drawBackground(background_shader, time, getBpm(), camera);
 
