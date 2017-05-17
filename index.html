@@ -995,7 +995,8 @@
     65: false,
     68: false,
     81: false,
-    69: false
+    69: false,
+    32: false
   };
   /**
    * Move rotate camera from WASD, SHIFT, SPACEBAR
@@ -1040,6 +1041,15 @@
     // E - zoom in - decr z
     if (map[69]) {
        offset[2] -= s/2;
+    }
+
+    // Space - pause music
+    if (map[32]) {
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause();
+      }
     }
   });
 
