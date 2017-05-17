@@ -151,6 +151,7 @@
 
   uniform float time;
   uniform float bpm;
+  uniform float distance;
 
   varying vec2 texCoord;
   varying vec3 position;
@@ -187,10 +188,16 @@
   vec4 litepink = vec4(255.0,	182.0, 193.0, 255.0) / 255.0;
 
   void main() {
-    float radius = 3.0;
+    float radius = 3.5;
+    float width = 0.4;
     float hardness = 0.1;
-    float speed = 0.85;
-    float r = radius + (speed * abs(sin(time/bpm)));
+    
+    float pi = 3.14159265359;
+    float bpms = bpm / 60000.0;    // beats per ms
+
+
+    float r = radius + width * sin( time * bpms * pi / 10.0 );    // To change pulses per minute, multiply/divide inside sin()
+
     // adjust by 5/3 to make circular
     float t = max(0.0, hardness * ((r * r) - (25.0 * position.x * position.x) - (9.0 * position.y * position.y)));
     t = min(t, 1.0);
@@ -547,7 +554,6 @@
   camera.origin = [0.0, 0.0, 0.0];
   camera.projection = perspectiveMatrix;
   camera.position = vec3.fromValues(0, 0, 3);
-  //camera.radius = vec3.length(camera.position);
   camera.scale = [1,1,1];
   updateToWorldMatrix(camera);
 
@@ -603,7 +609,7 @@
       //prevTime = time;
     }
 
-    drawBackground(background_shader, time, getBpm(), camera.projection);
+    drawBackground(background_shader, time, getBpm(), camera);
 
     // Update Camera Position if it has been offset
     updateSceneOffset(scene, offset);

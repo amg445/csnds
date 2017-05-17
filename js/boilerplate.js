@@ -163,7 +163,8 @@ function drawShape(gl, shape, camera, toWorld, disType) {
     gl.disable(gl.DEPTH_TEST);
 }
 
-function drawBackground(program, time, bpm, projection) {
+function drawBackground(program, time, bpm, camera) {
+    var distance = camera.position[2];
     var vertexData = [
         -1.0, -1.0, 0.0,  // Lower left
         0.0,  0.0,
@@ -207,8 +208,8 @@ function drawBackground(program, time, bpm, projection) {
     var bpmLocation = gl.getUniformLocation(program, "bpm");
     gl.uniform1f(bpmLocation, bpm);
 
-    var projectionLocation = gl.getUniformLocation(program, "projection");
-    gl.uniformMatrix4fv(projectionLocation, false, camera.projection);
+    var distanceLocation = gl.getUniformLocation(program, "distance");
+    gl.uniform1f(distanceLocation, distance);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
