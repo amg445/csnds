@@ -58,6 +58,13 @@
       font-weight: 700;
     }
 
+    audio{
+      width: 1000px;
+      display: block;
+      margin: 0 auto;
+      margin-top: -40px;
+    }
+
   </style>
 </head>
 
@@ -86,14 +93,12 @@
   </div>
 
   <div class="song-btns">
-    <p class="js-pause" style="margin-top: 3px;">Pause</p>
+    <p style="margin-top: 3px;">Controls</p>
   </div>
 
   <div class="flex">
     <canvas tabindex="1" id="webglCanvas" style="border: none; background-color: black;" width="1000" height="600"></canvas>
   </div>
-
-  <div>COOL</div>
 
   <script src="js/bundle.js" charset="utf-8"></script>
   <script src="js/perlin.js" charset="utf-8"></script>
@@ -686,12 +691,13 @@
     if(canPlay) {
       analyser.getByteTimeDomainData(waveArray); // Wavalength data
       analyser.getByteFrequencyData(freqArray);  // Frequency data
-      console.log(freqArray);
-      if ($('.js-pause').text() == 'Pause') {
+      if (!audio.paused) {
         inc += .5;
+        if(Math.abs(prevTime - time) > 350) prevTime = time;
         updateScene(scene, freqArray, waveArray, prevTime, time, getBpm());
         prevTime = time;
       }
+
       //updateScene(scene, freqArray, waveArray, time, time, getBpm());
       //prevTime = time;
     }
