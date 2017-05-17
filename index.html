@@ -290,6 +290,28 @@
   }
 
   /**
+   * [waveformVal] range: [-1, 1]
+   */
+  function getWaveformSound(center, amp, scale, waveformVal, j) {
+    // Update waveformVal if particle is in the waveform range
+    //var half = scene.particles.list[i].length / 4.0;
+    var val = amp * Math.abs(waveformVal);
+    if (center-val < j && j < center+val) {
+      var r = scale * val / amp;
+      var x = scale * ( Math.abs(j - center) ) / amp;
+      var y = Math.sqrt(Math.pow(r, 2) - Math.pow(x, 2));
+      waveformVal = y;
+    } else {
+      waveformVal = 0;
+    }
+
+    // Waveform
+    var waveformSound = waveformVal;
+
+    return waveformSound;
+  }
+
+  /**
    * update scene according to music data
    * [spectrum] - amplitudes across frequency spectrum
    *              range: [0, 255]
@@ -305,40 +327,34 @@
     var displaced = 0;
     var scale = 0.1;
     var threshold = 0.0;
-    var decaySpeed = 0.0015;
+    var decaySpeed = 0.0005;
 
     for (var i = 0; i < scene.particles.list.length; i++) {
-      var wVal = ( waveform[i] - (255.0/2.0) ) / (255.0/2.0); // range: [-1, 1];
+      var waveformVal = ( waveform[i] - (255.0/2.0) ) / (255.0/2.0); // range: [-1, 1];
 
       for (var j = 0; j < scene.particles.list[i].length; j++) {
         var particle = scene.particles.list[i][j];
 
         var spectrumVal = spectrum[j]/255.0;    // range: [0, 1]
-        var waveformVal = wVal;
 
-        // Update waveformVal if particle is in the waveform range
-        var half = scene.particles.list[i].length / 2.0;
-        var val = (scene.particles.list[i].length / 2.0) * Math.abs(wVal);
-        if (half-val < j && j < half+val) {
-          var r = (val / half) * 5.0/6.0;
-          var x = ( Math.abs(j - half) ) / half;
-          var y = Math.sqrt(Math.pow(r, 2) - Math.pow(x, 2));
-          waveformVal = y;
-          
-          // Set particle.waveform
+        // Waveform 1 ---------------------------------------------------------
+        var center1 = scene.particles.list[i].length / 4.0;
+        var amp1 = scene.particles.list[i].length / 4.0;
+        var scale1 = 3;
+        var waveformSound1 = getWaveformSound(center1, amp1, scale1, waveformVal, j);
+
+        // Waveform 2 ---------------------------------------------------------
+        var center2 = scene.particles.list[i].length * 3.0 / 4.0;
+        var amp2 = scene.particles.list[i].length / 4.0;
+        var scale2 = 3;
+        var waveformSound2 = getWaveformSound(center2, amp2, scale2, waveformVal, j);
+
+        // Update particle.waveform
+        //if (waveformSound2 != 0 || waveformSound1 != 0) {
+        if (waveformSound1 != 0) {
           particle.waveform = true;
         } else {
-          waveformVal = 0;
-          
-          // Set particle.waveform flag
           particle.waveform = false;
-        }
-
-        // Waveform
-        var thresholdWaveform = 0;
-        var waveformSound = 0;
-        if (waveformVal > thresholdWaveform) {
-          waveformSound = 5 * (waveformVal - thresholdWaveform);
         }
 
         // Spectrum (Frequency)
@@ -346,13 +362,13 @@
         var spectrumSound = 0;
         if (spectrumVal > thresholdSpectrum) {
           spectrumSound = spectrumVal - thresholdSpectrum;
-          particle.spectrum = true;
+          //particle.spectrum = true;
         } else {
           particle.spectrum = false;
         }
 
         // Sound
-        var vSound = scale * (0*spectrumSound + waveformSound);
+        var vSound = scale * (waveformSound2);
 
         // Noise
         var vNoise = noiseAmp * PerlinNoise.noise((i+inc)/30,(j+inc)/30,.5);
@@ -367,7 +383,6 @@
           particle.displacement = 1.0;
           displaced++;
           if (scale * spectrumVal > threshold) {
-            particle.spectrum = true;
           } else {
             particle.spectrum = false;
           }
@@ -380,7 +395,6 @@
           moveParticle(particle, y, 1.0);
           particle.displacement = 0.0;
           particle.spectrum = false;
-          particle.waveform = false;
         }
       }
     }
