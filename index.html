@@ -313,11 +313,7 @@
 
     // Update Velocity
     var dv = particle.acceleration * dt;
-    if (particle.yVelocity < 0) {
-      particle.yVelocity -= dv;
-    } else {
-      particle.yVelocity += dv;
-    }
+    particle.yVelocity += dv;
   }
 
   /**
@@ -452,8 +448,8 @@
           //if (dist > 0) dist--;
           //waveformSound2 = waveformSound2 - Math.pow( (dist / intWaveSound2/5), 2);
           particle.decay = true;
-          particle.yVelocity = -decaySpeed;
-          particle.acceleration = decayAcceleration;
+          particle.yVelocity = 0.0008 * scale * waveformSound2;
+          particle.acceleration = -decayAcceleration;
         }
 
         // Update particle.waveform
