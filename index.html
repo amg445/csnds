@@ -44,11 +44,9 @@
       font-weight: 500;
     }
 
-    canvas{margin: 100px auto;}
-
     .flex{
       width: 100%;
-      height: 110vh;
+      height: 90vh;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -67,15 +65,23 @@
 
   <div>
     <select name="" id="js-songs" class="song-select">
-      <option data-bpm="120" value="https://soundcloud.com/verzache/conscious">Conscious</option>
-      <option data-bpm="120" value="https://soundcloud.com/itndylan/lemons-dylan">Lemons</option>
-      <option data-bpm="120" value="https://soundcloud.com/lidogotsongs/feel-it-still-lido-remix">Feel it Still</option>
-      <option data-bpm="120" value="https://soundcloud.com/liluzivert/15-xo-tour-llif3">XO TOUR Lif3</option>
-      <option data-bpm="120" value="https://soundcloud.com/green-mountain-boys/power-moves-rough">Power Moves [Rough]</option>
-      <option data-bpm="120" value="https://soundcloud.com/travisscott-2/11-grey">Grey - Travis Scott</option>
-      <option data-bpm="100" value="https://soundcloud.com/santandave/wanna-know-remix-feat-drake">Wanna Know - Dave</option>
-      <option data-bpm="91.972" value="https://soundcloud.com/zarsh-elsawaf/inception-mind-heist-movie">Inception</option>
-      <option data-bpm="117" value="https://soundcloud.com/partyomo/partynextdoor-break-from">Break From Toronto</option>
+        <option data-bpm="120" value="https://soundcloud.com/verzache/conscious">Conscious</option>
+        <option data-bpm="120" value="https://soundcloud.com/itndylan/lemons-dylan">Lemons</option>
+        <option data-bpm="120" value="https://soundcloud.com/lidogotsongs/feel-it-still-lido-remix">Feel it Still</option>
+        <option data-bpm="120" value="https://soundcloud.com/liluzivert/15-xo-tour-llif3">XO TOUR Lif3</option>
+        <option data-bpm="120" value="https://soundcloud.com/green-mountain-boys/power-moves-rough">Power Moves [Rough]</option>
+        <option data-bpm="120" value="https://soundcloud.com/travisscott-2/11-grey">Grey - Travis Scott</option>
+        <option data-bpm="100" value="https://soundcloud.com/santandave/wanna-know-remix-feat-drake">Wanna Know - Dave</option>
+        <option data-bpm="91.972" value="https://soundcloud.com/zarsh-elsawaf/inception-mind-heist-movie">Inception</option>
+        <option data-bpm="117" value="https://soundcloud.com/partyomo/partynextdoor-break-from">Break From Toronto</option>
+    </select>
+  </div>
+
+  <div>
+    <select name="" id="js-visID" class="song-select">
+      <option value="cool1">Cool1</option>
+      <option value="cool2">Cool2</option>
+      <option value="cool3">Cool3</option>
     </select>
   </div>
 
@@ -86,6 +92,8 @@
   <div class="flex">
     <canvas tabindex="1" id="webglCanvas" style="border: none; background-color: black;" width="1000" height="600"></canvas>
   </div>
+
+  <div>COOL</div>
 
   <script src="js/bundle.js" charset="utf-8"></script>
   <script src="js/perlin.js" charset="utf-8"></script>
@@ -117,7 +125,7 @@
 
     // scandenavian cube colors
     vec4 scand_red  = vec4(245.0, 88.0, 109.0, 255.0 ) / 255.0;
-    vec4 scand_black = vec4(51., 51., 51., 255.)/255.0;
+    vec4 scand_black = vec4(152., 152., 152., 255.)/255.0;
 
     void main() {
       if (waveform) {
@@ -125,7 +133,7 @@
       } else if (spectrum) {
         gl_FragColor = purp;
       } else {
-        gl_FragColor = grey;
+        gl_FragColor = white;
       }
 
 
@@ -165,7 +173,7 @@
   vec4 scand2   = vec4(1.0, .989, .989, 1.0);
 
   // blue guys
-  vec4 blu1  = vec4(.768, .925, .984, 1.0);
+  vec4 blu1     = vec4(.768, .925, .984, 1.0);
   vec4 blu2     = vec4(.603, .741, .931, 1.);
 
   // sunrise
@@ -173,13 +181,11 @@
   vec4 sun2     = vec4(245.0, 217.0, 97.0, 255.0)/255.0;
 
   // spring
-
   vec4 sp1     = vec4(255.0, 238.0, 238.0, 255.0)/255.0;
   vec4 sp2     = vec4(221.0, 238.0, 187.0, 255.0)/255.0;
 
 
   // deep sea
-
   vec4 deep2 = vec4(20.0, 30.0, 48.0, 255.0)/255.0;
   vec4 deep1 = vec4(36.0, 59.0, 85.0, 255.0)/255.0;
 
@@ -193,7 +199,8 @@
     float radius = 3.5;
     float width = 0.4;
     float hardness = 0.1;
-    
+    float speed = 1.0;
+
     float pi = 3.14159265359;
     float bpms = bpm / 60000.0;    // beats per ms
 
@@ -233,6 +240,20 @@
     window.location.href = newURL;
     location.reload();
   })
+
+  $('#js-visID').on('change', function(){
+
+    switch(this.value){
+      case "cool1":
+        break;
+
+      case "cool2":
+        break;
+
+      case "cool3":
+        break;
+    }
+  });
 
   // Scene Objects  ---------------------------------------------------
 
@@ -430,7 +451,7 @@
         var max = 4;
         var sin = beats % (2.0*max);
         if (sin >= max) {
-          sin = 2.0*max - sin; 
+          sin = 2.0*max - sin;
         }
         sin = sin / max;
         var curI = Math.round( l * sin );
@@ -643,6 +664,17 @@
   function updateWebGL(time) {
     if (canPlay) {
       time = audio.currentTime * 1000;
+    }
+
+    var id = $('#js-visID').val();
+
+    switch(id){
+      case 'cool1':
+        inc += .5;
+        break;
+      case 'cool2':
+        inc += 2;
+        break;
     }
 
     scene = getScene(scenetype);
