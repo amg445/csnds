@@ -67,7 +67,7 @@ var init = function() {
   source.connect(analyser);
 
   analyser.fftSize = 2*bins;
-  analyser.smoothingTimeConstant = 0;
+  analyser.smoothingTimeConstant = smoothing;
   bufferLength = analyser.frequencyBinCount;
   waveArray = new Uint8Array(bufferLength);
   freqArray = new Uint8Array(bufferLength);
@@ -75,7 +75,6 @@ var init = function() {
   source.connect(audioCtx.destination);
   canPlay = true;
   audio.play();
-
 
 }
 

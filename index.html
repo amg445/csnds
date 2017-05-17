@@ -500,6 +500,7 @@
         // Final Value
         var v = vNoise + soundAmp * (vSound - threshold);
 
+        // Move Particles
         if (vSound > threshold) {
           moveParticle(particle, v, 1.0);
           //if (Math.random() > 0.5) { moveParticle(particle, v, 1.0); }
@@ -605,7 +606,7 @@
   var background_shader = createGlslProgram(gl, "vertexShader--background", "fragmentShader--background");
   //var fft = null;
   //var sound = null;
-  var smoothing = 0.99;   // range: (0.0, 1.0), def: 0.8
+  var smoothing = 0;   // range: (0.0, 1.0), def: 0.8
   var bins = 64;   // range: [16, 1024], def: 1024 - MUST be power of 2
   var offset = [80,-350,0];   // offset for controlling camera movement
   var analyser;
@@ -678,7 +679,8 @@
 
     scene = getScene(scenetype);
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    //gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
     if(canPlay && (time - prevTime) > 33) {
