@@ -361,7 +361,7 @@
         if (waveformSound1 != 0) {
           particle.waveform = true;
         } else {
-          particle.waveform = false;
+          //particle.waveform = false;
         }
 
         // Spectrum (Frequency)
@@ -371,11 +371,11 @@
           spectrumSound = spectrumVal - thresholdSpectrum;
           //particle.spectrum = true;
         } else {
-          particle.spectrum = false;
+          //particle.spectrum = false;
         }
 
         // Sound
-        var vSound = scale * (waveformSound2);
+        var vSound = scale * (waveformSound1 + waveformSound2);
 
         // Noise
         var vNoise = noiseAmp * PerlinNoise.noise((i+inc)/30,(j+inc)/30,.5);
@@ -385,8 +385,6 @@
 
         if (vSound > threshold) {
           moveParticle(particle, v, 1.0);
-          //if (Math.random() > 0.5) { moveParticle(particle, v, 1.0); }
-          //else { moveParticle(particle, v, -0.3); }
           particle.displacement = 1.0;
           displaced++;
           if (scale * spectrumVal > threshold) {
@@ -396,8 +394,9 @@
         } else {
           var dy = (decaySpeed * dt);
           var y = particle.position[1]-dy;
-          if (y < vNoise) {
+          if (y < vNoise || particle.waveform) {
             y = vNoise;
+            particle.waveform = false;
           }
           moveParticle(particle, y, 1.0);
           particle.displacement = 0.0;
