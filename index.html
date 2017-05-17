@@ -527,6 +527,45 @@
   }
 
   /*
+   * Frequency
+   */
+  function getSoundValueFrequency(id, dt, soundAmp, noiseAmp, displaced, scale,
+                          threshold, bpms, decaySpeed, decayAcceleration,
+                          beats, maxWaveformVal, waveformVal, particle,
+                          spectrumVal, l, i, j,
+                          scene, spectrum, waveform, prevTime, time, bpm) {
+    // Waveform 1 ---------------------------------------------------------
+    var center1 = l * 3.0/4.0;
+    var amp1 = l / 4.0;
+    var scale1 = 3;
+    var waveformSound1 = getWaveformSound(center1, amp1, scale1, waveformVal, j);
+
+    // Update particle.waveform
+    if (waveformSound1 != 0) {
+      particle.waveform = true;
+
+      particle.decay = true;
+      particle.yVelocity = 0.0015 * scale * waveformSound1;
+      particle.acceleration = -decayAcceleration;
+    } else {
+      particle.waveform = false;
+    }
+
+    // Spectrum (Frequency)
+    var thresholdSpectrum = 0.7;
+    var spectrumSound = 0;
+    if (spectrumVal > thresholdSpectrum) {
+      spectrumSound = spectrumVal - thresholdSpectrum;
+      //particle.spectrum = true;
+    } else {
+      particle.spectrum = false;
+    }
+
+    // Sound
+    return vSound = scale * (spectrumSound + waveformSound1);
+  }
+
+  /*
    * Sweeping - Default baseline
    */
   function getSoundValue(id, dt, soundAmp, noiseAmp, displaced, scale,
@@ -627,7 +666,7 @@
         var vSound = 0;
         switch (id) {
           case "cool1":
-            vSound = getSoundValue(id, dt, soundAmp, noiseAmp, displaced, scale,
+            vSound = getSoundValueFrequency(id, dt, soundAmp, noiseAmp, displaced, scale,
                                 threshold, bpms, decaySpeed, decayAcceleration,
                                 beats, maxWaveformVal, waveformVal, particle,
                                 spectrumVal, l, i, j,
