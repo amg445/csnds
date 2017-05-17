@@ -67,15 +67,15 @@
 
   <div>
     <select name="" id="js-songs" class="song-select">
-      <option data-bpm="775" value="https://soundcloud.com/verzache/conscious">Conscious</option>
-      <option data-bpm="775" value="https://soundcloud.com/itndylan/lemons-dylan">Lemons</option>
-      <option data-bpm="500" value="https://soundcloud.com/lidogotsongs/feel-it-still-lido-remix">Feel it Still</option>
-      <option data-bpm="500" value="https://soundcloud.com/liluzivert/15-xo-tour-llif3">XO TOUR Lif3</option>
-      <option data-bpm="775" value="https://soundcloud.com/green-mountain-boys/power-moves-rough">Power Moves [Rough]</option>
-      <option data-bpm="775" value="https://soundcloud.com/travisscott-2/11-grey">Grey - Travis Scott</option>
-      <option data-bpm="760" value="https://soundcloud.com/santandave/wanna-know-remix-feat-drake">Wanna Know - Dave</option>
-      <option value="https://soundcloud.com/rlgrime/core-rl-grime">C O R E</option>
-      <option value="https://soundcloud.com/verzache2/in-ny-i-milly-rock">yikessss</option>
+        <option data-bpm="120" value="https://soundcloud.com/verzache/conscious">Conscious</option>
+        <option data-bpm="120" value="https://soundcloud.com/itndylan/lemons-dylan">Lemons</option>
+        <option data-bpm="120" value="https://soundcloud.com/lidogotsongs/feel-it-still-lido-remix">Feel it Still</option>
+        <option data-bpm="120" value="https://soundcloud.com/liluzivert/15-xo-tour-llif3">XO TOUR Lif3</option>
+        <option data-bpm="120" value="https://soundcloud.com/green-mountain-boys/power-moves-rough">Power Moves [Rough]</option>
+        <option data-bpm="120" value="https://soundcloud.com/travisscott-2/11-grey">Grey - Travis Scott</option>
+        <option data-bpm="100" value="https://soundcloud.com/santandave/wanna-know-remix-feat-drake">Wanna Know - Dave</option>
+        <option data-bpm="91.972" value="https://soundcloud.com/zarsh-elsawaf/inception-mind-heist-movie">Inception</option>
+        <option data-bpm="117" value="https://soundcloud.com/partyomo/partynextdoor-break-from">Break From Toronto</option>
     </select>
   </div>
 
@@ -88,7 +88,7 @@
   </div>
 
   <div class="song-btns">
-    <p class="js-pause">Pause</p>
+    <p class="js-pause" style="margin-top: 3px;">Pause</p>
   </div>
 
   <div class="flex">
@@ -163,6 +163,7 @@
 
   uniform float time;
   uniform float bpm;
+  uniform float distance;
 
   varying vec2 texCoord;
   varying vec3 position;
@@ -197,10 +198,18 @@
   vec4 litepink = vec4(255.0,	182.0, 193.0, 255.0) / 255.0;
 
   void main() {
-    float radius = 3.0;
+    float radius = 3.5;
+    float width = 0.4;
     float hardness = 0.1;
     float speed = 1.0;
-    float r = radius + (speed * sin(time/bpm));
+
+    float pi = 3.14159265359;
+    float bpms = bpm / 60000.0;    // beats per ms
+
+
+    //float r = radius + width * cos( time * bpms * pi );    // To change pulses per minute, multiply/divide inside sin()
+    float r = radius + width * abs( cos( time * bpms * (pi/2.0) + (pi/2.0) + 0.2 ));
+
     // adjust by 5/3 to make circular
     float t = max(0.0, hardness * ((r * r) - (25.0 * position.x * position.x) - (9.0 * position.y * position.y)));
     t = min(t, 1.0);
@@ -256,9 +265,12 @@
 
     // Instantiate particle
     particle.position = [x, y, z];
+    particle.yVelocity = 0;
+    particle.acceleration = 0;
     particle.scale = [s, s, s];
     particle.waveform = false;
     particle.spectrum = false;
+    particle.decay = false;
 
     // Create [particle.toWorld] matrix
     updateToWorldMatrix(particle);
@@ -308,6 +320,23 @@
   function moveParticle(particle, value, dir) {
     particle.position[1] = dir * value;
     updateToWorldMatrix(particle);
+  }
+
+  /**
+   * Update particle position & velocity based on acceleration, dt, minV
+   */
+  function moveParticleByPhysics(particle, dt, minV) {
+    var dy = (particle.yVelocity * dt);
+    var y = particle.position[1] + dy;
+    if (y < minV) {
+      y = minV;
+      particle.decay = false;
+    }
+    moveParticle(particle, y, 1.0);
+
+    // Update Velocity
+    var dv = particle.acceleration * dt;
+    particle.yVelocity += dv;
   }
 
   /**
@@ -371,6 +400,14 @@
     return waveformSound;
   }
 
+  function normalizeWaveformVal(waveformVal) {
+    return ( waveformVal - (255.0/2.0) ) / (255.0/2.0); // range: [-1, 1];
+  }
+
+  function normalizeSpectrumVal(spectrumVal) {
+    return spectrumVal / 255.0;    // range: [0, 1]
+  }
+
   /**
    * update scene according to music data
    * [spectrum] - amplitudes across frequency spectrum
@@ -380,17 +417,24 @@
    * [scale] - scale factor for particle offset
    */
   var inc = 0;
-  function updateScene(scene, spectrum, waveform, prevTime, time) {
+  function updateScene(scene, spectrum, waveform, prevTime, time, bpm) {
     var dt = time - prevTime;
     var soundAmp = 2;
     var noiseAmp = 0.3;
     var displaced = 0;
     var scale = 0.1;
     var threshold = 0.0;
-    var decaySpeed = 0.0005;
+    var bpms = bpm / 60000;
+    //var decaySpeed = 0.0005;
+    //var decaySpeed = 0.05 / bpm;
+    var decaySpeed = 0.0005 / bpm;
+    var decayAcceleration = 0.0000005;
+    //var decayAcceleration = 0;
+    var beats = time * bpms;
+    var maxWaveformVal = normalizeWaveformVal( Math.max.apply(null, waveform) );
 
     for (var i = 0; i < scene.particles.list.length; i++) {
-      var waveformVal = ( waveform[i] - (255.0/2.0) ) / (255.0/2.0); // range: [-1, 1];
+      var waveformVal = normalizeWaveformVal(waveform[i]); // range: [-1, 1];
 
       for (var j = 0; j < scene.particles.list[i].length; j++) {
         var particle = scene.particles.list[i][j];
@@ -405,15 +449,30 @@
         var waveformSound1 = getWaveformSound(center1, amp1, scale1, waveformVal, j);
 
         // Waveform 2 ---------------------------------------------------------
-        var sin = Math.abs( Math.sin( (time / 1000.0) ) );
-        var curI = Math.round(l * sin);
+        //var sin = Math.abs( Math.sin( (time / 1000.0) ) );
+        var max = 4;
+        var sin = beats % (2.0*max);
+        if (sin >= max) {
+          sin = 2.0*max - sin;
+        }
+        sin = sin / max;
+        var curI = Math.round( l * sin );
+        //var sin = Math.cos( time * bpms * Math.PI / 2.0 / 2.0);
+        //var curI = Math.round( l/2.0 + (l/2.0*sin) );
         var center2 = l * 3.0/4.0;
         var amp2 = l / 4.0;
-        var scale2 = 3;
-        var waveformSound2 = getWaveformSound(center2, amp2, scale2, waveformVal, j);
+        var scale2 = 2;
+        var waveformSound2 = getWaveformSound(center2, amp2, scale2, maxWaveformVal, j);
         var intWaveSound2 = Math.round(waveformSound2);
         if ( !(curI-intWaveSound2-1 < i && i < curI+intWaveSound2+1) ) {
           waveformSound2 = 0;
+        } else if (waveformSound2 != 0) {
+          //var dist = Math.abs(curI - i);
+          //if (dist > 0) dist--;
+          //waveformSound2 = waveformSound2 - Math.pow( (dist / intWaveSound2/5), 2);
+          particle.decay = true;
+          particle.yVelocity = 0.0015 * scale * waveformSound2;
+          particle.acceleration = -decayAcceleration;
         }
 
         // Update particle.waveform
@@ -454,12 +513,11 @@
             particle.spectrum = false;
           }
         } else {
-          var dy = (decaySpeed * dt);
-          var y = particle.position[1]-dy;
-          if (y < vNoise) {
-            y = vNoise;
+          if (particle.decay) {
+            moveParticleByPhysics(particle, dt, vNoise);
+          } else {
+            moveParticle(particle, vNoise, 1.0);
           }
-          moveParticle(particle, y, 1.0);
           particle.displacement = 0.0;
           particle.spectrum = false;
         }
@@ -551,7 +609,7 @@
   //var sound = null;
   var smoothing = 0.99;   // range: (0.0, 1.0), def: 0.8
   var bins = 64;   // range: [16, 1024], def: 1024 - MUST be power of 2
-  var offset = [50,-190,0];   // offset for controlling camera movement
+  var offset = [80,-350,0];   // offset for controlling camera movement
   var analyser;
   var audio;
 
@@ -571,7 +629,6 @@
   camera.origin = [0.0, 0.0, 0.0];
   camera.projection = perspectiveMatrix;
   camera.position = vec3.fromValues(0, 0, 3);
-  //camera.radius = vec3.length(camera.position);
   camera.scale = [1,1,1];
   updateToWorldMatrix(camera);
 
@@ -631,14 +688,14 @@
       analyser.getByteFrequencyData(freqArray);  // Frequency data
       if ($('.js-pause').text() == 'Pause') {
         inc += .5;
-        updateScene(scene, freqArray, waveArray, prevTime, time);
+        updateScene(scene, freqArray, waveArray, prevTime, time, getBpm());
         prevTime = time;
       }
-      //updateScene(scene, freqArray, waveArray, time-prevTime);
+      //updateScene(scene, freqArray, waveArray, time, time, getBpm());
       //prevTime = time;
     }
 
-    drawBackground(background_shader, time, getBpm(), camera.projection);
+    drawBackground(background_shader, time, getBpm(), camera);
 
     // Update Camera Position if it has been offset
     updateSceneOffset(scene, offset);
