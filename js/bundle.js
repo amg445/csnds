@@ -79,11 +79,6 @@ var init = function() {
 
 }
 
-
-// audio.addEventListener('canplay', function() {
-//
-// })
-
 },{"soundcloud-badge":7}],2:[function(require,module,exports){
 (function (global){
 if (typeof window !== "undefined") {
