@@ -804,6 +804,11 @@
       analyser.getByteTimeDomainData(waveArray); // Wavalength data
       analyser.getByteFrequencyData(freqArray);  // Frequency data
       if (!audio.paused) {
+        // Rotate if user is not moving camera
+        if (!dragging) {
+          offset[1] = -1;    // 1 is rotation around y speed right now
+        }
+
         inc += .5;
         if(Math.abs(prevTime - time) > 350) prevTime = time;
         updateScene(scene, freqArray, waveArray, prevTime, time, getBpm(), id);
