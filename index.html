@@ -438,7 +438,7 @@
         //var curI = Math.round( l/2.0 + (l/2.0*sin) );
         var center2 = l * 3.0/4.0;
         var amp2 = l / 4.0;
-        var scale2 = 3;
+        var scale2 = 2;
         var waveformSound2 = getWaveformSound(center2, amp2, scale2, maxWaveformVal, j);
         var intWaveSound2 = Math.round(waveformSound2);
         if ( !(curI-intWaveSound2-1 < i && i < curI+intWaveSound2+1) ) {
@@ -448,7 +448,7 @@
           //if (dist > 0) dist--;
           //waveformSound2 = waveformSound2 - Math.pow( (dist / intWaveSound2/5), 2);
           particle.decay = true;
-          particle.yVelocity = 0.0008 * scale * waveformSound2;
+          particle.yVelocity = 0.0015 * scale * waveformSound2;
           particle.acceleration = -decayAcceleration;
         }
 
