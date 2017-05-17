@@ -407,9 +407,9 @@
     var bpms = bpm / 60000;
     //var decaySpeed = 0.0005;
     //var decaySpeed = 0.05 / bpm;
-    var decaySpeed = 0.005 / bpm;
-    //var decayAcceleration = 0.000001;
-    var decayAcceleration = 0;
+    var decaySpeed = 0.0005 / bpm;
+    var decayAcceleration = 0.0000005;
+    //var decayAcceleration = 0;
     var beats = time * bpms;
     var maxWaveformVal = normalizeWaveformVal( Math.max.apply(null, waveform) );
 
@@ -444,13 +444,15 @@
         var scale2 = 3;
         var waveformSound2 = getWaveformSound(center2, amp2, scale2, maxWaveformVal, j);
         var intWaveSound2 = Math.round(waveformSound2);
-        if ( (curI-intWaveSound2-1 < i && i < curI+intWaveSound2+1) && waveformSound2 != 0 ) {
-          waveformSound2 = waveformSound2 - Math.pow( (Math.abs(curI-i) / intWaveSound2/5), 2);
+        if ( !(curI-intWaveSound2-1 < i && i < curI+intWaveSound2+1) ) {
+          waveformSound2 = 0;
+        } else if (waveformSound2 != 0) {
+          //var dist = Math.abs(curI - i);
+          //if (dist > 0) dist--;
+          //waveformSound2 = waveformSound2 - Math.pow( (dist / intWaveSound2/5), 2);
           particle.decay = true;
           particle.yVelocity = -decaySpeed;
           particle.acceleration = decayAcceleration;
-        } else {
-          waveformSound2 = 0;
         }
 
         // Update particle.waveform
