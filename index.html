@@ -339,8 +339,8 @@
         var l = scene.particles.list[i].length;
 
         // Waveform 1 ---------------------------------------------------------
-        var center1 = scene.particles.list[i].length / 4.0;
-        var amp1 = scene.particles.list[i].length / 4.0;
+        var center1 = l / 4.0;
+        var amp1 = l / 4.0;
         var scale1 = 3;
         var waveformSound1 = getWaveformSound(center1, amp1, scale1, waveformVal, j);
 
@@ -350,9 +350,10 @@
         var center2 = l * 3.0/4.0;
         var amp2 = l / 4.0;
         var scale2 = 3;
-        var waveformSound2 = 0;
-        if (i == curI) {
-          waveformSound2 = getWaveformSound(center2, amp2, scale2, waveformVal, j);
+        var waveformSound2 = getWaveformSound(center2, amp2, scale2, waveformVal, j);
+        var intWaveSound2 = Math.round(waveformSound2);
+        if ( !(curI-intWaveSound2-1 < i && i < curI+intWaveSound2+1) ) {
+          waveformSound2 = 0;
         }
 
         // Update particle.waveform
