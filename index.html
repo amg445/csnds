@@ -320,8 +320,8 @@
    * [scale] - scale factor for particle offset
    */
   var inc = 0;
-  function updateScene(scene, spectrum, waveform, dt) {
-    // Scale [waveform] by [spectrum]
+  function updateScene(scene, spectrum, waveform, prevTime, time) {
+    var dt = time - prevTime;
     var soundAmp = 2;
     var noiseAmp = 0.3;
     var displaced = 0;
@@ -336,6 +336,7 @@
         var particle = scene.particles.list[i][j];
 
         var spectrumVal = spectrum[j]/255.0;    // range: [0, 1]
+        var l = scene.particles.list[i].length;
 
         // Waveform 1 ---------------------------------------------------------
         var center1 = scene.particles.list[i].length / 4.0;
@@ -344,8 +345,9 @@
         var waveformSound1 = getWaveformSound(center1, amp1, scale1, waveformVal, j);
 
         // Waveform 2 ---------------------------------------------------------
-        var center2 = scene.particles.list[i].length * 3.0 / 4.0;
-        var amp2 = scene.particles.list[i].length / 4.0;
+        var sin = Math.abs( Math.sin( (time / 10000.0) ) );
+        var center2 = l * 3.0/4.0 - (l / 2.0 * sin);
+        var amp2 = l / 4.0;
         var scale2 = 3;
         var waveformSound2 = getWaveformSound(center2, amp2, scale2, waveformVal, j);
 
@@ -553,7 +555,7 @@
       analyser.getByteFrequencyData(freqArray);  // Frequency data
       if ($('.js-pause').text() == 'Pause') {
         inc += .5;
-        updateScene(scene, freqArray, waveArray, time-prevTime);
+        updateScene(scene, freqArray, waveArray, prevTime, time);
         prevTime = time;
       }
       //updateScene(scene, freqArray, waveArray, time-prevTime);
