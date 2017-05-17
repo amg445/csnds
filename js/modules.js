@@ -77,8 +77,3 @@ var init = function() {
   audio.play();
 
 }
-
-
-// audio.addEventListener('canplay', function() {
-//
-// })

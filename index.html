@@ -683,9 +683,10 @@
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
-    if(canPlay && (time - prevTime) > 33) {
+    if(canPlay) {
       analyser.getByteTimeDomainData(waveArray); // Wavalength data
       analyser.getByteFrequencyData(freqArray);  // Frequency data
+      console.log(freqArray);
       if ($('.js-pause').text() == 'Pause') {
         inc += .5;
         updateScene(scene, freqArray, waveArray, prevTime, time, getBpm());
