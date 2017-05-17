@@ -50,31 +50,36 @@ require('soundcloud-badge')({
 
 })
 
-
-function init() {
+var init = function() {
+  console.log(song_url);
   audio  = new Audio
   audio.crossOrigin = 'Anonymous'
   audio.src = song_url
   audio.loop = true
+  audio.controls = true
   document.body.appendChild(audio);
 
+  console.log('playing!');
+  var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
 
-  audio.addEventListener('canplay', function() {
-    console.log('playing!');
-    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser();
+  var source = audioCtx.createMediaElementSource(audio);
+  source.connect(analyser);
 
-    var source = audioCtx.createMediaElementSource(audio);
-    source.connect(analyser);
+  analyser.fftSize = 2*bins;
+  analyser.smoothingTimeConstant = 0;
+  bufferLength = analyser.frequencyBinCount;
+  waveArray = new Uint8Array(bufferLength);
+  freqArray = new Uint8Array(bufferLength);
 
-    analyser.fftSize = 2*bins;
-    analyser.smoothingTimeConstant = 0;
-    bufferLength = analyser.frequencyBinCount;
-    waveArray = new Uint8Array(bufferLength);
-    freqArray = new Uint8Array(bufferLength);
+  source.connect(audioCtx.destination);
+  canPlay = true;
+  audio.play();
 
-    source.connect(audioCtx.destination);
-    canPlay = true;
-    audio.play();
-  })
+
 }
+
+
+// audio.addEventListener('canplay', function() {
+//
+// })
