@@ -241,9 +241,12 @@
 
     // Instantiate particle
     particle.position = [x, y, z];
+    particle.yVelocity = 0;
+    particle.acceleration = 0;
     particle.scale = [s, s, s];
     particle.waveform = false;
     particle.spectrum = false;
+    particle.decay = false;
 
     // Create [particle.toWorld] matrix
     updateToWorldMatrix(particle);
@@ -293,6 +296,27 @@
   function moveParticle(particle, value, dir) {
     particle.position[1] = dir * value;
     updateToWorldMatrix(particle);
+  }
+
+  /**
+   * Update particle position & velocity based on acceleration, dt, minV
+   */
+  function moveParticleByPhysics(particle, dt, minV) {
+    var dy = (particle.yVelocity * dt);
+    var y = particle.position[1] + dy;
+    if (y < minV) {
+      y = minV;
+      particle.decay = false;
+    }
+    moveParticle(particle, y, 1.0);
+
+    // Update Velocity
+    var dv = particle.acceleration * dt;
+    if (particle.yVelocity < 0) {
+      particle.yVelocity -= dv;
+    } else {
+      particle.yVelocity += dv;
+    }
   }
 
   /**
@@ -382,7 +406,10 @@
     var threshold = 0.0;
     var bpms = bpm / 60000;
     //var decaySpeed = 0.0005;
-    var decaySpeed = 0.05 / bpm;
+    //var decaySpeed = 0.05 / bpm;
+    var decaySpeed = 0.005 / bpm;
+    //var decayAcceleration = 0.000001;
+    var decayAcceleration = 0;
     var beats = time * bpms;
     var maxWaveformVal = normalizeWaveformVal( Math.max.apply(null, waveform) );
 
@@ -417,8 +444,11 @@
         var scale2 = 3;
         var waveformSound2 = getWaveformSound(center2, amp2, scale2, maxWaveformVal, j);
         var intWaveSound2 = Math.round(waveformSound2);
-        if ( curI-intWaveSound2-1 < i && i < curI+intWaveSound2+1 ) {
+        if ( (curI-intWaveSound2-1 < i && i < curI+intWaveSound2+1) && waveformSound2 != 0 ) {
           waveformSound2 = waveformSound2 - Math.pow( (Math.abs(curI-i) / intWaveSound2/5), 2);
+          particle.decay = true;
+          particle.yVelocity = -decaySpeed;
+          particle.acceleration = decayAcceleration;
         } else {
           waveformSound2 = 0;
         }
@@ -461,12 +491,11 @@
             particle.spectrum = false;
           }
         } else {
-          var dy = (decaySpeed * dt);
-          var y = particle.position[1]-dy;
-          if (y < vNoise) {
-            y = vNoise;
+          if (particle.decay) {
+            moveParticleByPhysics(particle, dt, vNoise);
+          } else {
+            moveParticle(particle, vNoise, 1.0);
           }
-          moveParticle(particle, y, 1.0);
           particle.displacement = 0.0;
           particle.spectrum = false;
         }
