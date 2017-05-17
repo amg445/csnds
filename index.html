@@ -81,6 +81,7 @@
         <option data-bpm="100" value="https://soundcloud.com/santandave/wanna-know-remix-feat-drake">Wanna Know - Dave</option>
         <option data-bpm="91.972" value="https://soundcloud.com/zarsh-elsawaf/inception-mind-heist-movie">Inception</option>
         <option data-bpm="117" value="https://soundcloud.com/partyomo/partynextdoor-break-from">Break From Toronto</option>
+        <option data-bpm="120" style="display:none" selected>User Input</option>
     </select>
   </div>
 
@@ -633,7 +634,7 @@
                                 spectrumVal, l, i, j,
                                 scene, spectrum, waveform, prevTime, time, bpm);
             break;
-          
+
           case "cool2":
             vSound = getSoundValueSweep(id, dt, soundAmp, noiseAmp, displaced, scale,
                                 threshold, bpms, decaySpeed, decayAcceleration,
@@ -649,7 +650,7 @@
                                 spectrumVal, l, i, j,
                                 scene, spectrum, waveform, prevTime, time, bpm);
             break;
-          
+
           default:
             vSound = 0;
             break;
@@ -817,7 +818,8 @@
   }
 
   function getBpm() {
-    return $('#js-songs :selected').data('bpm');
+    var bpm = $('#js-songs :selected').data('bpm');
+    return bpm;
   }
 
   // UpdateWebGL --------------------------------------------------------------
