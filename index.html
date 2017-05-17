@@ -110,13 +110,20 @@
     vec4 white = vec4(1.0);
     vec4 purp = vec4(59.0, 38.0, 130.0, 255.0) / 255.0;
 
+    vec4 grey = vec4(230.,230.,230.,255.)/255.;
+
+
+    // scandenavian cube colors
+    vec4 scand_red  = vec4(245.0, 88.0, 109.0, 255.0 ) / 255.0;
+    vec4 scand_black = vec4(51., 51., 51., 255.)/255.0;
+
     void main() {
       if (waveform) {
         gl_FragColor = aqua;
       } else if (spectrum) {
         gl_FragColor = purp;
       } else {
-        gl_FragColor = white;
+        gl_FragColor = grey;
       }
 
 
@@ -140,26 +147,55 @@
   </script>
 
   <script id="fragmentShader--background" type="x-shader/x-fragment">
-    precision mediump float;
+  precision mediump float;
 
-    uniform float time;
-    uniform float bpm;
+  uniform float time;
+  uniform float bpm;
 
-    varying vec2 texCoord;
-    varying vec3 position;
+  varying vec2 texCoord;
+  varying vec3 position;
 
-    vec4 pink = vec4(1.0, 0.27, 0.73, 1.0);
-    vec4 white = vec4(1.0);
-    vec4 blue = vec4(.2, .2, 1., 1.);
-    vec4 litepink = vec4(255.0,	182.0, 193.0, 255.0) / 255.0;
+  // COLORS ~~
 
-    void main() {
-      float r = 2.5 + (0.55 * abs(sin(time/bpm)));
-      // adjust by 5/3 to make circular
-      float t = max(0.0, 0.1 * ((r * r) - (25.0 * position.x * position.x) - (9.0 * position.y * position.y)));
-      t = min(t, .8);
-      gl_FragColor = (1.0 - t) * blue + t * litepink;
-    }
+  // scandanavian interior
+  vec4 scand1   = vec4(.918, .925, .926, 1.0);
+  vec4 scand2   = vec4(1.0, .989, .989, 1.0);
+
+  // blue guys
+  vec4 blu1  = vec4(.768, .925, .984, 1.0);
+  vec4 blu2     = vec4(.603, .741, .931, 1.);
+
+  // sunrise
+  vec4 sun1     = vec4(254.0, 156.0, 136.0, 255.0)/255.0;
+  vec4 sun2     = vec4(245.0, 217.0, 97.0, 255.0)/255.0;
+
+  // spring
+
+  vec4 sp1     = vec4(255.0, 238.0, 238.0, 255.0)/255.0;
+  vec4 sp2     = vec4(221.0, 238.0, 187.0, 255.0)/255.0;
+
+
+  // deep sea
+
+  vec4 deep2 = vec4(20.0, 30.0, 48.0, 255.0)/255.0;
+  vec4 deep1 = vec4(36.0, 59.0, 85.0, 255.0)/255.0;
+
+
+  vec4 pink     = vec4(1.0, 0.27, 0.73, 1.0);
+  vec4 white    = vec4(1.0);
+  vec4 blue     = vec4(.2, .2, 1., 1.);
+  vec4 litepink = vec4(255.0,	182.0, 193.0, 255.0) / 255.0;
+
+  void main() {
+    float radius = 3.0;
+    float hardness = 0.1;
+    float speed = 0.85;
+    float r = radius + (speed * abs(sin(time/bpm)));
+    // adjust by 5/3 to make circular
+    float t = max(0.0, hardness * ((r * r) - (25.0 * position.x * position.x) - (9.0 * position.y * position.y)));
+    t = min(t, 1.0);
+    gl_FragColor = (1.0 - t) * deep1 + t *  deep2;
+  }
   </script>
 
   <script>
