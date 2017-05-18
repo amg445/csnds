@@ -5,14 +5,14 @@ Final project for CS 4621 @ Cornell.
 
 ### To Run
 
-Souldn't have to change anything.
+Should run out of the box.
 
 To rebuild `js/modules.js`:
 `npm install -g browserify`
 `npm install soundcloud-badge`
 `make`
 
-Additionally the entire project is hosted on github pages for convenience at
+Additionally the entire project is hosted on github pages for your convenience at
 `https://amg445.github.io/cs4621_final/`
 
 
