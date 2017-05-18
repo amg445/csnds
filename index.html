@@ -117,6 +117,10 @@
       float: right;
     }
 
+    select:focus {
+      outline: none;
+    }
+
     input[type=range]:focus {
       outline: none;
     }
@@ -182,21 +186,21 @@
         <p class='title-control'>Control Panel</p>
         <!-- sliders -->
         <div class="sliders">
-          <label for="accel">Acceleration</label>
-          <input type="range" class="js-acceleration" min="0" value="5" max="20"/>
+          <label for="accel">Gravity</label>
+          <input type="range" class="js-acceleration" min="0" value="5" max="20"/><br>
           <label for="velocity">Velocity</label>
-          <input type="range" class="js-velocity" min="0" value="5" max="10"/>
+          <input type="range" class="js-velocity" min="0" value="5" max="10"/><br>
           <label for="rotation">Rotation*</label>
-          <input type="range" class="js-rotationSpeed" min="-6" value="0" max="6"/>
+          <input type="range" class="js-rotationSpeed" min="-6" value="0" max="6"/><br>
         </div>
         <div>*Click and drag the canvas to rotate at your own speed.</div>
         <!-- Song -->
         <div>
           <label for="song">Song*:</label>
           <select name="songs" id="js-songs" class="song-select">
+              <option data-bpm="120" value="https://soundcloud.com/lidogotsongs/feel-it-still-lido-remix">Feel it Still</option>
               <option data-bpm="120" value="https://soundcloud.com/verzache/conscious">Conscious</option>
               <option data-bpm="120" value="https://soundcloud.com/itndylan/lemons-dylan">Lemons</option>
-              <option data-bpm="120" value="https://soundcloud.com/lidogotsongs/feel-it-still-lido-remix">Feel it Still</option>
               <option data-bpm="120" value="https://soundcloud.com/liluzivert/15-xo-tour-llif3">XO TOUR Lif3</option>
               <option data-bpm="120" value="https://soundcloud.com/green-mountain-boys/power-moves-rough">Power Moves [Rough]</option>
               <option data-bpm="120" value="https://soundcloud.com/travisscott-2/11-grey">Grey - Travis Scott</option>
@@ -382,7 +386,6 @@
   });
 
   $(document).on("webkitfullscreenchange mozfullscreenchange fullscreenchange", function( event ) {
-    console.log('change');
 
     var isFullScreen = document.fullScreen     ||
                        document.mozFullScreen  ||
@@ -1168,14 +1171,6 @@
        offset[2] -= s/2;
     }
 
-    // Space - pause music
-    if (map[32]) {
-      if (audio.paused) {
-        audio.play();
-      } else {
-        audio.pause();
-      }
-    }
   });
 
   $("#webglCanvas").on('keyup', function(event) {
@@ -1185,10 +1180,20 @@
     }
   });
 
+  $(document).on('keydown', function(event) {
+    // Space - pause music
+    if (event.keyCode == 32) {
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause();
+      }
+    }
+  });
+
   $(".js-acceleration").on('change', function(event) {
     // Update acceleration for all particles
     var acceleration = getAcceleration();
-    console.log("update to: " + acceleration);
     for (var i = 0; i < scene.particles.list.length; i++) {
       for (var j = 0; j < scene.particles.list[i].length; j++) {
         scene.particles.list[i][j].acceleration = -acceleration;
