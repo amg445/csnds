@@ -16,7 +16,12 @@
 
 
   <style>
-    body { background-color: white; color: black; font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    body {
+      background-color: white;
+      color: black;
+      font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
     button {
       color: black;
       background-color: white;
@@ -26,9 +31,6 @@
       border: none;
     }
 
-    .song-select{
-      float: right;
-    }
 
     #play-bar {
       display: black;
@@ -46,29 +48,87 @@
 
     .flex{
       width: 100%;
-      height: 90vh;
+      height: 85vh;
       display: inline-flex;
       justify-content: center;
       align-items: center;
     }
 
-    .song-btns{
-      float: right;
-      margin: 10px;
-      font-weight: 700;
-    }
-
     audio{
-      width: 1000px;
+      width: 1300px;
       display: block;
       margin: 0 auto;
-      margin-top: -100px;
+      /*margin-top: 30px;*/
     }
 
+    .title{
+      float: right;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 12px;
+    }
+
+    .title span{
+      font-weight: 400;
+      font-size: 12px;
+    }
 
     .canvas{
       display: block;
     }
+
+    .sliders{
+      margin: 0 auto;
+      margin-top: 50px;
+      display: block;
+      width: 100%;
+    }
+
+    .controls{
+      background-color: #FAFAFA;
+      border: 1px solid #DDDDDD;
+      padding: 10px;
+      height: 600px;
+      width: 300px;
+      margin-left: 20px;
+    }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      margin: 10px 0;
+      width: 100%;
+    }
+
+    input[type=range]:focus {
+      outline: none;
+    }
+
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 2px;
+      cursor: pointer;
+      animate: 0.2s;
+      box-shadow: 0px 0px 0px #000000;
+      background: #5A5A5A;
+      border-radius: 1px;
+      border: 0px solid #000000;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      box-shadow: 0px 0px 0px #000000;
+      height: 12px;
+      width: 12px;
+      border-radius: 25px;
+      background: #2E84FC;
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -5px;
+    }
+
+    input[type=range]:focus::-webkit-slider-runnable-track {
+      background: #2E84FC;
+    }
+
 
     audio::-internal-media-controls-download-button {
       display:none;
@@ -82,67 +142,80 @@
         width: calc(100% + 30px); /* Adjust as needed */
     }
 
+    .btn{
+      background-color:#2E84FC;
+      color: white;
+      width: 100%;
+    }
+
 
   </style>
 </head>
 
 <body>
 
-  <div>
-    <select name="songs" id="js-songs" class="song-select">
-        <option data-bpm="120" value="https://soundcloud.com/verzache/conscious">Conscious</option>
-        <option data-bpm="120" value="https://soundcloud.com/itndylan/lemons-dylan">Lemons</option>
-        <option data-bpm="120" value="https://soundcloud.com/lidogotsongs/feel-it-still-lido-remix">Feel it Still</option>
-        <option data-bpm="120" value="https://soundcloud.com/liluzivert/15-xo-tour-llif3">XO TOUR Lif3</option>
-        <option data-bpm="120" value="https://soundcloud.com/green-mountain-boys/power-moves-rough">Power Moves [Rough]</option>
-        <option data-bpm="120" value="https://soundcloud.com/travisscott-2/11-grey">Grey - Travis Scott</option>
-        <option data-bpm="100" value="https://soundcloud.com/santandave/wanna-know-remix-feat-drake">Wanna Know - Dave</option>
-        <option data-bpm="91.972" value="https://soundcloud.com/zarsh-elsawaf/inception-mind-heist-movie">Inception</option>
-        <option data-bpm="117" value="https://soundcloud.com/partyomo/partynextdoor-break-from">Break From Toronto</option>
-        <option data-bpm="120" style="display:none" selected>User Input</option>
-    </select>
-  </div>
+    <p class="title">Cool Visualization</p>
 
-  <div>
-    <select name="colors" id="js-colors" style="float: right">
-      <option value="1">Deep Sea</option>
-      <option value="2">Sunset</option>
-      <option value="3">Scandenavian</option>
-    </select>
-  </div>
-
-  <div>
-    <select name="" id="js-visID" class="song-select">
-      <option value="cool1">Cool1</option>
-      <option value="cool2">Cool2</option>
-      <option value="cool3">Cool3</option>
-    </select>
-  </div>
-
-
-  <div>
-    <button class="js-fullscreen" style="float: right;">Full Screen</button>
-  </div>
-
-
-
-  <!--<div style="float: right;">-->
-    <!--<input type="checkbox" id="rotationCheckbox" name="rotation" value="rotation">-->
-  <!--</div>-->
-
-  <div class="song-btns">
-    <p style="margin-top: 3px;">Controls</p>
-  </div>
 
   <div class="flex">
       <canvas tabindex="1" id="webglCanvas" style="border: none; background-color: black;" width="1000" height="600" class="canvas"></canvas>
+      <div class="controls">
+        <!-- sliders -->
+        <div class="sliders">
+          <label for="accel">Acceleration</label>
+          <input type="range" class="js-acceleration" min="0" value="5" max="15"/>
+          <label for="velocity">Velocity</label>
+          <input type="range" class="js-velocity" min="0" value="5" max="10"/>
+          <label for="rotation">Rotation</label>
+          <input type="range" class="js-rotationSpeed" min="-6" value="0" max="6"/>
+        </div>
+        <!-- Song -->
+        <div>
+          <label for="song">Song*:</label>
+          <select name="songs" id="js-songs" class="song-select">
+              <option data-bpm="120" value="https://soundcloud.com/verzache/conscious">Conscious</option>
+              <option data-bpm="120" value="https://soundcloud.com/itndylan/lemons-dylan">Lemons</option>
+              <option data-bpm="120" value="https://soundcloud.com/lidogotsongs/feel-it-still-lido-remix">Feel it Still</option>
+              <option data-bpm="120" value="https://soundcloud.com/liluzivert/15-xo-tour-llif3">XO TOUR Lif3</option>
+              <option data-bpm="120" value="https://soundcloud.com/green-mountain-boys/power-moves-rough">Power Moves [Rough]</option>
+              <option data-bpm="120" value="https://soundcloud.com/travisscott-2/11-grey">Grey - Travis Scott</option>
+              <option data-bpm="100" value="https://soundcloud.com/santandave/wanna-know-remix-feat-drake">Wanna Know - Dave</option>
+              <option data-bpm="91.972" value="https://soundcloud.com/zarsh-elsawaf/inception-mind-heist-movie">Inception</option>
+              <option data-bpm="117" value="https://soundcloud.com/partyomo/partynextdoor-break-from">Break From Toronto</option>
+              <option data-bpm="120" style="display:none" selected>User Input</option>
+          </select>
+        </div>
+        <div>*To use your own song, copy the entire url from the page of a soundcloud song, and paste it after the '#' in the url of the visualization.</div>
+        <!-- Theme -->
+        <div>
+          <label for="color">Theme:</label>
+          <select name="colors" id="js-colors">
+            <option value="1">Deep Sea</option>
+            <option value="2">Sunset</option>
+            <option value="3">Scandenavian</option>
+          </select>
+        </div>
+          <!-- Option -->
+          <div>
+            <label for="">Option:</label>
+            <select name="" id="js-visID" class="song-select">
+              <option value="cool1">Cool1</option>
+              <option value="cool2">Cool2</option>
+              <option value="cool3">Cool3</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="rotation">Rotation</label>
+            <input type="checkbox" id="rotationCheckbox" name="rotation" value="rotation">
+          </div>
+
+            <button class="js-fullscreen btn">Full Screen Mode</button>
+
+        </div>
+      </div>
   </div>
 
-  <div style="margin-top: 50px">
-    <input type="range" class="js-acceleration" min="0" value="5" max="15"/>
-    <input type="range" class="js-velocity" min="0" value="5" max="10"/>
-    <input type="range" class="js-rotationSpeed" min="-6" value="0" max="6"/>
-  </div>
 
   <script src="js/bundle.js" charset="utf-8"></script>
   <script src="js/perlin.js" charset="utf-8"></script>
