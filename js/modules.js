@@ -40,7 +40,9 @@ require('soundcloud-badge')({
   , dark: true
   , getFonts: true
 }, function(err, src, data, div) {
-  if (err) throw err
+  if (err) { 
+    alert("Error: Unable to load song.  Please note that some Soundcloud songs have playback disabled on other sites.");
+  }
 
   song_url = src;
   init()
