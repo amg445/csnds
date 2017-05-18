@@ -408,6 +408,9 @@
     moveParticle(particle, y, 1.0);
 
     // Update Velocity
+    if (particle.acceleration == 0) {
+      console.log("NOOOOOOO");
+    }
     var dv = particle.acceleration * dt;
     particle.yVelocity += dv;
   }
@@ -1080,7 +1083,8 @@
     console.log("update to: " + acceleration);
     for (var i = 0; i < scene.particles.list.length; i++) {
       for (var j = 0; j < scene.particles.list[i].length; j++) {
-        scene.particles.list[i][j].acceleration = acceleration;
+        var particle = scene.particles.list[i][j];
+        particle.acceleration = acceleration;
       }
     }
   });
