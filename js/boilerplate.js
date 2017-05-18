@@ -123,7 +123,7 @@ function createShape(gl, shader, data, faces) {
 }
 
 //function drawShape(gl, shape, program, camera, toWorld, faces) {
-function drawShape(gl, shape, camera, toWorld, disType) {
+function drawShape(gl, shape, camera, toWorld, disType, theme) {
     var program = shape.shader;
     var faces = shape.faces;
 
@@ -146,8 +146,11 @@ function drawShape(gl, shape, camera, toWorld, disType) {
     var waveformLocation = gl.getUniformLocation(program, "waveform");
     gl.uniform1f(waveformLocation, disType[0]);
 
-     var frequencyLocation = gl.getUniformLocation(program, "spectrum");
+    var frequencyLocation = gl.getUniformLocation(program, "spectrum");
     gl.uniform1f(frequencyLocation, disType[1]);
+
+    var themeLocation = gl.getUniformLocation(program, "theme");
+    gl.uniform1i(themeLocation, theme);
 
     if (faces) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.triIndexBuffer);
@@ -163,7 +166,7 @@ function drawShape(gl, shape, camera, toWorld, disType) {
     gl.disable(gl.DEPTH_TEST);
 }
 
-function drawBackground(program, time, bpm, camera) {
+function drawBackground(program, time, bpm, camera, theme) {
     var distance = camera.position[2];
     var vertexData = [
         -1.0, -1.0, 0.99,  // Lower left
@@ -213,6 +216,9 @@ function drawBackground(program, time, bpm, camera) {
 
     var distanceLocation = gl.getUniformLocation(program, "distance");
     gl.uniform1f(distanceLocation, distance);
+
+    var themeLocation = gl.getUniformLocation(program, "theme");
+    gl.uniform1i(themeLocation, theme);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
