@@ -139,8 +139,8 @@
   </div>
 
   <div style="margin-top: 50px">
-    <input type="range" class="js-acceleration" min="0" value="5" max="10"/>
-    <input type="range" class="js-velocity"/>
+    <input type="range" class="js-acceleration" min="0" value="5" max="15"/>
+    <input type="range" class="js-velocity" min="0" value="5" max="10"/>
     <input type="range" class="js-rotationSpeed" min="-6" value="0" max="6"/>
   </div>
 
@@ -412,9 +412,9 @@
     particle.yVelocity += dv;
   }
 
-  function setParticleDecay(particle, waveformSound, decayAcceleration, scale) {
+  function setParticleDecay(particle, waveformSound, decayAcceleration, velocity) {
     particle.decay = true;
-    particle.yVelocity = 0.0015 * scale * waveformSound;
+    particle.yVelocity = velocity * waveformSound;
     particle.acceleration = -decayAcceleration;
   }
 
@@ -520,7 +520,7 @@
     if ( !(curI-intWaveSound2-1 < i && i < curI+intWaveSound2+1) ) {
       waveformSound2 = 0;
     } else if (waveformSound2 != 0) {
-      setParticleDecay(particle, waveformSound2, decayAcceleration, scale);
+      setParticleDecay(particle, waveformSound2, decayAcceleration, decaySpeed);
     }
 
     // Update particle.waveform
@@ -549,7 +549,7 @@
     var waveformSound1 = getWaveformSound(center1, amp1, scale1, waveformVal, j);
 
     if (waveformSound1 != 0) {
-      setParticleDecay(particle, waveformSound1, decayAcceleration, scale);
+      setParticleDecay(particle, waveformSound1, decayAcceleration, decaySpeed);
     }
 
     // Update particle.waveform
@@ -580,7 +580,7 @@
     // Update particle.waveform
     if (waveformSound1 != 0) {
       particle.waveform = true;
-      setParticleDecay(particle, waveformSound1, decayAcceleration, scale);
+      setParticleDecay(particle, waveformSound1, decayAcceleration, decaySpeed);
     } else {
       particle.waveform = false;
     }
@@ -592,7 +592,7 @@
     var spectrumIdx = Math.round(spectrumVal * maxSpectrumJ);
     if (j == spectrumIdx && spectrumVal != 0) {
       spectrumSound = 2.0 * (spectrumVal - thresholdSpectrum);
-      setParticleDecay(particle, spectrumSound, decayAcceleration, scale);
+      setParticleDecay(particle, spectrumSound, decayAcceleration, decaySpeed);
       particle.spectrum = true;
     } else {
       spectrumSound = 0;
@@ -685,7 +685,9 @@
     var bpms = bpm / 60000;
     //var decaySpeed = 0.0005;
     //var decaySpeed = 0.05 / bpm;
-    var decaySpeed = 0.0005 / bpm;
+    //var decaySpeed = 0.0005 / bpm;
+    //var decaySpeed = 0.0015 * scale
+    var decaySpeed = velocity;
     //var decayAcceleration = 0.0000005;
     var decayAcceleration = acceleration;
     //var decayAcceleration = 0;
@@ -903,6 +905,10 @@
     return 0.0000001 * $(".js-acceleration").val();
   }
 
+  function getVelocity() {
+    return 0.00003 * $(".js-velocity").val();
+  }
+
   // UpdateWebGL --------------------------------------------------------------
   var prevTime = 0;
   function updateWebGL(time) {
@@ -933,7 +939,7 @@
 
         inc += .5;
         if(Math.abs(prevTime - time) > 350) prevTime = time;
-        var velocity = $(".js-velocity").val();
+        var velocity = getVelocity();
         var acceleration = getAcceleration();
         updateScene(scene, freqArray, waveArray, prevTime, time, getBpm(), velocity, acceleration, id);
         prevTime = time;
