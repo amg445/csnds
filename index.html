@@ -608,6 +608,10 @@
                           beats, maxWaveformVal, waveformVal, particle,
                           spectrumVal, l, i, j,
                           scene, spectrum, waveform, prevTime, time, bpm) {
+
+    // No spectrum for this vis
+    particle.spectrum = false;
+
     // Waveform 1 ---------------------------------------------------------
     var center1 = l / 4.0;
     var amp1 = l / 4.0;
@@ -655,6 +659,9 @@
                           beats, maxWaveformVal, waveformVal, particle,
                           spectrumVal, l, i, j,
                           scene, spectrum, waveform, prevTime, time, bpm) {
+    // No spectrum for this vis
+    particle.spectrum = false;
+
     // Waveform 1 ---------------------------------------------------------
     var center1 = l / 2.0;
     var amp1 = l / 2.0;
