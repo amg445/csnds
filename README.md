@@ -2,9 +2,10 @@
 
 Final project for CS 4621 @ Cornell.
 
+### Changes Since Project Submitted
+Made canvas responsive, so the projection matrix and background will update when window is resized.
 
 ### To Run
-
 Should run out of the box.  Runs best on latest version of Chrome locally.  Requires internet connection to play music, better internet connection will allow for better performance.
 
 To rebuild `js/modules.js`:
