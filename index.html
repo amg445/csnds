@@ -1157,7 +1157,9 @@
     for (var i = 0; i < scene.particles.list.length; i++) {
       for (var j = 0; j < scene.particles.list[i].length; j++) {
         var particle = scene.particles.list[i][j];
-        particle.acceleration = acceleration;
+        if (particle.decay) {
+          particle.acceleration = -acceleration;
+        }
       }
     }
   });
