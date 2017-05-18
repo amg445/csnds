@@ -40,7 +40,7 @@
     }
 
     select{
-      margin: 10px;
+      float: right;
       color: black;
       background-color: white;
       font-weight: 500;
@@ -57,6 +57,10 @@
 
     .controls div{
       margin-bottom: 5px;
+    }
+
+    .controls p {
+      margin: 10px auto;
     }
 
     audio{
@@ -193,7 +197,7 @@
           <label for="rotation">Rotation*</label>
           <input type="range" class="js-rotationSpeed" min="-6" value="0" max="6"/><br>
         </div>
-        <div>*Click and drag the canvas to rotate at your own speed.</div>
+        <p>*Click and drag the canvas to rotate at your own speed.</p>
         <!-- Song -->
         <div>
           <label for="song">Song*:</label>
@@ -210,7 +214,7 @@
               <option data-bpm="120" style="display:none" selected>User Input</option>
           </select>
         </div>
-        <div>*To use your own song, copy the entire url from the page of a soundcloud song, and paste it after the '#' in the url of the visualization.</div>
+        <p>*To use your own song, copy the entire url from the page of a soundcloud song, and paste it after the '#' in the url of the visualization.</p>
         <!-- Theme -->
         <div>
           <label for="color">Theme:</label>
