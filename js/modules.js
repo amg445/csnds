@@ -9,8 +9,6 @@ function getSongFromURL() {
     song = 'https://soundcloud.com/verzache/conscious';
   }
 
-  console.log(song);
-
   $('#js-songs option').each(function(){
     var val = this.value;
     if (val == song) {
@@ -24,7 +22,6 @@ function getSongFromURL() {
 // only pauses for now bc its annoying listen to 1000 times
 $('.js-pause').on('click', function() {
   var status = $(this).text();
-  console.log(status);
    if(Audio && status == "Pause"){
      audio.pause();
      this.innerHTML = 'Play';
@@ -51,7 +48,6 @@ require('soundcloud-badge')({
 })
 
 var init = function() {
-  console.log(song_url);
   audio  = new Audio
   audio.crossOrigin = 'Anonymous'
   audio.src = song_url
@@ -59,7 +55,6 @@ var init = function() {
   audio.controls = true
   document.body.appendChild(audio);
 
-  console.log('playing!');
   var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   analyser = audioCtx.createAnalyser();
 
