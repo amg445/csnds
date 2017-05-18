@@ -12,8 +12,9 @@ To rebuild `js/modules.js`:
 `npm install soundcloud-badge`
 `make`
 
-Additionally the entire project is hosted on github pages for your convenience at
-`https://amg445.github.io/cs4621_final/`
+
+### Website
+Project hosted at <a href="https://amg445.github.io/cs4621_final/">https://amg445.github.io/cs4621_final/</a>
 
 
 ### Note
