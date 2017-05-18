@@ -44,6 +44,7 @@
       color: black;
       background-color: white;
       font-weight: 500;
+      width: 70%;
     }
 
     .flex{
@@ -54,51 +55,66 @@
       align-items: center;
     }
 
+    .flex div{
+      margin-bottom: 15px;
+    }
+
     audio{
-      width: 1300px;
+      width: 87%;
       display: block;
       margin: 0 auto;
       /*margin-top: 30px;*/
     }
 
-    .title{
+    .title-main{
       float: right;
       font-weight: 700;
       font-size: 16px;
       padding: 12px;
     }
 
-    .title span{
+    .title-main span{
       font-weight: 400;
       font-size: 12px;
     }
 
+    .title-control{
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 20px;
+
+    }
+
     .canvas{
       display: block;
-      width: 60%;
+      width: 65%;
       height: 80%;
     }
 
     .sliders{
       margin: 0 auto;
-      margin-top: 50px;
       display: block;
       width: 100%;
+    }
+
+    .sliders input[type=range]{
+      width: 62%;
     }
 
     .controls{
       background-color: #FAFAFA;
       border: 1px solid #DDDDDD;
-      padding: 10px;
+      padding: 15px;
       width: 20%;
       height: 80%;
-      margin-left: 20px;
+      margin-left: 2%;
     }
 
     input[type=range] {
       -webkit-appearance: none;
       margin: 10px 0;
-      width: 100%;
+      float: right;
     }
 
     input[type=range]:focus {
@@ -156,21 +172,23 @@
 
 <body>
 
-    <p class="title">Cool Visualization</p>
+    <p class="title-main">Cool Visualization</p>
 
 
   <div class="flex">
       <canvas tabindex="1" id="webglCanvas" style="border: none; background-color: black;" width="1000" height="600" class="canvas"></canvas>
       <div class="controls">
+        <p class='title-control'>Control Panel</p>
         <!-- sliders -->
         <div class="sliders">
           <label for="accel">Acceleration</label>
           <input type="range" class="js-acceleration" min="0" value="5" max="15"/>
           <label for="velocity">Velocity</label>
           <input type="range" class="js-velocity" min="0" value="5" max="10"/>
-          <label for="rotation">Rotation</label>
+          <label for="rotation">Rotation*</label>
           <input type="range" class="js-rotationSpeed" min="-6" value="0" max="6"/>
         </div>
+        <div>*Click and drag the canvas to rotate at your own speed.</div>
         <!-- Song -->
         <div>
           <label for="song">Song*:</label>
