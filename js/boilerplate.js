@@ -220,6 +220,10 @@ function drawBackground(program, time, bpm, camera, theme) {
     var themeLocation = gl.getUniformLocation(program, "theme");
     gl.uniform1i(themeLocation, theme);
 
+    var canvas = document.getElementById("webglCanvas");
+    var resolutionLocation = gl.getUniformLocation(program, "resolution");
+    gl.uniform2f(resolutionLocation, canvas.clientWidth, canvas.clientHeight);
+
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
