@@ -515,9 +515,6 @@
     moveParticle(particle, y, 1.0);
 
     // Update Velocity
-    if (particle.acceleration == 0) {
-      console.log("NOOOOOOO");
-    }
     var dv = particle.acceleration * dt;
     particle.yVelocity += dv;
   }
