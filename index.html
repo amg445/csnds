@@ -55,8 +55,8 @@
       align-items: center;
     }
 
-    .flex div{
-      margin-bottom: 4%;
+    .controls div{
+      margin-bottom: 5px;
     }
 
     audio{
@@ -83,12 +83,13 @@
       font-weight: 700;
       text-align: center;
       margin-bottom: 20px;
+
     }
 
     .canvas{
       display: block;
       width: 65%;
-      height: 80%;
+      height: 85%;
     }
 
     .sliders{
@@ -106,7 +107,7 @@
       border: 1px solid #DDDDDD;
       padding: 15px;
       width: 20%;
-      height: 80%;
+      height: 85%;
       margin-left: 2%;
     }
 
@@ -182,7 +183,7 @@
         <!-- sliders -->
         <div class="sliders">
           <label for="accel">Acceleration</label>
-          <input type="range" class="js-acceleration" min="0" value="5" max="15"/>
+          <input type="range" class="js-acceleration" min="0" value="5" max="20"/>
           <label for="velocity">Velocity</label>
           <input type="range" class="js-velocity" min="0" value="5" max="10"/>
           <label for="rotation">Rotation*</label>
@@ -253,7 +254,6 @@
 
     uniform bool waveform;
     uniform bool spectrum;
-    uniform int theme;
 
     vec4 aqua = vec4(0.0, 207.0, 202.0, 255.0) / 255.0;
     vec4 white = vec4(1.0);
@@ -261,32 +261,18 @@
 
     vec4 grey = vec4(230.,230.,230.,255.)/255.;
 
+
     // scandenavian cube colors
     vec4 scand_red  = vec4(245.0, 88.0, 109.0, 255.0 ) / 255.0;
     vec4 scand_black = vec4(152., 152., 152., 255.)/255.0;
 
     void main() {
-
-      vec4 color1;
-      vec4 color2;
-
-      if (theme == 1) {
-        color1 = aqua;
-        color2 = white;
-      } else if (theme == 2) {
-        color1 = grey;
-        color2 = white;
-      } else {
-        color1 = scand_red;
-        color2 = scand_black;
-      }
-
       if (waveform) {
-        gl_FragColor = color1;
+        gl_FragColor = aqua;
       } else if (spectrum) {
-        gl_FragColor = color1;
+        gl_FragColor = aqua;
       } else {
-        gl_FragColor = color2;
+        gl_FragColor = white;
       }
 
 
@@ -315,7 +301,6 @@
   uniform float time;
   uniform float bpm;
   uniform float distance;
-  uniform int theme;
 
   varying vec2 texCoord;
   varying vec3 position;
@@ -326,15 +311,27 @@
   vec4 scand1   = vec4(.918, .925, .926, 1.0);
   vec4 scand2   = vec4(1.0, .989, .989, 1.0);
 
+  // blue guys
+  vec4 blu1     = vec4(.768, .925, .984, 1.0);
+  vec4 blu2     = vec4(.603, .741, .931, 1.);
+
   // sunrise
   vec4 sun1     = vec4(254.0, 156.0, 136.0, 255.0)/255.0;
   vec4 sun2     = vec4(245.0, 217.0, 97.0, 255.0)/255.0;
+
+  // spring
+  vec4 sp1     = vec4(255.0, 238.0, 238.0, 255.0)/255.0;
+  vec4 sp2     = vec4(221.0, 238.0, 187.0, 255.0)/255.0;
 
   // deep sea
   vec4 deep2 = vec4(20.0, 30.0, 48.0, 255.0)/255.0;
   vec4 deep1 = vec4(36.0, 59.0, 85.0, 255.0)/255.0;
 
+
+  vec4 pink     = vec4(1.0, 0.27, 0.73, 1.0);
   vec4 white    = vec4(1.0);
+  vec4 blue     = vec4(.2, .2, 1., 1.);
+  vec4 litepink = vec4(255.0,	182.0, 193.0, 255.0) / 255.0;
 
   void main() {
     float radius = 3.5;
@@ -345,20 +342,6 @@
     float pi = 3.14159265359;
     float bpms = bpm / 60000.0;    // beats per ms
 
-    vec4 color1; 
-    vec4 color2;
-
-    if (theme == 1) {
-      color1 = deep1;
-      color2 = deep2;
-    } else if (theme == 2) {
-      color1 = sun1;
-      color2 = sun2;
-    } else {
-      color1 = scand1;
-      color2 = scand2;
-    }
-
 
     //float r = radius + width * cos( time * bpms * pi );    // To change pulses per minute, multiply/divide inside sin()
     float r = radius + width * abs( cos( time * bpms * (pi/2.0) + (pi/2.0) + 0.2 ));
@@ -366,7 +349,7 @@
     // adjust by 5/3 to make circular
     float t = max(0.0, hardness * ((r * r) - (25.0 * position.x * position.x) - (9.0 * position.y * position.y)));
     t = min(t, 1.0);
-    gl_FragColor = (1.0 - t) * color1 + t *  color2;
+    gl_FragColor = (1.0 - t) * deep1 + t *  deep2;
   }
   </script>
 
@@ -392,8 +375,8 @@
       c.css('width', '100%');
     } else {
       var c = $('#webglCanvas');
-      c.css('height','600px');
-      c.css('width', '1000px');
+      c.css('height','85%');
+      c.css('width', '65%');
     }
 
 });
@@ -552,14 +535,14 @@
    *   - [toWorld]
    *   - [projection]
    */
-  function drawScene(gl, scene, theme) {
+  function drawScene(gl, scene) {
     // Draw each particle
     for (var i = 0; i < particles.list.length; i++) {
       for (var j = 0; j < particles.list[i].length; j++) {
         var particle = particles.list[i][j];
         var toWorld = mat4.create();
         mat4.mul(toWorld, particles.toWorld, particle.toWorld);
-        drawShape(gl, scene.shape, camera, toWorld, [particle.waveform, particle.spectrum], theme);
+        drawShape(gl, scene.shape, camera, toWorld, [particle.waveform, particle.spectrum]);
       }
     }
   }
@@ -938,7 +921,7 @@
 
     // Check min/max zoom
     var min = 0.5;
-    var max = 30;
+    var max = 15;
     if (scene.camera.position[2] < min) {
       scene.camera.position[2] = min;
     } else if (scene.camera.position[2] > max) {
@@ -1024,7 +1007,6 @@
     }
 
     var id = $('#js-visID').val();
-    var theme = $('#js-colors').val();
 
     scene = getScene(scenetype);
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
@@ -1049,20 +1031,20 @@
         if(Math.abs(prevTime - time) > 350) prevTime = time;
         var velocity = getVelocity();
         var acceleration = getAcceleration();
-        updateScene(scene, freqArray, waveArray, prevTime, time, getBpm(), velocity, acceleration, id, theme);
+        updateScene(scene, freqArray, waveArray, prevTime, time, getBpm(), velocity, acceleration, id);
         prevTime = time;
       }
     }
 
 
-    drawBackground(background_shader, time, getBpm(), camera, theme);
+    drawBackground(background_shader, time, getBpm(), camera);
 
     // Update Camera Position if it has been offset
     updateSceneOffset(scene, offset);
     offset = [0, 0, 0];
 
     // Draw Scene
-    drawScene(gl, scene, theme);
+    drawScene(gl, scene);
 
     // Reschedule the next frame.
     //prevTime = time;
@@ -1188,10 +1170,7 @@
     console.log("update to: " + acceleration);
     for (var i = 0; i < scene.particles.list.length; i++) {
       for (var j = 0; j < scene.particles.list[i].length; j++) {
-        var particle = scene.particles.list[i][j];
-        if (particle.decay) {
-          particle.acceleration = -acceleration;
-        }
+        scene.particles.list[i][j].acceleration = acceleration;
       }
     }
   });
