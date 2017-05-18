@@ -60,16 +60,6 @@ var init = function() {
   audio.controls = true
   document.body.appendChild(audio);
 
-  $(".js-scrubber").bind("change", function() {
-		audio.currentTime = $(this).val();
-	});
-
-  audio.addEventListener('timeupdate',function (){
-	   curtime = parseInt(audio.currentTime, 10);
-     console.log(curtime);
-		   $(".js-scrubber").attr("value", curtime);
-	});
-
   console.log('playing!');
   var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   analyser = audioCtx.createAnalyser();

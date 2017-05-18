@@ -156,17 +156,18 @@
 
     <p class="title">Cool Visualization</p>
 
+
   <div class="flex">
       <canvas tabindex="1" id="webglCanvas" style="border: none; background-color: black;" width="1000" height="600" class="canvas"></canvas>
       <div class="controls">
         <!-- sliders -->
         <div class="sliders">
           <label for="accel">Acceleration</label>
-          <input type="range" class="js-acceleration" value="0"/>
+          <input type="range" class="js-acceleration" min="0" value="5" max="15"/>
           <label for="velocity">Velocity</label>
-          <input type="range" class="js-velocity"/>
+          <input type="range" class="js-velocity" min="0" value="5" max="10"/>
           <label for="rotation">Rotation</label>
-          <input type="range" class="js-rotationSpeed"/>
+          <input type="range" class="js-rotationSpeed" min="-6" value="0" max="6"/>
         </div>
         <!-- Song -->
         <div>
@@ -484,9 +485,9 @@
     particle.yVelocity += dv;
   }
 
-  function setParticleDecay(particle, waveformSound, decayAcceleration, scale) {
+  function setParticleDecay(particle, waveformSound, decayAcceleration, velocity) {
     particle.decay = true;
-    particle.yVelocity = 0.0015 * scale * waveformSound;
+    particle.yVelocity = velocity * waveformSound;
     particle.acceleration = -decayAcceleration;
   }
 
@@ -592,7 +593,7 @@
     if ( !(curI-intWaveSound2-1 < i && i < curI+intWaveSound2+1) ) {
       waveformSound2 = 0;
     } else if (waveformSound2 != 0) {
-      setParticleDecay(particle, waveformSound2, decayAcceleration, scale);
+      setParticleDecay(particle, waveformSound2, decayAcceleration, decaySpeed);
     }
 
     // Update particle.waveform
@@ -621,7 +622,7 @@
     var waveformSound1 = getWaveformSound(center1, amp1, scale1, waveformVal, j);
 
     if (waveformSound1 != 0) {
-      setParticleDecay(particle, waveformSound1, decayAcceleration, scale);
+      setParticleDecay(particle, waveformSound1, decayAcceleration, decaySpeed);
     }
 
     // Update particle.waveform
@@ -652,7 +653,7 @@
     // Update particle.waveform
     if (waveformSound1 != 0) {
       particle.waveform = true;
-      setParticleDecay(particle, waveformSound1, decayAcceleration, scale);
+      setParticleDecay(particle, waveformSound1, decayAcceleration, decaySpeed);
     } else {
       particle.waveform = false;
     }
@@ -664,7 +665,7 @@
     var spectrumIdx = Math.round(spectrumVal * maxSpectrumJ);
     if (j == spectrumIdx && spectrumVal != 0) {
       spectrumSound = 2.0 * (spectrumVal - thresholdSpectrum);
-      setParticleDecay(particle, spectrumSound, decayAcceleration, scale);
+      setParticleDecay(particle, spectrumSound, decayAcceleration, decaySpeed);
       particle.spectrum = true;
     } else {
       spectrumSound = 0;
@@ -747,7 +748,7 @@
    * [scale] - scale factor for particle offset
    */
   var inc = 0;
-  function updateScene(scene, spectrum, waveform, prevTime, time, bpm, id) {
+  function updateScene(scene, spectrum, waveform, prevTime, time, bpm, velocity, acceleration, id) {
     var dt = time - prevTime;
     var soundAmp = 2;
     var noiseAmp = 0.3;
@@ -757,8 +758,11 @@
     var bpms = bpm / 60000;
     //var decaySpeed = 0.0005;
     //var decaySpeed = 0.05 / bpm;
-    var decaySpeed = 0.0005 / bpm;
-    var decayAcceleration = 0.0000005;
+    //var decaySpeed = 0.0005 / bpm;
+    //var decaySpeed = 0.0015 * scale
+    var decaySpeed = velocity;
+    //var decayAcceleration = 0.0000005;
+    var decayAcceleration = acceleration;
     //var decayAcceleration = 0;
     var beats = time * bpms;
     var maxWaveformVal = normalizeWaveformVal( Math.max.apply(null, waveform) );
@@ -970,6 +974,13 @@
     return bpm;
   }
 
+  function getAcceleration() {
+    return 0.0000001 * $(".js-acceleration").val();
+  }
+
+  function getVelocity() {
+    return 0.00003 * $(".js-velocity").val();
+  }
 
   // UpdateWebGL --------------------------------------------------------------
   var prevTime = 0;
@@ -993,13 +1004,17 @@
       if (!audio.paused) {
         // $('.js-time').text(audio.currentTime + "/" + audio.duration);
         // Rotate if user is not moving camera
-        if (!dragging && $("#rotationCheckbox").is(":checked")) {
-          offset[1] = -1;    // 1 is rotation around y speed right now
+        //if (!dragging && $("#rotationCheckbox").is(":checked")) {
+        if (!dragging) {
+          var rotationSpeed = $(".js-rotationSpeed").val();
+          offset[1] = -1*rotationSpeed;    // 1 is rotation around y speed right now
         }
 
         inc += .5;
         if(Math.abs(prevTime - time) > 350) prevTime = time;
-        updateScene(scene, freqArray, waveArray, prevTime, time, getBpm(), id);
+        var velocity = getVelocity();
+        var acceleration = getAcceleration();
+        updateScene(scene, freqArray, waveArray, prevTime, time, getBpm(), velocity, acceleration, id);
         prevTime = time;
       }
     }
@@ -1129,6 +1144,17 @@
     // Update map
     if (event.keyCode in map) {
       map[event.keyCode] = false;
+    }
+  });
+
+  $(".js-acceleration").on('change', function(event) {
+    // Update acceleration for all particles
+    var acceleration = getAcceleration();
+    console.log("update to: " + acceleration);
+    for (var i = 0; i < scene.particles.list.length; i++) {
+      for (var j = 0; j < scene.particles.list[i].length; j++) {
+        scene.particles.list[i][j].acceleration = acceleration;
+      }
     }
   });
 
