@@ -1081,7 +1081,9 @@
         //if (!dragging && $("#rotationCheckbox").is(":checked")) {
         if (!dragging) {
           var rotationSpeed = $(".js-rotationSpeed").val();
-          offset[1] = -1*rotationSpeed;    // 1 is rotation around y speed right now
+          if (offset[1] == 0) {
+            offset[1] = -1*rotationSpeed;    // 1 is rotation around y speed right now
+          }
         }
 
         inc += .5;
