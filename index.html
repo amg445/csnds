@@ -411,7 +411,13 @@
       c.css('width', '65%');
     }
 
-});
+  });
+
+  $(window).on("resize", function(event) {
+    // Update PerspectiveMatrix
+    perspectiveMatrix = createPerspectiveMatrix();
+    camera.projection = perspectiveMatrix;
+  });
 
   var canPlay = false;
   var analyser;
@@ -969,6 +975,19 @@
     updateToWorldMatrix(scene.camera);
   }
 
+  function createPerspectiveMatrix() {
+    var perspectiveMatrix = mat4.create();
+    var fovy = (45.0 / 180.0) * Math.PI;
+    //var aspect = $("#webglCanvas").attr("width") / $("#webglCanvas").attr("height");
+    var canvas = document.getElementById("webglCanvas");
+    var aspect = canvas.clientWidth / canvas.clientHeight;
+    var near = 0.1;
+    var far = 100.0;
+    mat4.perspective(perspectiveMatrix, fovy, aspect, near, far);
+
+    return perspectiveMatrix;
+  }
+
   // WebGL --------------------------------------------------------------------
   // Global Vars
   var gl = initializeWebGL($("#webglCanvas"));
@@ -983,12 +1002,7 @@
   var audio;
 
   // Create Projection Matrix (Perspective Camera)
-  var perspectiveMatrix = mat4.create();
-  var fovy = (45.0 / 180.0) * Math.PI;
-  var aspect = $("#webglCanvas").attr("width") / $("#webglCanvas").attr("height");
-  var near = 0.1;
-  var far = 100.0;
-  mat4.perspective(perspectiveMatrix, fovy, aspect, near, far);
+  var perspectiveMatrix = createPerspectiveMatrix();
 
   // Create Camera
   var camera = {};
