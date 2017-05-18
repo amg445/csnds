@@ -702,6 +702,7 @@
     if (j == spectrumIdx && spectrumVal != 0) {
       spectrumSound = 2.0 * (spectrumVal - thresholdSpectrum);
       setParticleDecay(particle, spectrumSound, decayAcceleration, decaySpeed);
+      spectrumSound = 0;
       particle.spectrum = true;
     } else {
       spectrumSound = 0;
@@ -1190,7 +1191,7 @@
     console.log("update to: " + acceleration);
     for (var i = 0; i < scene.particles.list.length; i++) {
       for (var j = 0; j < scene.particles.list[i].length; j++) {
-        scene.particles.list[i][j].acceleration = acceleration;
+        scene.particles.list[i][j].acceleration = -acceleration;
       }
     }
   });
