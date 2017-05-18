@@ -126,9 +126,9 @@
 
 
 
-  <div style="float: right;">
-    <input type="checkbox" id="rotationCheckbox" name="rotation" value="rotation">
-  </div>
+  <!--<div style="float: right;">-->
+    <!--<input type="checkbox" id="rotationCheckbox" name="rotation" value="rotation">-->
+  <!--</div>-->
 
   <div class="song-btns">
     <p style="margin-top: 3px;">Controls</p>
@@ -139,9 +139,9 @@
   </div>
 
   <div style="margin-top: 50px">
-    <input type="range" class="js-acceleration" value="0"/>
+    <input type="range" class="js-acceleration" min="0" value="0"/>
     <input type="range" class="js-velocity"/>
-    <input type="range" class="js-rotationSpeed"/>
+    <input type="range" class="js-rotationSpeed" min="-6" value="0" max="6"/>
   </div>
 
   <script src="js/bundle.js" charset="utf-8"></script>
@@ -675,7 +675,7 @@
    * [scale] - scale factor for particle offset
    */
   var inc = 0;
-  function updateScene(scene, spectrum, waveform, prevTime, time, bpm, id) {
+  function updateScene(scene, spectrum, waveform, prevTime, time, bpm, velocity, acceleration, id) {
     var dt = time - prevTime;
     var soundAmp = 2;
     var noiseAmp = 0.3;
@@ -921,13 +921,17 @@
       if (!audio.paused) {
         // $('.js-time').text(audio.currentTime + "/" + audio.duration);
         // Rotate if user is not moving camera
-        if (!dragging && $("#rotationCheckbox").is(":checked")) {
-          offset[1] = -1;    // 1 is rotation around y speed right now
+        //if (!dragging && $("#rotationCheckbox").is(":checked")) {
+        if (!dragging) {
+          var rotationSpeed = $(".js-rotationSpeed").val();
+          offset[1] = -1*rotationSpeed;    // 1 is rotation around y speed right now
         }
 
         inc += .5;
         if(Math.abs(prevTime - time) > 350) prevTime = time;
-        updateScene(scene, freqArray, waveArray, prevTime, time, getBpm(), id);
+        var velocity = $(".js-velocity").val();
+        var acceleration = $(".js-acceleration").val();
+        updateScene(scene, freqArray, waveArray, prevTime, time, getBpm(), velocity, acceleration, id);
         prevTime = time;
       }
     }
