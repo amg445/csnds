@@ -139,7 +139,7 @@
   </div>
 
   <div style="margin-top: 50px">
-    <input type="range" class="js-acceleration" min="0" value="0"/>
+    <input type="range" class="js-acceleration" min="0" value="5" max="10"/>
     <input type="range" class="js-velocity"/>
     <input type="range" class="js-rotationSpeed" min="-6" value="0" max="6"/>
   </div>
@@ -686,7 +686,8 @@
     //var decaySpeed = 0.0005;
     //var decaySpeed = 0.05 / bpm;
     var decaySpeed = 0.0005 / bpm;
-    var decayAcceleration = 0.0000005;
+    //var decayAcceleration = 0.0000005;
+    var decayAcceleration = acceleration;
     //var decayAcceleration = 0;
     var beats = time * bpms;
     var maxWaveformVal = normalizeWaveformVal( Math.max.apply(null, waveform) );
@@ -898,6 +899,9 @@
     return bpm;
   }
 
+  function getAcceleration() {
+    return 0.0000001 * $(".js-acceleration").val();
+  }
 
   // UpdateWebGL --------------------------------------------------------------
   var prevTime = 0;
@@ -930,7 +934,7 @@
         inc += .5;
         if(Math.abs(prevTime - time) > 350) prevTime = time;
         var velocity = $(".js-velocity").val();
-        var acceleration = $(".js-acceleration").val();
+        var acceleration = getAcceleration();
         updateScene(scene, freqArray, waveArray, prevTime, time, getBpm(), velocity, acceleration, id);
         prevTime = time;
       }
@@ -1061,6 +1065,17 @@
     // Update map
     if (event.keyCode in map) {
       map[event.keyCode] = false;
+    }
+  });
+
+  $(".js-acceleration").on('change', function(event) {
+    // Update acceleration for all particles
+    var acceleration = getAcceleration();
+    console.log("update to: " + acceleration);
+    for (var i = 0; i < scene.particles.list.length; i++) {
+      for (var j = 0; j < scene.particles.list[i].length; j++) {
+        scene.particles.list[i][j].acceleration = acceleration;
+      }
     }
   });
 
