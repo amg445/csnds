@@ -5,10 +5,16 @@ Final project for CS 4621 @ Cornell.
 
 ### To Run
 
-`npm install -g browserify`
-`npm install web-audio-analyser`
-`npm install soundcloud-badge`
-`cd js`
-`browserify modules.js -o bundle.js`
+Souldn't have to change anything.
 
-Additionally the entire project will be hosted on github pages for convenience. 
+To rebuild `js/modules.js`:
+`npm install -g browserify`
+`npm install soundcloud-badge`
+`make`
+
+Additionally the entire project is hosted on github pages for convenience at
+`https://amg445.github.io/cs4621_final/`
+
+
+### Note
+Not all soundcloud songs work for some reason.
