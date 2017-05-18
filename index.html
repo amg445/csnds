@@ -611,6 +611,10 @@
                           beats, maxWaveformVal, waveformVal, particle,
                           spectrumVal, l, i, j,
                           scene, spectrum, waveform, prevTime, time, bpm) {
+
+    // No spectrum for this vis
+    particle.spectrum = false;
+
     // Waveform 1 ---------------------------------------------------------
     var center1 = l / 4.0;
     var amp1 = l / 4.0;
@@ -658,6 +662,9 @@
                           beats, maxWaveformVal, waveformVal, particle,
                           spectrumVal, l, i, j,
                           scene, spectrum, waveform, prevTime, time, bpm) {
+    // No spectrum for this vis
+    particle.spectrum = false;
+
     // Waveform 1 ---------------------------------------------------------
     var center1 = l / 2.0;
     var amp1 = l / 2.0;
@@ -707,8 +714,8 @@
     var maxSpectrumJ = l/3.0;
     var spectrumIdx = Math.round(spectrumVal * maxSpectrumJ);
     if (j == spectrumIdx && spectrumVal != 0) {
-      spectrumSound = 2.0 * (spectrumVal - thresholdSpectrum);
-      setParticleDecay(particle, spectrumSound, decayAcceleration, decaySpeed);
+      spectrumSound = 4.0 * (spectrumVal - thresholdSpectrum);
+      setParticleDecay(particle, spectrumSound, 4*decayAcceleration, decaySpeed);
       spectrumSound = 0;
       particle.spectrum = true;
     } else {
@@ -876,7 +883,6 @@
             moveParticle(particle, vNoise, 1.0);
           }
           particle.displacement = 0.0;
-          particle.spectrum = false;
         }
       }
     }
