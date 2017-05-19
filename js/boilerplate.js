@@ -172,13 +172,9 @@ function drawBackground(program, time, bpm, camera, theme) {
     var distance = camera.position[2];
     var vertexData = [
         -1.0, -1.0, 0.99,  // Lower left
-        0.0,  0.0,
         1.0, -1.0, 0.99,  // Lower right
-        0.0,  0.0,
         1.0,  1.0, 0.99,  // Top right
-        3.0,  3.0,
         -1.0,  1.0, 0.99,  // Top left
-        3.0,  3.0
     ];
     var vertexArray = new Float32Array(vertexData);
     var vertexBuffer = gl.createBuffer();
@@ -198,17 +194,11 @@ function drawBackground(program, time, bpm, camera, theme) {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexArray, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 
     var vertPositionLocation = gl.getAttribLocation(program, "vert_position");
     gl.enableVertexAttribArray(vertPositionLocation);
-    gl.vertexAttribPointer(vertPositionLocation, 3, gl.FLOAT, false, 4*5, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    var vertTextureLocation = gl.getAttribLocation(program, "vert_texCoord");
-    gl.enableVertexAttribArray(vertTextureLocation);
-    gl.vertexAttribPointer(vertTextureLocation, 2, gl.FLOAT, false, 4*5, 4*3);
+    gl.vertexAttribPointer(vertPositionLocation, 3, gl.FLOAT, false, 4*3, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
     var timeLocation = gl.getUniformLocation(program, "time");

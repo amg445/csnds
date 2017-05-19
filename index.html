@@ -309,22 +309,19 @@
 
   <script id="vertexShader--background" type="x-shader/x-vertex">
     attribute vec3 vert_position;
-    attribute vec2 vert_texCoord;
 
     uniform mat4 projection;
 
-    varying vec2 texCoord;
     varying vec3 position;
 
     void main() {
       gl_Position = vec4(vert_position, 1.0);
-      texCoord = vert_texCoord;
       position = vert_position;
     }
   </script>
 
   <script id="fragmentShader--background" type="x-shader/x-fragment">
-  precision mediump float;
+  precision highp float;
 
   uniform float time;
   uniform float bpm;
@@ -332,7 +329,6 @@
   uniform int theme;
   uniform vec2 resolution;
 
-  varying vec2 texCoord;
   varying vec3 position;
 
   // COLORS ~~
