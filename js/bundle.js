@@ -7,7 +7,7 @@ function getSongFromURL() {
   var song = hash.substring(1);
 
   if (song == "") {
-    song = 'https://soundcloud.com/verzache/conscious';
+    song = 'https://soundcloud.com/lidogotsongs/feel-it-still-lido-remix';
   }
 
   $('#js-songs option').each(function(){
