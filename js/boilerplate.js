@@ -129,6 +129,7 @@ function drawShape(gl, shape, camera, toWorld, disType, theme) {
 
     gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LESS);
+    gl.depthMask(gl.FALSE);
     gl.useProgram(program);
     gl.bindBuffer(gl.ARRAY_BUFFER, shape.vertexBuffer);
 
@@ -163,6 +164,7 @@ function drawShape(gl, shape, camera, toWorld, disType, theme) {
     }
 
     gl.useProgram(null);
+    gl.depthMask(gl.TRUE);
     gl.disable(gl.DEPTH_TEST);
 }
 
@@ -183,6 +185,7 @@ function drawBackground(program, time, bpm, camera, theme) {
 
     gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LESS);
+    gl.depthMask(gl.FALSE);
     gl.useProgram(program);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -229,5 +232,6 @@ function drawBackground(program, time, bpm, camera, theme) {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 
     gl.useProgram(null);
+    gl.depthMask(gl.FALSE);
     gl.disable(gl.DEPTH_TEST);
 }
