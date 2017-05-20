@@ -21,3 +21,8 @@ Project hosted at <a href="https://amg445.github.io/cs4621_final/">https://amg44
 
 ### Note
 Not all soundcloud songs work for some reason.  There is a known error in our vizualization where shadow block artifacts appear.  However, this has only been observed on certain computers.
+
+### Group Members
+- Andrew Grossfeld
+- Brandon Walker
+- Michael Gingras
