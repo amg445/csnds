@@ -16,7 +16,7 @@ To rebuild `js/modules.js`:
 
 
 ### Website
-Project hosted at <a href="https://amg445.github.io/cs4621_final/">https://amg445.github.io/cs4621_final/</a>
+Project hosted at <a href="https://amg445.github.io/cs4621_final/">https://amg445.github.io/csnds/</a>
 
 
 ### Note
