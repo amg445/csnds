@@ -169,7 +169,7 @@ function drawShape(gl, shape, camera, toWorld, disType, theme) {
     gl.disable(gl.DEPTH_TEST);
 }
 
-var d = 10.0;
+var d = 11.0;
 var vertexData = [
   -d, -d, 0.0,    // Lower Left
    d, -d, 0.0,    // Lower right
@@ -215,6 +215,11 @@ function drawBackground(program, time, bpm, camera, theme) {
 
     var projectionLocation = gl.getUniformLocation(program, "projection");
     gl.uniformMatrix4fv(projectionLocation, false, camera.projection);
+    
+    var toCamLocation = gl.getUniformLocation(program, "toCam");
+    var toCam = mat4.create();
+    mat4.invert(toCam, camera.toWorld);
+    gl.uniformMatrix4fv(toCamLocation, false, toCam);
 
     var themeLocation = gl.getUniformLocation(program, "theme");
     gl.uniform1i(themeLocation, theme);

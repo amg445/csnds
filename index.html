@@ -309,11 +309,12 @@
     attribute vec3 vert_position;
 
     uniform mat4 projection;
+    uniform mat4 toCam;
 
     varying vec3 position;
 
     void main() {
-      gl_Position = projection * vec4(vert_position, 1.0);
+      gl_Position = projection * toCam * vec4(vert_position, 1.0);
       position = vert_position;
     }
   </script>
@@ -349,9 +350,9 @@
   vec4 litepink = vec4(255.0,	182.0, 193.0, 255.0) / 255.0;
 
   void main() {
-    float radius = 3.5;
-    float width = 0.4;
-    float hardness = 0.1;
+    float radius = 1.5;
+    float width = 0.3;
+    float hardness = 0.4;
     float speed = 1.0;
 
     float pi = 3.14159265359;
@@ -374,12 +375,12 @@
     float r = radius + width * abs( cos( time * bpms * (pi/2.0) + (pi/2.0) + 0.2 ));
 
     // adjust by 5/3 to make circular
-    vec2 pos = 2.5 * position.xy * resolution / min(resolution.x, resolution.y);
+    vec2 pos = position.xy;
+    //vec2 pos = 2.5 * position.xy * resolution / min(resolution.x, resolution.y);
     float t = max(0.0, hardness * ((r * r) - (pos.x * pos.x) - (pos.y * pos.y)));
     //float t = max(0.0, hardness * ((r * r) - (25.0 * position.x * position.x) - (9.0 * position.y * position.y)));
     t = min(t, 1.0);
-    //gl_FragColor = (1.0 - t) * color1 + t *  color2;
-    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);;
+    gl_FragColor = (1.0 - t) * color1 + t *  color2;
   }
   </script>
 
@@ -1088,8 +1089,8 @@
     offset = [0, 0, 0];
 
     // Draw Scene
-    //drawScene(gl, scene, theme);
     drawBackground(background_shader, time, getBpm(), camera, theme);
+    drawScene(gl, scene, theme);
 
     // Reschedule the next frame.
     //prevTime = time;
