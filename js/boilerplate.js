@@ -164,32 +164,38 @@ function drawShape(gl, shape, camera, toWorld, disType, theme) {
     }
 
     gl.useProgram(null);
+    gl.depthRange(0.0, 1.0);
     gl.depthMask(gl.TRUE);
     gl.disable(gl.DEPTH_TEST);
 }
 
+var d = 10.0;
+var vertexData = [
+  -d, -d, 0.0,    // Lower Left
+   d, -d, 0.0,    // Lower right
+   d,  d, 0.0,    // Top right
+  -d,  d, 0.0     // Top left
+];
+//var vertexData = [
+    //-1.0, -1.0, 0.0,  // Lower left
+    //1.0, -1.0, 0.0,  // Lower right
+    //1.0,  1.0, 0.0,  // Top right
+    //-1.0,  1.0, 0.0,  // Top left
+//];
+var vertexArray = new Float32Array(vertexData);
+var indexData = [0, 1, 2, 0, 2, 3];
+var indexArray = new Uint16Array(indexData);
 function drawBackground(program, time, bpm, camera, theme) {
-    var distance = camera.position[2];
-    var vertexData = [
-        -1.0, -1.0, 0.99,  // Lower left
-        1.0, -1.0, 0.99,  // Lower right
-        1.0,  1.0, 0.99,  // Top right
-        -1.0,  1.0, 0.99,  // Top left
-    ];
-    var vertexArray = new Float32Array(vertexData);
-    var vertexBuffer = gl.createBuffer();
-
     gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LESS);
-    gl.depthMask(gl.FALSE);
+    //gl.depthMask(gl.FALSE);
     gl.useProgram(program);
 
+    var vertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, vertexArray, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-    var indexData = [0, 1, 2, 0, 2, 3];
-    var indexArray = new Uint16Array(indexData);
     var indexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexArray, gl.STATIC_DRAW);
@@ -207,8 +213,8 @@ function drawBackground(program, time, bpm, camera, theme) {
     var bpmLocation = gl.getUniformLocation(program, "bpm");
     gl.uniform1f(bpmLocation, bpm);
 
-    var distanceLocation = gl.getUniformLocation(program, "distance");
-    gl.uniform1f(distanceLocation, distance);
+    var projectionLocation = gl.getUniformLocation(program, "projection");
+    gl.uniformMatrix4fv(projectionLocation, false, camera.projection);
 
     var themeLocation = gl.getUniformLocation(program, "theme");
     gl.uniform1i(themeLocation, theme);
@@ -222,6 +228,6 @@ function drawBackground(program, time, bpm, camera, theme) {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 
     gl.useProgram(null);
-    gl.depthMask(gl.FALSE);
+    //gl.depthMask(gl.FALSE);
     gl.disable(gl.DEPTH_TEST);
 }
