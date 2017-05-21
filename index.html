@@ -302,8 +302,6 @@
       } else {
         gl_FragColor = color2;
       }
-
-
     }
   </script>
 
@@ -325,7 +323,6 @@
 
   uniform float time;
   uniform float bpm;
-  uniform float distance;
   uniform int theme;
   uniform vec2 resolution;
 
@@ -722,11 +719,11 @@
     // Spectrum (Frequency)
     var thresholdSpectrum = 0.0;
     var spectrumSound = 0;
-    var maxSpectrumJ = l/3.0;
+    var maxSpectrumJ = l * 2.0/5.0;
     var spectrumIdx = Math.round(spectrumVal * maxSpectrumJ);
     if (j == spectrumIdx && spectrumVal != 0) {
-      spectrumSound = 4.0 * (spectrumVal - thresholdSpectrum);
-      setParticleDecay(particle, spectrumSound, 4*decayAcceleration, decaySpeed);
+      spectrumSound = 2.0 * (spectrumVal - thresholdSpectrum);
+      setParticleDecay(particle, spectrumSound, 2.0*decayAcceleration, decaySpeed);
       spectrumSound = 0;
       particle.spectrum = true;
     } else {
@@ -994,7 +991,7 @@
   var background_shader = createGlslProgram(gl, "vertexShader--background", "fragmentShader--background");
   //var fft = null;
   //var sound = null;
-  var smoothing = 0;   // range: (0.0, 1.0), def: 0.8
+  var smoothing = 0.5;   // range: (0.0, 1.0), def: 0.8
   var bins = 64;   // range: [16, 1024], def: 1024 - MUST be power of 2
   var offset = [80,-350,0];   // offset for controlling camera movement
   var analyser;
@@ -1059,8 +1056,7 @@
     var theme = $('#js-colors').val();
 
     scene = getScene(scenetype);
-    gl.clearColor(0.0, 0.0, 0.0, 0.0);
-    //gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     if(canPlay) {
@@ -1086,8 +1082,7 @@
       }
     }
 
-
-    drawBackground(background_shader, time, getBpm(), camera, theme);
+    drawBackground(background_shader, time, getBpm(), theme);
 
     // Update Camera Position if it has been offset
     updateSceneOffset(scene, offset);
