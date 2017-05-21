@@ -168,8 +168,7 @@ function drawShape(gl, shape, camera, toWorld, disType, theme) {
     gl.disable(gl.DEPTH_TEST);
 }
 
-function drawBackground(program, time, bpm, camera, theme) {
-    var distance = camera.position[2];
+function drawBackground(program, time, bpm, theme) {
     var vertexData = [
         -1.0, -1.0, 0.99,  // Lower left
         1.0, -1.0, 0.99,  // Lower right
@@ -206,9 +205,6 @@ function drawBackground(program, time, bpm, camera, theme) {
 
     var bpmLocation = gl.getUniformLocation(program, "bpm");
     gl.uniform1f(bpmLocation, bpm);
-
-    var distanceLocation = gl.getUniformLocation(program, "distance");
-    gl.uniform1f(distanceLocation, distance);
 
     var themeLocation = gl.getUniformLocation(program, "theme");
     gl.uniform1i(themeLocation, theme);
