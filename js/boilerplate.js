@@ -166,35 +166,40 @@ function drawShape(gl, shape, camera, toWorld, disType, theme) {
     gl.disable(gl.DEPTH_TEST);
 }
 
-function drawBackground(program, time, bpm, theme) {
-    var vertexData = [
-        -1.0, -1.0, 0.99,  // Lower left
-        1.0, -1.0, 0.99,  // Lower right
-        1.0,  1.0, 0.99,  // Top right
-        -1.0,  1.0, 0.99,  // Top left
-    ];
-    var vertexArray = new Float32Array(vertexData);
-    var vertexBuffer = gl.createBuffer();
+var backgroundVertexData = [
+  -1.0, -1.0, 0.99,  // Lower left
+  1.0, -1.0, 0.99,  // Lower right
+  1.0,  1.0, 0.99,  // Top right
+  -1.0,  1.0, 0.99,  // Top left
+];
+var backgroundIndexData = [0, 1, 2, 0, 2, 3];
+function createBackground(gl) {
+    var backgroundShape = {};
 
+    backgroundShape.vertexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, backgroundShape.vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(backgroundVertexData), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    backgroundShape.indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, backgroundShape.indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(backgroundIndexData), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+
+    backgroundShape.indexLength = backgroundIndexData.length;
+
+    return backgroundShape;
+}
+
+function drawBackground(background, program, time, bpm, theme) {
     gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LESS);
     gl.depthMask(gl.FALSE);
     gl.useProgram(program);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, vertexArray, gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-    var indexData = [0, 1, 2, 0, 2, 3];
-    var indexArray = new Uint16Array(indexData);
-    var indexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexArray, gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-
+    gl.bindBuffer(gl.ARRAY_BUFFER, background.vertexBuffer);
     var vertPositionLocation = gl.getAttribLocation(program, "vert_position");
     gl.enableVertexAttribArray(vertPositionLocation);
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
     gl.vertexAttribPointer(vertPositionLocation, 3, gl.FLOAT, false, 4*3, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
@@ -211,7 +216,7 @@ function drawBackground(program, time, bpm, theme) {
     var resolutionLocation = gl.getUniformLocation(program, "resolution");
     gl.uniform2f(resolutionLocation, canvas.clientWidth, canvas.clientHeight);
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, background.indexBuffer);
     gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 

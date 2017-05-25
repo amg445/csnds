@@ -1032,6 +1032,7 @@
   // Create shape
   var cube = createShape(gl, basic_shader, cubeData, true);
   var wireframe = createShape(gl, basic_shader, cubeData, false);
+  var background = createBackground(gl);
 
   // Create scene
   var cubescene = createScene(camera, particles, cube);
@@ -1101,7 +1102,7 @@
       }
     }
 
-    drawBackground(background_shader, time, getBpm(), theme);
+    drawBackground(background, background_shader, time, getBpm(), theme);
 
     // Update Camera Position if it has been offset
     updateSceneOffset(scene, offset);
