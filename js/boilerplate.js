@@ -140,9 +140,7 @@ function drawShape(gl, shape, camera, toWorld, disType, theme) {
 
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "projection"), false, camera.projection);
     gl.uniformMatrix4fv(gl.getUniformLocation(program, "toWorld"), false, toWorld);
-    var toCam = mat4.create();
-    mat4.invert(toCam, camera.toWorld);
-    gl.uniformMatrix4fv(gl.getUniformLocation(program, "toCam"), false, toCam);
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, "toCam"), false, camera.toCam);
 
     var waveformLocation = gl.getUniformLocation(program, "waveform");
     gl.uniform1f(waveformLocation, disType[0]);

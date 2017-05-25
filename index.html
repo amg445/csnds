@@ -928,6 +928,22 @@
   }
 
   /**
+   * update [camera.toWorld] matrix and create [camera.toCam] matrix to be the
+   * inverse of [camera.toWorld]
+   */
+  function updateCamToWorldMatrix(camera) {
+    // update [camera.toWorld] matrix
+    updateToWorldMatrix(camera);
+
+    // update [camera.toCam] matrix
+    var toCam = mat4.create();
+    mat4.invert(toCam, camera.toWorld);
+    camera.toCam = toCam;
+
+    return camera;
+  }
+
+  /**
    * update [scene] to move camera around by [offset]
    */
   function updateSceneOffset(scene, offset) {
@@ -970,7 +986,7 @@
     } else if (scene.camera.position[2] > max) {
       scene.camera.position[2] = max;
     }
-    updateToWorldMatrix(scene.camera);
+    updateCamToWorldMatrix(scene.camera);
   }
 
   function createPerspectiveMatrix() {
@@ -1008,7 +1024,7 @@
   camera.projection = perspectiveMatrix;
   camera.position = vec3.fromValues(0, 0, 3);
   camera.scale = [1,1,1];
-  updateToWorldMatrix(camera);
+  updateCamToWorldMatrix(camera);
 
   // Create particles
   var particles = createParticleSheet(bins, bins, -1, 1, -1, 1);
@@ -1074,6 +1090,7 @@
             offset[1] = -0.5*rotationSpeed;    // 1 is rotation around y speed right now
           }
         }
+        updateCamToWorldMatrix(scene.camera);
 
         inc += .5;
         if(Math.abs(prevTime - time) > 350) prevTime = time;
